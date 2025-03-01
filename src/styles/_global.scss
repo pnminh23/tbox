@@ -1,0 +1,88 @@
+@import './color';
+@import './fontsGloball';
+// :root {
+// 	--toastify-toast-min-height: 56px;
+// 	--toastify-toast-width: 400px;
+// }
+
+html,
+body {
+	padding: 0;
+	margin: 0;
+	font-family: "Roboto";
+	color: var(--text-color);
+	background-color: var(--bg);
+
+	::-moz-selection {
+		color: var(--light);
+		background: var(--primary);
+	}
+
+	::selection {
+		color: var(--light);
+		background: var(--primary);
+	}
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+* {
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	height: 100%;
+}
+body {
+	line-height: 1.5;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+	display: block;
+	max-width: 100%;
+}
+input,
+button,
+textarea,
+select {
+	font: inherit;
+	outline: none;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	overflow-wrap: break-word;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+.container{
+	margin: auto ;
+    max-width: 1440px;
+}
