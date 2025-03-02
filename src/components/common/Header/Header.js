@@ -112,7 +112,7 @@ const Header = () => {
                     modules={[Navigation, Autoplay]}
                     speed={1000}
                     slidesPerView={1}
-                    autoplay={{ delay: 5000 }}
+                    // autoplay={{ delay: 5000 }}
                     loop={true}
                     // grabCursor={true}s
                     draggable={true}

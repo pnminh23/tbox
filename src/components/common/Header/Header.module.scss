@@ -1,9 +1,10 @@
 
-
 .header{
     background: var(--dark);
     // background-color: red;
-
+    :global(.swiper-slide) {
+        height: auto !important; /* Ghi đè height mặc định */
+      }
 }
 
 .container{
@@ -101,7 +102,7 @@
                     right: -10px;
                     top: 50%;
                     transform: translateY(-50%);
-                    width: 2px;
+                    width: 1px;
                     height: 15px;
                     background-color: #ccc;
                   }
@@ -117,8 +118,8 @@
     position: relative;
     img{
         width: 100%;
-        height: 500px;
-        object-fit: fill;
+        height:100%;
+        object-fit: cover;
     }
     .prevButton, 
     .nextButton {
@@ -147,6 +148,8 @@
         color: #fff;
         background-color: rgba(0, 0, 0, 0.7);
     }
-    
+    .swiper-slide{
+        height: auto !important;
+    }
 }
 
