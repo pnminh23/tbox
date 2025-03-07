@@ -11,7 +11,7 @@
   "dependencies": {
     "next": "13.5.8",
     "react": "^18",
-    "react-dom": "^18",
+    "react-dom": "^18.1.08",
     "react-icon": "^1.0.0",
     "react-icons": "^5.5.0",
     "sass": "^1.85.1",

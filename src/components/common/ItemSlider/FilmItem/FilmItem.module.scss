@@ -1,0 +1,13 @@
+.content{
+    background-color: #151515;
+    padding: 10px;
+    h5{
+        white-space: nowrap;       /* Ngăn chữ xuống dòng */
+        overflow: hidden;          /* Ẩn phần nội dung bị tràn */
+        text-overflow: ellipsis;   /* Hiển thị dấu "..." khi nội dung bị cắt */
+        // height: 50px;
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+}

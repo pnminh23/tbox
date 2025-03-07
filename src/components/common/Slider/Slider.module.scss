@@ -1,0 +1,114 @@
+.sliderContainer{
+    margin: 20px;
+    
+}
+.swiperSlider{
+    display: flex;
+    column-gap: 10px;
+    flex-direction: column-reverse;
+    .sliderTop{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        height: 50px;
+        padding: 0 10px;
+        margin: 30px 0 20px;
+        .navLeft{
+            display: flex;
+            align-items: center;
+            svg{
+                margin-left: 10px;
+                font-size: 28px;
+                // line-height: 50px;
+            }
+            .title{
+                // align-items: center;
+                font-size: 24px;
+                text-transform: uppercase;
+                position: relative;
+                padding-left: 15px;
+                line-height: 50px;
+                transition: all 0.2s ease-in-out ;
+                &:hover{
+                    color: var(--hightlight);
+                }
+                &::after{
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    border-radius: 3px;
+                    left: 0;
+                    width: 5px;
+                    height: 50px;
+                    background-color: var(--hightlight);
+                }
+    
+            }
+        }
+        .navRight{
+            display: flex;
+            
+            .prevButton, 
+            .nextButton {
+                // z-index: 99;
+                // color: rgb(255, 255, 255);
+                // position: absolute;
+                top: 0;
+                color: #ccc;
+                background-color: rgba(0, 0, 0, 0.1);
+                width: 40px;
+                height: 40px;
+                border: 3px solid #fff;
+                border-radius: 5px;
+                margin: 0 5px;
+                z-index: 2;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease-out;
+            }
+            .prevButton{
+                // left: 50;
+                font-size: 25px;
+            }
+            .nextButton{
+                // right: 0;
+                font-size: 25px;
+        
+            }
+        
+            .prevButton:hover, 
+            .nextButton:hover {
+                border: 3px solid var(--hightlight);
+                color: var(--hightlight);
+                background-color: rgba(0, 0, 0, 0.7);
+            }
+        }
+    }
+}
+.item{
+    position: relative;
+    transition: transform 0.2s  ease-in-out;
+
+    &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .image{
+        position: relative;
+        width: 100%;
+        height: 300px;
+    }
+    padding: 0 10px;
+    img{
+        height: 350px;
+    }
+    h5{
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    
+}

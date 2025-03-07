@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-}
+    images: {
+        domains: ["phimimg.com", "phimapi.com"], // Thêm domain ảnh API
+    },
+    reactStrictMode: true,
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

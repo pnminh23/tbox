@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
-import logoSrc from "../../../../public/static/img/logo.webp";
+import logoSrc from "../../../../public/static/img/logoBOX.svg";
 import banerSrc1 from "../../../../public/static/img/slide-img1.webp";
 import banerSrc2 from "../../../../public/static/img/slide-img2.webp";
 import banerSrc3 from "../../../../public/static/img/slide-img3.webp";
@@ -101,8 +101,8 @@ const Header = () => {
                             </div>
                         </div>
                         <div className={style.login}>
-                            <Link href="#">Đăng ký</Link>
-                            <Link href="#">Đăng nhập</Link>
+                            <Link href="/auth/register">Đăng ký</Link>
+                            <Link href="/auth/login">Đăng nhập</Link>
                         </div>
                     </div>
                 </div>
@@ -112,7 +112,7 @@ const Header = () => {
                     modules={[Navigation, Autoplay]}
                     speed={1000}
                     slidesPerView={1}
-                    // autoplay={{ delay: 5000 }}
+                    autoplay={{ delay: 5000 }}
                     loop={true}
                     // grabCursor={true}s
                     draggable={true}
@@ -135,13 +135,13 @@ const Header = () => {
                     </div>
 
                     <SwiperSlide>
-                        <Image src={banerSrc1} />
+                        <Image src={banerSrc1} alt="banner" priority={true} />
                     </SwiperSlide>
                     <SwiperSlide>
-                        <Image src={banerSrc2} />
+                        <Image src={banerSrc2} alt="banner" priority={true} />
                     </SwiperSlide>
                     <SwiperSlide>
-                        <Image src={banerSrc3} />
+                        <Image src={banerSrc3} alt="banner" priority={true} />
                     </SwiperSlide>
                 </Swiper>
             </div>
