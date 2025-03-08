@@ -5,7 +5,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    h3 {
+        text-transform: uppercase;
+    }
 }
+
 .login {
     padding: 35px 0;
     width: 650px;
@@ -19,13 +23,20 @@
     flex-direction: column;
     align-items: center;
     row-gap: 25px;
-    .password {
+    .relative {
         position: relative;
     }
+    .justyfiContentBetween {
+        justify-content: space-between !important;
+    }
     .groupItem {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 450px;
         .input {
             font-size: 16px;
-            width: 453px;
+            width: 100%;
             height: 50px;
             border-radius: 30px;
             background: #2c2c2c;
@@ -45,17 +56,146 @@
         .eye {
             position: absolute;
             right: 15px;
-            top: 20px;
+            top: 50%;
+            transform: translateY(-50%);
             font-size: 25px;
             cursor: pointer;
             svg {
                 color: #ccc;
+                transition: color 0.2s;
                 &:hover {
                     color: #fff;
                 }
             }
 
             // z-index: 99;
+        }
+
+        .validation {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            .tooltip {
+                width: 150px;
+                visibility: hidden;
+                background-color: #f44336;
+                color: #fff;
+                text-align: center;
+                padding: 5px 10px;
+                border-radius: 5px;
+                position: absolute;
+                top: 50%;
+                left: 30px;
+                transform: translateY(-50%);
+                // white-space: nowrap;
+                font-size: 12px;
+                box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+                z-index: 10;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            &:hover .tooltip {
+                visibility: visible;
+                opacity: 1;
+            }
+            svg {
+                width: 25px;
+                height: 25px;
+                color: red;
+                // background-color: red;
+            }
+        }
+
+        .checkboxWrapper {
+            --size: 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            input {
+                border: 0;
+                clip: rect(0 0 0 0);
+                height: 1px;
+                margin: -1px;
+                overflow: hidden;
+                padding: 0;
+                position: absolute;
+                width: 1px;
+            }
+
+            input:checked ~ svg {
+                height: calc(var(--size) * 0.6);
+                animation: drawCheckbox 0.2s ease-in-out forwards;
+            }
+
+            label {
+                color: #fff;
+                line-height: var(--size);
+                cursor: pointer;
+                position: relative;
+
+                &:after {
+                    content: "";
+                    height: var(--size);
+                    width: var(--size);
+                    margin-right: 8px;
+                    float: left;
+                    border: 2px solid #fff;
+                    border-radius: 3px;
+                    transition: 0.15s all ease-out;
+                }
+            }
+
+            svg {
+                stroke: #fff;
+                stroke-width: 3px;
+                height: 0;
+                width: calc(var(--size) * 0.6);
+                position: absolute;
+                left: calc(var(--size) * 0.21);
+                top: calc(var(--size) * 0.2);
+                stroke-dasharray: 33;
+            }
+        }
+
+        @keyframes drawCheckbox {
+            0% {
+                stroke-dashoffset: 33;
+            }
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+        a {
+            color: var(--hightlight);
+        }
+        .dividerText {
+            color: #ccc;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            padding: 0 15px;
+
+            &::before,
+            &::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background-color: #888;
+                position: absolute;
+                top: 50%;
+                width: 100%;
+            }
+
+            &::before {
+                left: -100%;
+            }
+
+            &::after {
+                right: -100%;
+            }
         }
         button {
             width: 453px;
@@ -65,12 +205,28 @@
             font-weight: 700;
             letter-spacing: 0.5px;
             text-transform: uppercase;
+            border: none;
+            // transition: transform 0.3s ease-in-out;
+            cursor: pointer;
         }
         .buttonLogin {
             background: linear-gradient(90deg, #efeb77 0%, #f3b817 100%);
         }
         .buttonGG {
             background-color: #fff;
+            display: flex;
+            column-gap: 10px;
+            flex-direction: row-reverse;
+            justify-content: center;
+            align-items: center;
+            svg {
+                width: 30px;
+                height: 30px;
+            }
         }
     }
+}
+.checked {
+    // border: 1px solid red !important;
+    box-shadow: 0 0 0 1px red !important;
 }
