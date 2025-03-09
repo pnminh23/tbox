@@ -1,12 +1,8 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay } from "swiper/modules";
+
 import logoSrc from "../../../../public/static/img/logoBOX.svg";
-import banerSrc1 from "../../../../public/static/img/slide-img1.webp";
-import banerSrc2 from "../../../../public/static/img/slide-img2.webp";
-import banerSrc3 from "../../../../public/static/img/slide-img3.webp";
-import { AiOutlineSearch, AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+import { AiOutlineSearch } from "react-icons/ai";
 import Image from "next/image";
 import Link from "next/link";
 import style from "./Header.module.scss";
@@ -106,44 +102,6 @@ const Header = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className={style.banner}>
-                <Swiper
-                    modules={[Navigation, Autoplay]}
-                    speed={1000}
-                    slidesPerView={1}
-                    autoplay={{ delay: 5000 }}
-                    loop={true}
-                    // grabCursor={true}s
-                    draggable={true}
-                    navigation={{
-                        prevEl: `.${style.prevButton}`,
-                        nextEl: `.${style.nextButton}`,
-                    }}
-                    // onSwiper={(swiper) => {
-                    //     setTimeout(() => {
-                    //         swiper.navigation.init();
-                    //         swiper.navigation.update();
-                    //     });
-                    // }}
-                >
-                    <div className={style.prevButton}>
-                        <AiOutlineLeft />
-                    </div>
-                    <div className={style.nextButton}>
-                        <AiOutlineRight />
-                    </div>
-
-                    <SwiperSlide>
-                        <Image src={banerSrc1} alt="banner" priority={true} />
-                    </SwiperSlide>
-                    <SwiperSlide>
-                        <Image src={banerSrc2} alt="banner" priority={true} />
-                    </SwiperSlide>
-                    <SwiperSlide>
-                        <Image src={banerSrc3} alt="banner" priority={true} />
-                    </SwiperSlide>
-                </Swiper>
             </div>
         </div>
     );

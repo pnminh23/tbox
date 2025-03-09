@@ -5,28 +5,21 @@ import {
     AiOutlineRight,
     AiOutlineDoubleRight,
 } from "react-icons/ai";
-import img1 from "../../../../public/static/img/item1.jpg";
-import img2 from "../../../../public/static/img/item2.webp";
-import img3 from "../../../../public/static/img/item3.jpg";
 import style from "./Slider.module.scss";
-import Image from "next/image";
 import { useState, useEffect } from "react";
-import FilmItem from "../ItemSlider/FilmItem";
 
-const Slider = () => {
-    const [films, setFilms] = useState([]);
+const Slider = ({ apiUrl, renderItem, title = "Slider", slidesPerView }) => {
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchFilms = async () => {
+        const fetchData = async () => {
             try {
-                const response = await fetch(
-                    "https://phimapi.com/v1/api/danh-sach/phim-le"
-                );
+                const response = await fetch(apiUrl);
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const result = await response.json();
-
                 // Kiểm tra dữ liệu trả về có đúng không
                 console.log("API Response:", result);
 
@@ -35,17 +28,19 @@ const Slider = () => {
                     result.data &&
                     result.data.items
                 ) {
-                    setFilms(result.data.items);
+                    setItems(result.data.items);
                 } else {
                     console.error("Dữ liệu API không hợp lệ");
                 }
             } catch (error) {
                 console.error("Lỗi khi fetch dữ liệu:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchFilms();
-    }, []);
+        fetchData();
+    }, [apiUrl]);
 
     return (
         <div className={style.sliderContainer}>
@@ -53,7 +48,7 @@ const Slider = () => {
                 className={style.swiperSlider}
                 modules={[Navigation, Autoplay]}
                 speed={1000}
-                slidesPerView={5}
+                slidesPerView={slidesPerView}
                 autoplay={{ delay: 7000 }}
                 loop={true}
                 // grabCursor={true}s
@@ -62,17 +57,17 @@ const Slider = () => {
                     prevEl: `.${style.prevButton}`,
                     nextEl: `.${style.nextButton}`,
                 }}
-                breakpoints={{
-                    320: { slidesPerView: 1 }, // Màn hình nhỏ (điện thoại)
-                    480: { slidesPerView: 2 }, // Màn hình nhỏ hơn (điện thoại ngang)
-                    768: { slidesPerView: 3 }, // Tablet
-                    1024: { slidesPerView: 4 }, // Laptop nhỏ
-                    1280: { slidesPerView: 5 }, // Desktop
-                }}
+                // breakpoints={{
+                //     320: { slidesPerView: 1 }, // Màn hình nhỏ (điện thoại)
+                //     480: { slidesPerView: 2 }, // Màn hình nhỏ hơn (điện thoại ngang)
+                //     768: { slidesPerView: 3 }, // Tablet
+                //     1024: { slidesPerView: 4 }, // Laptop nhỏ
+                //     1280: { slidesPerView: 5 }, // Desktop
+                // }}
             >
                 <div className={style.sliderTop}>
                     <div className={style.navLeft}>
-                        <h3 className={style.title}>Phim hot tại TBOX</h3>
+                        <h3 className={style.title}>{title}</h3>
                         <AiOutlineDoubleRight />
                     </div>
 
@@ -86,24 +81,14 @@ const Slider = () => {
                     </div>
                 </div>
 
-                {films.length > 0 ? (
-                    films.map((item) => (
+                {loading ? (
+                    <p>Đang tải dữ liệu...</p>
+                ) : (
+                    items.map((item) => (
                         <SwiperSlide key={item._id}>
-                            <div className={style.item}>
-                                <div className={style.image}>
-                                    <Image
-                                        src={`https://phimimg.com//${item.poster_url}`}
-                                        alt={item.origin_name}
-                                        fill
-                                        objectFit="cover"
-                                    />
-                                </div>
-                                <FilmItem film={item} />
-                            </div>
+                            {renderItem(item)}
                         </SwiperSlide>
                     ))
-                ) : (
-                    <p>Đang tải dữ liệu...</p>
                 )}
             </Swiper>
         </div>

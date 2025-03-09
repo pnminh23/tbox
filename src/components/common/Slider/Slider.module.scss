@@ -1,12 +1,11 @@
-.sliderContainer{
-    margin: 20px;
-    
+.sliderContainer {
+    // margin: 20px;
 }
-.swiperSlider{
+.swiperSlider {
     display: flex;
     column-gap: 10px;
     flex-direction: column-reverse;
-    .sliderTop{
+    .sliderTop {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -14,26 +13,26 @@
         height: 50px;
         padding: 0 10px;
         margin: 30px 0 20px;
-        .navLeft{
+        .navLeft {
             display: flex;
             align-items: center;
-            svg{
+            svg {
                 margin-left: 10px;
                 font-size: 28px;
                 // line-height: 50px;
             }
-            .title{
+            .title {
                 // align-items: center;
                 font-size: 24px;
                 text-transform: uppercase;
                 position: relative;
                 padding-left: 15px;
                 line-height: 50px;
-                transition: all 0.2s ease-in-out ;
-                &:hover{
+                transition: all 0.2s ease-in-out;
+                &:hover {
                     color: var(--hightlight);
                 }
-                &::after{
+                &::after {
                     content: "";
                     position: absolute;
                     top: 0;
@@ -43,13 +42,12 @@
                     height: 50px;
                     background-color: var(--hightlight);
                 }
-    
             }
         }
-        .navRight{
+        .navRight {
             display: flex;
-            
-            .prevButton, 
+
+            .prevButton,
             .nextButton {
                 // z-index: 99;
                 // color: rgb(255, 255, 255);
@@ -68,17 +66,16 @@
                 justify-content: center;
                 transition: all 0.3s ease-out;
             }
-            .prevButton{
+            .prevButton {
                 // left: 50;
                 font-size: 25px;
             }
-            .nextButton{
+            .nextButton {
                 // right: 0;
                 font-size: 25px;
-        
             }
-        
-            .prevButton:hover, 
+
+            .prevButton:hover,
             .nextButton:hover {
                 border: 3px solid var(--hightlight);
                 color: var(--hightlight);
@@ -86,29 +83,4 @@
             }
         }
     }
-}
-.item{
-    position: relative;
-    transition: transform 0.2s  ease-in-out;
-
-    &:hover {
-        transform: scale(1.05);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .image{
-        position: relative;
-        width: 100%;
-        height: 300px;
-    }
-    padding: 0 10px;
-    img{
-        height: 350px;
-    }
-    h5{
-        font-size: 16px;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-    
 }
