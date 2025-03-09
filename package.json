@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@svgr/webpack": "^8.1.0",
-    "next": "13.2.6",
+    "next": "^13.4.0",
     "react": "^18",
     "react-dom": "^18.1.08",
     "react-icon": "^1.0.0",
