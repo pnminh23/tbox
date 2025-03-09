@@ -8,7 +8,14 @@ import {
 import style from "./Slider.module.scss";
 import { useState, useEffect } from "react";
 
-const Slider = ({ apiUrl, renderItem, title = "Slider", slidesPerView }) => {
+const Slider = ({
+    apiUrl,
+    renderItem,
+    title = "Slider",
+    slidesPerView,
+    autoplay = false,
+    slidesPerGroup = 1,
+}) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -49,14 +56,19 @@ const Slider = ({ apiUrl, renderItem, title = "Slider", slidesPerView }) => {
                 modules={[Navigation, Autoplay]}
                 speed={1000}
                 slidesPerView={slidesPerView}
-                autoplay={{ delay: 7000 }}
                 loop={true}
+                slidesPerGroup={slidesPerGroup}
                 // grabCursor={true}s
                 draggable={true}
                 navigation={{
                     prevEl: `.${style.prevButton}`,
                     nextEl: `.${style.nextButton}`,
                 }}
+                autoplay={
+                    autoplay
+                        ? { delay: 7000, disableOnInteraction: false }
+                        : false
+                }
                 // breakpoints={{
                 //     320: { slidesPerView: 1 }, // Màn hình nhỏ (điện thoại)
                 //     480: { slidesPerView: 2 }, // Màn hình nhỏ hơn (điện thoại ngang)

@@ -1,5 +1,6 @@
 import style from "./FilmItem.module.scss";
 import Image from "next/image";
+import Link from "next/link";
 
 const FilmItem = ({ film }) => {
     return (
@@ -12,6 +13,14 @@ const FilmItem = ({ film }) => {
                     objectFit="cover"
                 />
             </div>
+            <div className={style.overlay}></div>
+            <Link href="/dat-hang" className={style.orderButton}>
+                Đặt phòng xem ngay
+            </Link>
+            {/* Lớp overlay khi hover */}
+
+            {/* Nút đặt hàng */}
+
             <div className={style.content}>
                 <h5>{film.origin_name}</h5>
                 <p>{film.category[0].name}</p>

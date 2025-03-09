@@ -16,6 +16,7 @@
         .navLeft {
             display: flex;
             align-items: center;
+            transition: all 0.2s ease-in-out;
             svg {
                 margin-left: 10px;
                 font-size: 28px;
@@ -28,10 +29,7 @@
                 position: relative;
                 padding-left: 15px;
                 line-height: 50px;
-                transition: all 0.2s ease-in-out;
-                &:hover {
-                    color: var(--hightlight);
-                }
+
                 &::after {
                     content: "";
                     position: absolute;
@@ -42,6 +40,9 @@
                     height: 50px;
                     background-color: var(--hightlight);
                 }
+            }
+            &:hover {
+                color: var(--hightlight);
             }
         }
         .navRight {

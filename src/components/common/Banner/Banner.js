@@ -3,9 +3,9 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import Image from "next/image";
-import banerSrc1 from "../../../../public/static/img/slide-img1.webp";
-import banerSrc2 from "../../../../public/static/img/slide-img2.webp";
-import banerSrc3 from "../../../../public/static/img/slide-img3.webp";
+import banerSrc1 from "../../../../public/static/img/banner/slide-img1.webp";
+import banerSrc2 from "../../../../public/static/img/banner/slide-img2.webp";
+import banerSrc3 from "../../../../public/static/img/banner/slide-img3.webp";
 const Banner = () => {
     return (
         <div className={style.banner}>

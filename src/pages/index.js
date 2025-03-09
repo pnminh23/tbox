@@ -1,12 +1,13 @@
 import Head from "next/head";
 // import Image from "next/image";
-import { Inter } from "next/font/google";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import Slider from "@/components/common/Slider";
 import FilmItem from "@/components/common/ItemSlider/FilmItem";
 import Banner from "@/components/common/Banner";
 import BoxItem from "@/components/common/ItemSlider/BoxItem";
+import { Inter } from "next/font/google";
+import HomePage from "@/components/page/HomePage";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
@@ -24,25 +25,7 @@ export default function Home() {
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <div>
-                <Header />
-                <Banner />
-                <div className="container">
-                    <Slider
-                        apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
-                        slidesPerView={5}
-                        renderItem={(film) => <FilmItem film={film} />}
-                    />
-
-                    <Slider
-                        apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
-                        title="Hệ thống phòng tại PNM - BOX"
-                        slidesPerView={3}
-                        renderItem={(box) => <BoxItem box={box} />}
-                    />
-                </div>
-                <Footer />
-            </div>
+            <HomePage />
         </>
     );
 }

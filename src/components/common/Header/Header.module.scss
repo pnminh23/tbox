@@ -1,6 +1,11 @@
 @import "../../../styles/breakpoints";
 
 .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    z-index: 99;
     background: var(--dark);
     // background-color: red;
     :global(.swiper-slide) {
