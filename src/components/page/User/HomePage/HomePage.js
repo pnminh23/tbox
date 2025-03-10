@@ -5,20 +5,22 @@ import Slider from "@/components/common/Slider";
 import FilmItem from "@/components/common/ItemSlider/FilmItem";
 import Banner from "@/components/common/Banner";
 import BoxItem from "@/components/common/ItemSlider/BoxItem";
-import imgContent1 from "../../../../public/static/img/imgContent1.webp";
-import img2Content1 from "../../../../public/static/img/img2Content1.jpg";
+import Button from "@/components/common/Button/Button";
+import imgContent1 from "@public/static/img/imgContent1.webp";
+import img2Content1 from "@public/static/img/img2Content1.jpg";
 import { AiOutlineCheck, AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
-import decorImg1 from "../../../../public/static/img/decor/1.webp";
-import decorImg2 from "../../../../public/static/img/decor/2.webp";
-import decorImg3 from "../../../../public/static/img/decor/3.webp";
-import decorImg4 from "../../../../public/static/img/decor/4.webp";
-import menu1 from "../../../../public/static/img/menuItem/menu1.jpg";
-import menu2 from "../../../../public/static/img/menuItem/menu2.jpg";
-import menu3 from "../../../../public/static/img/menuItem/menu3.jpg";
-import comboDat from "../../../../public/static/img/menuItem/comboDating.jpg";
-import backgroundContent3 from "../../../../public/static/img/menuItem/background.jpg";
+import decorImg1 from "@public/static/img/decor/1.webp";
+import decorImg2 from "@public/static/img/decor/2.webp";
+import decorImg3 from "@public/static/img/decor/3.webp";
+import decorImg4 from "@public/static/img/decor/4.webp";
+import menu1 from "@public/static/img/menuItem/menu1.jpg";
+import menu2 from "@public/static/img/menuItem/menu2.jpg";
+import menu3 from "@public/static/img/menuItem/menu3.jpg";
+import comboDat from "@public/static/img/menuItem/comboDating.jpg";
+// import backgroundContent3 from "@public/static/img/menuItem/background.jpg";
+import clsx from "clsx";
 import { useRef, useEffect } from "react";
 import Image from "next/image";
 const Home = () => {
@@ -99,7 +101,16 @@ const Home = () => {
                                 <AiOutlineCheck />
                             </li>
                         </ul>
-                        <button className={style.btn}>Đặt phòng</button>
+                        <Button
+                            uppercase
+                            p_10_24
+                            w_fit
+                            rounded_10
+                            redLinear
+                            bold
+                        >
+                            Đặt phòng
+                        </Button>
                     </div>
                 </div>
             </div>

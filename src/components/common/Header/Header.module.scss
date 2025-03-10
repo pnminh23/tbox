@@ -7,6 +7,11 @@
     width: 100vw;
     z-index: 99;
     background: var(--dark);
+    // ::before {
+    //     content: "";
+    //     display: block;
+    //     height: 80px;
+    // }
     // background-color: red;
     :global(.swiper-slide) {
         height: auto !important; /* Ghi đè height mặc định */

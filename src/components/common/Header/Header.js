@@ -38,14 +38,12 @@ const Header = () => {
                             </li>
                             <li
                                 className={
-                                    activePath === "/danh-sach-phim"
+                                    activePath === "/listFilm"
                                         ? style.active
                                         : ""
                                 }
                             >
-                                <Link href="/danh-sach-phim">
-                                    Danh sách phim
-                                </Link>
+                                <Link href="/listFilm">Danh sách phim</Link>
                             </li>
                             <li
                                 className={

@@ -7,6 +7,7 @@ import {
 } from "react-icons/ai";
 import style from "./Slider.module.scss";
 import { useState, useEffect } from "react";
+import clsx from "clsx";
 
 const Slider = ({
     apiUrl,
