@@ -51,6 +51,21 @@ const Slider = ({
 
     return (
         <div className={style.sliderContainer}>
+            <div className={style.sliderTop}>
+                <div className={style.navLeft}>
+                    <h3 className={style.title}>{title}</h3>
+                    <AiOutlineDoubleRight />
+                </div>
+
+                <div className={style.navRight}>
+                    <div className={style.prevButton}>
+                        <AiOutlineLeft />
+                    </div>
+                    <div className={style.nextButton}>
+                        <AiOutlineRight />
+                    </div>
+                </div>
+            </div>
             <Swiper
                 className={style.swiperSlider}
                 modules={[Navigation, Autoplay]}
@@ -77,22 +92,6 @@ const Slider = ({
                 //     1280: { slidesPerView: 5 }, // Desktop
                 // }}
             >
-                <div className={style.sliderTop}>
-                    <div className={style.navLeft}>
-                        <h3 className={style.title}>{title}</h3>
-                        <AiOutlineDoubleRight />
-                    </div>
-
-                    <div className={style.navRight}>
-                        <div className={style.prevButton}>
-                            <AiOutlineLeft />
-                        </div>
-                        <div className={style.nextButton}>
-                            <AiOutlineRight />
-                        </div>
-                    </div>
-                </div>
-
                 {loading ? (
                     <p>Đang tải dữ liệu...</p>
                 ) : (

@@ -1,0 +1,67 @@
+.container {
+    margin-top: 30px;
+    width: 100%;
+    height: 250px;
+    background-color: #151515;
+    .footer {
+        padding: 20px 0;
+        display: flex;
+        flex-wrap: wrap;
+        .logo {
+            width: 25%;
+            padding: 0 20px;
+            img {
+                height: auto;
+                width: 240px;
+            }
+        }
+        .listBranch {
+            width: 50%;
+            padding: 0 20px;
+
+            .listBranchctn {
+                display: flex;
+                justify-content: space-between;
+                ul {
+                    width: 50%;
+                    padding: 10px 20px;
+                    li {
+                        list-style: none;
+                        font-size: 16px;
+                        margin-bottom: 10px;
+                    }
+                }
+            }
+        }
+        .contact {
+            width: 25%;
+            padding: 0 20px;
+            .listContact {
+                margin-top: 10px;
+                display: flex;
+                column-gap: 20px;
+                .ico {
+                    width: 50px;
+                    height: 50px;
+                    background-color: #1e1e1e;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 50%;
+                    transition: all 0.5s;
+                    &:hover {
+                        background-color: #fff;
+
+                        a {
+                            color: #151515;
+                        }
+                    }
+                }
+                a {
+                    font-size: 25px;
+                    color: #fff;
+                }
+            }
+        }
+    }
+}

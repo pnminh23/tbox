@@ -1,10 +1,4 @@
 .sliderContainer {
-    // margin: 20px;
-}
-.swiperSlider {
-    display: flex;
-    column-gap: 10px;
-    flex-direction: column-reverse;
     .sliderTop {
         display: flex;
         justify-content: space-between;
@@ -84,4 +78,5 @@
             }
         }
     }
+    // margin: 20px;
 }

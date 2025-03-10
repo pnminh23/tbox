@@ -7,8 +7,23 @@ import Banner from "@/components/common/Banner";
 import BoxItem from "@/components/common/ItemSlider/BoxItem";
 import imgContent1 from "../../../../public/static/img/imgContent1.webp";
 import img2Content1 from "../../../../public/static/img/img2Content1.jpg";
+import { AiOutlineCheck, AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay } from "swiper/modules";
+import decorImg1 from "../../../../public/static/img/decor/1.webp";
+import decorImg2 from "../../../../public/static/img/decor/2.webp";
+import decorImg3 from "../../../../public/static/img/decor/3.webp";
+import decorImg4 from "../../../../public/static/img/decor/4.webp";
+import menu1 from "../../../../public/static/img/menuItem/menu1.jpg";
+import menu2 from "../../../../public/static/img/menuItem/menu2.jpg";
+import menu3 from "../../../../public/static/img/menuItem/menu3.jpg";
+import comboDat from "../../../../public/static/img/menuItem/comboDating.jpg";
+import backgroundContent3 from "../../../../public/static/img/menuItem/background.jpg";
+import { useRef, useEffect } from "react";
 import Image from "next/image";
 const Home = () => {
+    const prevRef = useRef(null);
+    const nextRef = useRef(null);
     return (
         <div>
             <Header />
@@ -58,6 +73,99 @@ const Home = () => {
                 <div className={style.utilities}>
                     <div className={style.image}>
                         <Image src={img2Content1} alt="ảnh nhân viên" />
+                    </div>
+                    <div className={style.contentUtilities}>
+                        <ul>
+                            <li>
+                                Thiết bị hiện đại <AiOutlineCheck />
+                            </li>
+                            <li>
+                                vệ sinh sạch sẽ <AiOutlineCheck />
+                            </li>
+                            <li>
+                                bảo mật riêng tư cam kết 100% ko camera
+                                <AiOutlineCheck />
+                            </li>
+                            <li>
+                                Tài khoản Youtube, Netflix, Fpt Play Prenium
+                                <AiOutlineCheck />
+                            </li>
+                            <li>
+                                Bảo đảm vệ sinh an toàn thực phẩm
+                                <AiOutlineCheck />
+                            </li>
+                            <li>
+                                Dành cho khách hàng trên 18 tuổi
+                                <AiOutlineCheck />
+                            </li>
+                        </ul>
+                        <button className={style.btn}>Đặt phòng</button>
+                    </div>
+                </div>
+            </div>
+            <div className="container">
+                <div className={style.content2}>
+                    <div className={style.title}>
+                        <h5>Tổ chức sự kiện</h5>
+                        <p>
+                            {`Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...`}
+                            <br />
+                            {`There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain...`}
+                        </p>
+                    </div>
+                    {/* Nút prev/next đặt ngoài Swiper */}
+                    <div ref={prevRef} className={style.prevButton}>
+                        <AiOutlineLeft />
+                    </div>
+                    <div ref={nextRef} className={style.nextButton}>
+                        <AiOutlineRight />
+                    </div>
+
+                    <Swiper
+                        className={style.swiperContent2}
+                        modules={[Navigation, Autoplay]}
+                        speed={700}
+                        slidesPerView={3}
+                        loop={true}
+                        navigation={{
+                            prevEl: prevRef.current,
+                            nextEl: nextRef.current,
+                        }}
+                        onInit={(swiper) => {
+                            swiper.params.navigation.prevEl = prevRef.current;
+                            swiper.params.navigation.nextEl = nextRef.current;
+                            swiper.navigation.init();
+                            swiper.navigation.update();
+                        }}
+                    >
+                        <SwiperSlide className={style.item}>
+                            <Image src={decorImg1} alt="decor Image" />
+                        </SwiperSlide>
+                        <SwiperSlide className={style.item}>
+                            <Image src={decorImg2} alt="decor Image" />
+                        </SwiperSlide>
+                        <SwiperSlide className={style.item}>
+                            <Image src={decorImg3} alt="decor Image" />
+                        </SwiperSlide>
+                        <SwiperSlide className={style.item}>
+                            <Image src={decorImg4} alt="decor Image" />
+                        </SwiperSlide>
+                    </Swiper>
+                </div>
+            </div>
+            <div className={style.content3}>
+                <h5>Thực đơn đa dạng</h5>
+                <div className={style.containerContent3}>
+                    <div className="container">
+                        <div className={style.menuitem}>
+                            <Image src={menu1} alt="Menu 1" />
+                            <Image src={menu2} alt="Menu 2" />
+                            <Image src={menu3} alt="Menu 3" />
+                            <Image src={menu3} alt="Menu 3" />
+                            <div className={style.comboImage}>
+                                <Image src={comboDat} alt="Combo dating" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
