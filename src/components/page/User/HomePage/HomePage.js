@@ -28,7 +28,6 @@ const Home = () => {
     const nextRef = useRef(null);
     return (
         <div>
-            <Header />
             <Banner />
             <div className="container">
                 <Slider
@@ -180,7 +179,6 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };

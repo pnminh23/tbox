@@ -28,11 +28,14 @@
         #ff5e5e 0%,
         #b80000 100%
     );
-    --gradient-blue-blue-red: linear-gradient(
-        90deg,
-        #0b99d2 3.55%,
-        #d42352 99.49%
+
+    --gradient-grey-black: linear-gradient(
+        180deg,
+        rgb(68, 68, 68) 0%,
+        rgb(26, 26, 26) 66.77%,
+        #151515 100%
     );
+
     --gradient-blue-blue-blue: linear-gradient(
         90deg,
         #1da7df -8.49%,

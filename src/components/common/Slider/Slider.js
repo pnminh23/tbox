@@ -6,7 +6,8 @@ import {
     AiOutlineDoubleRight,
 } from "react-icons/ai";
 import style from "./Slider.module.scss";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Loading from "../Loading";
 import clsx from "clsx";
 
 const Slider = ({
@@ -19,6 +20,9 @@ const Slider = ({
 }) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
+    const swiperRef = useRef(null); // Ref cho Swiper
+    const prevButtonRef = useRef(null);
+    const nextButtonRef = useRef(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -28,7 +32,6 @@ const Slider = ({
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const result = await response.json();
-                // Kiểm tra dữ liệu trả về có đúng không
                 console.log("API Response:", result);
 
                 if (
@@ -50,6 +53,17 @@ const Slider = ({
         fetchData();
     }, [apiUrl]);
 
+    useEffect(() => {
+        if (swiperRef.current && swiperRef.current.swiper) {
+            swiperRef.current.swiper.params.navigation.prevEl =
+                prevButtonRef.current;
+            swiperRef.current.swiper.params.navigation.nextEl =
+                nextButtonRef.current;
+            swiperRef.current.swiper.navigation.init();
+            swiperRef.current.swiper.navigation.update();
+        }
+    }, [items]); // Chỉ chạy khi items được tải xong
+
     return (
         <div className={style.sliderContainer}>
             <div className={style.sliderTop}>
@@ -59,51 +73,49 @@ const Slider = ({
                 </div>
 
                 <div className={style.navRight}>
-                    <div className={style.prevButton}>
+                    <div ref={prevButtonRef} className={clsx(style.prevButton)}>
                         <AiOutlineLeft />
                     </div>
-                    <div className={style.nextButton}>
+                    <div ref={nextButtonRef} className={clsx(style.nextButton)}>
                         <AiOutlineRight />
                     </div>
                 </div>
             </div>
+
             <Swiper
+                ref={swiperRef}
                 className={style.swiperSlider}
                 modules={[Navigation, Autoplay]}
                 speed={1000}
                 slidesPerView={slidesPerView}
                 loop={true}
                 slidesPerGroup={slidesPerGroup}
-                // grabCursor={true}s
                 draggable={true}
                 navigation={{
-                    prevEl: `.${style.prevButton}`,
-                    nextEl: `.${style.nextButton}`,
+                    prevEl: prevButtonRef.current,
+                    nextEl: nextButtonRef.current,
                 }}
                 autoplay={
                     autoplay
                         ? { delay: 7000, disableOnInteraction: false }
                         : false
                 }
-                // breakpoints={{
-                //     320: { slidesPerView: 1 }, // Màn hình nhỏ (điện thoại)
-                //     480: { slidesPerView: 2 }, // Màn hình nhỏ hơn (điện thoại ngang)
-                //     768: { slidesPerView: 3 }, // Tablet
-                //     1024: { slidesPerView: 4 }, // Laptop nhỏ
-                //     1280: { slidesPerView: 5 }, // Desktop
-                // }}
             >
-                {loading ? (
-                    <p>Đang tải dữ liệu...</p>
-                ) : (
-                    items.map((item) => (
-                        <SwiperSlide key={item._id}>
-                            {renderItem(item)}
-                        </SwiperSlide>
-                    ))
-                )}
+                {loading
+                    ? Array.from({ length: slidesPerView }).map((_, index) => (
+                          <SwiperSlide key={index}>
+                              <Loading />
+                          </SwiperSlide>
+                      ))
+                    : // <p>loading</p>
+                      items.map((item) => (
+                          <SwiperSlide key={item._id}>
+                              {renderItem(item)}
+                          </SwiperSlide>
+                      ))}
             </Swiper>
         </div>
     );
 };
+
 export default Slider;

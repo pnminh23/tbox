@@ -1,0 +1,13 @@
+.container {
+    display: flex;
+    .left {
+        width: 75%;
+    }
+    .right {
+        width: 25%;
+        height: 600px;
+        border-radius: 10px;
+        background: var(--gradient-grey-black);
+        margin-left: 20px;
+    }
+}

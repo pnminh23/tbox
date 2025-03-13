@@ -1,9 +1,6 @@
 import Head from "next/head";
-// import Image from "next/image";
-import { Inter } from "next/font/google";
-// import HomePage from "@/components/page/HomePage";
-import Header from "@/components/common/Header";
-
+import LayoutUser from "@/layout/LayoutUser/LayoutUser";
+import ListFilmPage from "@/components/page/User/ListFilmPage";
 export default function ListFilm() {
     return (
         <>
@@ -19,8 +16,10 @@ export default function ListFilm() {
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <Header />
-            {/* <ListFilmPage /> */}
+            <ListFilmPage />
         </>
     );
 }
+ListFilm.getLayout = function getLayout(page) {
+    return <LayoutUser>{page}</LayoutUser>;
+};

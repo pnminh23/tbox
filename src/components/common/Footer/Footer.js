@@ -7,7 +7,7 @@ import {
 } from "react-icons/ai";
 import Image from "next/image";
 import Link from "next/link";
-const Footer = () => {
+function Footer() {
     return (
         <div className={style.container}>
             <div className="container">
@@ -56,5 +56,5 @@ const Footer = () => {
             </div>
         </div>
     );
-};
+}
 export default Footer;
