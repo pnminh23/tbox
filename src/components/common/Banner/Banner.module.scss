@@ -1,20 +1,18 @@
 .banner {
-    // margin-top: 80px;
-    // width: 100%;
-    // height: 500px;
-    margin-bottom: 30px;
+    width: 100%;
+    height: 80%;
     position: relative;
     overflow: hidden;
-
+    :global(.swiper-slide) {
+        height: auto !important; // Tắt height: 100% mặc định của Swiper
+    }
     img {
         width: 100%;
-        height: 500px;
-        object-fit: cover; // Đảm bảo ảnh lấp đầy khung hình mà không bị méo
+        height: 100%;
+        // object-fit: cover;
     }
     .prevButton,
     .nextButton {
-        // z-index: 99;
-        // color: rgb(255, 255, 255);
         position: absolute;
         top: 0;
         color: #ccc;

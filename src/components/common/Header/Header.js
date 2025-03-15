@@ -1,34 +1,50 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-
 import logoSrc from "../../../../public/static/img/logoBOX.svg";
-import { AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineSearch, AiOutlineMenu } from "react-icons/ai";
 import Image from "next/image";
 import Link from "next/link";
 import style from "./Header.module.scss";
 import "swiper/css";
 import "swiper/css/navigation";
+
 const Header = () => {
-    const router = useRouter(); // Lấy thông tin đường dẫn hiện tại
+    const router = useRouter();
     const [activePath, setActivePath] = useState("");
+    const [isMenuOpen, setIsMenuOpen] = useState(false); // State để điều khiển menu
 
     useEffect(() => {
-        setActivePath(router.pathname); // Cập nhật đường dẫn mỗi khi trang thay đổi
+        setActivePath(router.pathname);
     }, [router.pathname]);
-    // const [activePath, setActivePath] = useState("");
+
+    // Hàm toggle menu
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
 
     return (
         <div className={style.header}>
             <div className="container">
                 <div className={style.container}>
                     <div className={style.headerLeft}>
+                        {/* Icon menu chỉ hiện khi màn hình nhỏ */}
+                        <div className={style.menuicon} onClick={toggleMenu}>
+                            <AiOutlineMenu />
+                        </div>
+
                         <Image
                             src={logoSrc}
                             className={style.logo}
                             alt="logo"
                             priority={true}
                         />
-                        <ul className={style.menu}>
+
+                        {/* Menu sẽ có class active nếu isMenuOpen = true */}
+                        <ul
+                            className={`${style.menu} ${
+                                isMenuOpen ? style.active : ""
+                            }`}
+                        >
                             <li
                                 className={
                                     activePath === "/" ? style.active : ""
@@ -82,18 +98,6 @@ const Header = () => {
                         </ul>
                     </div>
                     <div className={style.headerRight}>
-                        <div className={style.search}>
-                            <div className={style.searchButton}>
-                                <AiOutlineSearch />
-                            </div>
-
-                            <div className={style.searchInputText}>
-                                <input
-                                    type="text"
-                                    placeholder="Bạn muốn tìm gì?"
-                                />
-                            </div>
-                        </div>
                         <div className={style.login}>
                             <Link href="/auth/register">Đăng ký</Link>
                             <Link href="/auth/login">Đăng nhập</Link>
@@ -104,4 +108,5 @@ const Header = () => {
         </div>
     );
 };
+
 export default Header;

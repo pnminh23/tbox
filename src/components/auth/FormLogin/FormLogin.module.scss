@@ -12,6 +12,9 @@
 }
 
 .login {
+    a {
+        font-size: 14px;
+    }
     padding: 35px 0;
     width: 650px;
     height: 550px;
@@ -36,7 +39,7 @@
         align-items: center;
         width: 450px;
         .input {
-            font-size: 16px;
+            font-size: 14px;
             width: 100%;
             height: 50px;
             border-radius: 30px;
@@ -50,7 +53,7 @@
                 box-shadow: 0 0 0 1px #fff;
             }
             &::placeholder {
-                font-size: 16px;
+                font-size: 14px;
             }
         }
 
@@ -107,6 +110,9 @@
                 color: red;
                 // background-color: red;
             }
+        }
+        label {
+            font-size: 14px;
         }
 
         .checkboxWrapper {

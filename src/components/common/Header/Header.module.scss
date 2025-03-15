@@ -6,41 +6,47 @@
     left: 0;
     width: 100vw;
     z-index: 99;
+    // padding: 0 10px;
     background: var(--dark);
-    // ::before {
-    //     content: "";
-    //     display: block;
-    //     height: 80px;
-    // }
-    // background-color: red;
     :global(.swiper-slide) {
         height: auto !important; /* Ghi đè height mặc định */
     }
 }
 
 .container {
-    height: 80px;
+    padding: 10px 0;
+    // position: relative;
+    // padding: 0 10px;
+    height: 60px;
     display: flex;
     justify-content: space-between;
     .headerLeft {
-        width: 60%;
-        // background: red;
         display: flex;
+        flex: 1;
+        align-items: center;
         .logo {
-            padding: 10px 0;
+            // padding: 10px 0;
             object-fit: cover;
             width: auto;
             height: 100%;
             margin: 0 20px;
         }
+        .menuicon {
+            margin: 0 10px;
+            display: none;
+            font-size: 25px;
+        }
         .menu {
-            opacity: 1;
-            visibility: visible;
+            width: 100%;
+            // opacity: 1;
+            // visibility: visible;
             display: flex;
             align-items: center;
             // margin-left: 20px;
-            column-gap: 15px;
+            // column-gap: 15px;
             li {
+                margin: 0 1%;
+                // padding: 0 5px;
                 &.active {
                     color: var(--hightlight);
                 }
@@ -52,7 +58,7 @@
             }
 
             a {
-                font-size: 14px;
+                font-size: 12px;
                 font-weight: 600;
                 letter-spacing: 2px;
                 text-transform: uppercase;
@@ -60,38 +66,42 @@
         }
     }
     .headerRight {
+        margin: 0 20px;
         display: flex;
         justify-content: flex-end;
         align-items: center;
-        .search {
-            position: relative;
-            display: flex;
-            align-items: center;
-            margin: 0 10px;
-            .searchButton {
-                // position: relative;
-                svg {
-                    font-size: 25px;
-                }
-            }
+        // .search {
+        //     position: relative;
+        //     display: flex;
+        //     align-items: center;
+        //     // margin: 0 10px;
+        //     .searchButton {
+        //         // position: relative;
+        //         svg {
+        //             font-size: 25px;
+        //         }
+        //     }
 
-            .searchInputText {
-                position: absolute;
-                right: 35px;
-                input {
-                    border: none;
-                    border-radius: 10px;
-                    box-shadow: none;
-                    height: 35px;
-                    padding: 0 20px;
-                    font-size: 14px;
-                    width: 300px;
-                    ::placeholder {
-                        font-size: 14px;
-                    }
-                }
-            }
-        }
+        //     .searchInputText {
+        //         // position: absolute;
+        //         // right: 35px;
+        //         input {
+        //             border: none;
+        //             border-radius: 10px;
+        //             box-shadow: none;
+        //             height: 35px;
+        //             padding: 0 20px;
+        //             font-size: 14px;
+        //             width: 250px;
+        //             ::placeholder {
+        //                 font-size: 14px;
+        //             }
+        //         }
+        //     }
+        //     .searchButton {
+        //         margin: 0 10px;
+        //     }
+        // }
         .login {
             display: flex;
             column-gap: 20px;
@@ -120,10 +130,45 @@
             }
         }
     }
-    @include respond-between(768px, 1300px) {
-        max-width: 1300px;
+}
+@media screen and (max-width: 980px) {
+    .container {
+        padding: 15px 0;
+        // padding: 10px;
         .headerLeft {
-            flex-direction: column;
+            .logo {
+                margin: 0 10px;
+            }
+            .menuicon {
+                display: block; // Hiện icon menu khi màn hình nhỏ
+            }
+
+            .menu {
+                display: none; // Ẩn menu mặc định
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: #232323;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 20px;
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .menu.active {
+                display: flex; // Hiện menu khi có class active
+            }
+        }
+    }
+}
+@media screen and (max-width: 481px) {
+    .header {
+        background-color: red;
+        .menu {
+            width: 50%;
         }
     }
 }
