@@ -89,3 +89,35 @@ input::-webkit-inner-spin-button {
     max-width: 1440px;
     width: 100%;
 }
+
+@media screen and (max-width: 980px) {
+    .container {
+        max-width: 90%; /* Cho nhỏ hơn khi màn hình nhỏ */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        max-width: 100%; /* Để container tự co lại theo màn hình */
+        padding: 0 10px;
+    }
+}
+
+@media screen and (max-width: 481px) {
+    .container {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    li,
+    a {
+        font-size: 14px !important;
+    }
+}

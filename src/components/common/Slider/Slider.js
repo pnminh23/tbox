@@ -17,6 +17,7 @@ const Slider = ({
     slidesPerView,
     autoplay = false,
     slidesPerGroup = 1,
+    breakpoints,
 }) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -69,7 +70,6 @@ const Slider = ({
             <div className={style.sliderTop}>
                 <div className={style.navLeft}>
                     <h3 className={style.title}>{title}</h3>
-                    <AiOutlineDoubleRight />
                 </div>
 
                 <div className={style.navRight}>
@@ -100,6 +100,7 @@ const Slider = ({
                         ? { delay: 7000, disableOnInteraction: false }
                         : false
                 }
+                breakpoints={breakpoints}
             >
                 {loading
                     ? Array.from({ length: slidesPerView }).map((_, index) => (

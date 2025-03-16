@@ -1,7 +1,7 @@
 .item {
     position: relative;
     transition: transform 0.2s ease-in-out;
-    padding: 0 10px;
+    padding: 0 2%;
 
     // &:hover {
     //     outline: none;
@@ -37,8 +37,18 @@
         }
     }
     .icon {
+        width: 10%;
+        height: 10%;
+        object-fit: cover;
         position: absolute;
         top: 5px;
         right: 15px;
     }
+}
+@media screen and (max-width: 980px) {
+    .image {
+        height: 150px !important;
+    }
+}
+@media screen and (max-width: 481px) {
 }

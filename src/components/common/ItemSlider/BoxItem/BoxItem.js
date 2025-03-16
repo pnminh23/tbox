@@ -21,6 +21,7 @@ const BoxItem = ({ box }) => {
                     alt="Favicon"
                     width={32}
                     height={32}
+                    layout="responsive"
                 />
             </div>
         </div>
