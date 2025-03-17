@@ -1,7 +1,6 @@
 import style from "./FilmItem.module.scss";
 import Image from "next/image";
 import Link from "next/link";
-import Button from "../../Button/Button";
 
 const FilmItem = ({ film }) => {
     return (

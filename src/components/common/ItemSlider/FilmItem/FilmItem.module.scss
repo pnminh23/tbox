@@ -108,6 +108,12 @@
     .image {
         height: 200px !important;
     }
+    .orderButton {
+        padding: 0 12px !important;
+    }
 }
 @media screen and (max-width: 481px) {
+    .orderButton {
+        padding: 0 8px !important;
+    }
 }
