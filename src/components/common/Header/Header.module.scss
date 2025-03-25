@@ -1,4 +1,4 @@
-@import "../../../styles/breakpoints";
+@import '../../../styles/breakpoints';
 
 .header {
     position: fixed;
@@ -70,42 +70,13 @@
         display: flex;
         justify-content: flex-end;
         align-items: center;
-        // .search {
-        //     position: relative;
-        //     display: flex;
-        //     align-items: center;
-        //     // margin: 0 10px;
-        //     .searchButton {
-        //         // position: relative;
-        //         svg {
-        //             font-size: 25px;
-        //         }
-        //     }
+        column-gap: 20px;
 
-        //     .searchInputText {
-        //         // position: absolute;
-        //         // right: 35px;
-        //         input {
-        //             border: none;
-        //             border-radius: 10px;
-        //             box-shadow: none;
-        //             height: 35px;
-        //             padding: 0 20px;
-        //             font-size: 14px;
-        //             width: 250px;
-        //             ::placeholder {
-        //                 font-size: 14px;
-        //             }
-        //         }
-        //     }
-        //     .searchButton {
-        //         margin: 0 10px;
-        //     }
-        // }
         .login {
             display: flex;
             column-gap: 20px;
-            a {
+            a,
+            p {
                 position: relative;
                 font-size: 14px;
                 font-weight: 400;
@@ -114,7 +85,7 @@
                     color: var(--hightlight);
                 }
                 &::after {
-                    content: "";
+                    content: '';
                     position: absolute;
                     right: -10px;
                     top: 50%;
@@ -126,6 +97,81 @@
 
                 &:last-child::after {
                     display: none; // Ẩn đường kẻ ở thẻ cuối cùng
+                }
+            }
+        }
+        .userSection {
+            display: flex;
+            align-items: center;
+            position: relative;
+            .userName {
+                margin: 0 10px;
+                font-weight: 500;
+            }
+            .avatarContainer {
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+
+                img {
+                    border-radius: 50%;
+                    border: 2px solid #fff;
+                    width: 35px;
+                    height: 35px;
+                    transition: transform 0.2s ease-in-out;
+
+                    &:hover {
+                        transform: scale(1.1);
+                    }
+                }
+            }
+
+            .dropdownMenu {
+                position: absolute;
+                top: 50px;
+                right: 0;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                min-width: 160px;
+                z-index: 1000;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                animation: fadeIn 0.3s ease-in-out;
+
+                a,
+                .logoutButton {
+                    padding: 12px;
+                    text-align: center;
+                    text-decoration: none;
+                    color: black;
+                    font-size: 14px;
+                    cursor: pointer;
+                    transition: background 0.2s ease-in-out;
+
+                    &:hover {
+                        background: #f0f0f0;
+                    }
+                }
+
+                .menuItem {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .logoutButton {
+                    color: red;
+                    font-weight: bold;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                svg {
+                    width: 20px;
+                    height: 20px;
+                    margin-right: 10px;
                 }
             }
         }
@@ -164,5 +210,6 @@
         }
     }
 }
+
 @media screen and (max-width: 481px) {
 }

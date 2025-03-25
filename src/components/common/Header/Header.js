@@ -1,37 +1,87 @@
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import logoSrc from "../../../../public/static/img/logoBOX.svg";
-import { AiOutlineSearch, AiOutlineMenu } from "react-icons/ai";
-import Image from "next/image";
-import Link from "next/link";
-import style from "./Header.module.scss";
-import "swiper/css";
-import "swiper/css/navigation";
+import { useRouter } from 'next/router';
+import { useState, useEffect, useRef } from 'react';
+import { getdata } from '@/services/user';
+import { logout } from '@/services/auth';
+import { AiOutlineLogout, AiOutlineIdcard } from 'react-icons/ai';
+import logoSrc from '../../../../public/static/img/logoBOX.svg';
+import avata from '@public/static/img/avata/panda.png';
+import { AiOutlineMenu } from 'react-icons/ai';
+import Image from 'next/image';
+import Link from 'next/link';
+import style from './Header.module.scss';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import { PATH } from '@/constants/config';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Header = () => {
     const router = useRouter();
-    const [activePath, setActivePath] = useState("");
+    const [activePath, setActivePath] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isMenuAccount, setIsMenuAccount] = useState(false);
+    const [user, setUser] = useState(null);
+    const menuAccountRef = useRef(null);
 
     useEffect(() => {
         setActivePath(router.pathname);
     }, [router.pathname]);
 
     useEffect(() => {
-        if (isMenuOpen) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "auto";
-        }
+        document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
     }, [isMenuOpen]);
 
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
+    useEffect(() => {
+        // Gọi API để lấy thông tin user nếu đã đăng nhập
+        const fetchUser = async () => {
+            try {
+                const userData = await getdata();
+                setUser(userData.data);
+            } catch (error) {
+                setUser(null);
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuAccountRef.current && !menuAccountRef.current.contains(event.target)) {
+                setIsMenuAccount(false);
+            }
+        };
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            setUser(null);
+
+            setTimeout(() => {
+                router.push(PATH.Home);
+            }, 2000);
+        } catch (error) {
+            toast.error('Lỗi khi đăng xuất!', { autoClose: 2000 });
+        }
     };
 
-    const closeMenu = () => {
-        setIsMenuOpen(false);
-    };
+    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+    const toggleMenuAccount = () => setIsMenuAccount(!isMenuAccount);
+    const closeMenu = () => setIsMenuOpen(false);
+
+    const menuItems = [
+        { path: PATH.Home, label: 'Trang chủ' },
+        { path: PATH.ListFilm, label: 'Danh sách phim' },
+        { path: PATH.BookRoom, label: 'Đặt phòng' },
+        { path: PATH.Promotion, label: 'Khuyến mãi' },
+        { path: PATH.Combo, label: 'Combo' },
+        { path: PATH.Locations, label: 'Hệ thống PNM - BOX' },
+    ];
 
     return (
         <div className={style.header}>
@@ -42,91 +92,45 @@ const Header = () => {
                             <AiOutlineMenu />
                         </div>
 
-                        <Image
-                            src={logoSrc}
-                            className={style.logo}
-                            alt="logo"
-                            priority={true}
-                        />
+                        <Image src={logoSrc} className={style.logo} alt="logo" priority />
 
-                        <ul
-                            className={`${style.menu} ${
-                                isMenuOpen ? style.active : ""
-                            }`}
-                        >
-                            <li
-                                className={
-                                    activePath === "/" ? style.active : ""
-                                }
-                            >
-                                <Link href="/" onClick={closeMenu}>
-                                    Trang chủ
-                                </Link>
-                            </li>
-                            <li
-                                className={
-                                    activePath === "/listFilm"
-                                        ? style.active
-                                        : ""
-                                }
-                            >
-                                <Link href="/listFilm" onClick={closeMenu}>
-                                    Danh sách phim
-                                </Link>
-                            </li>
-                            <li
-                                className={
-                                    activePath === "/dat-phong"
-                                        ? style.active
-                                        : ""
-                                }
-                            >
-                                <Link href="/dat-phong" onClick={closeMenu}>
-                                    Đặt phòng
-                                </Link>
-                            </li>
-                            <li
-                                className={
-                                    activePath === "/khuyen-mai"
-                                        ? style.active
-                                        : ""
-                                }
-                            >
-                                <Link href="/khuyen-mai" onClick={closeMenu}>
-                                    Khuyến mãi
-                                </Link>
-                            </li>
-                            <li
-                                className={
-                                    activePath === "/combo" ? style.active : ""
-                                }
-                            >
-                                <Link href="/combo" onClick={closeMenu}>
-                                    Combo
-                                </Link>
-                            </li>
-                            <li
-                                className={
-                                    activePath === "/co-so-tbox"
-                                        ? style.active
-                                        : ""
-                                }
-                            >
-                                <Link href="/co-so-tbox" onClick={closeMenu}>
-                                    Cơ sở TBOX
-                                </Link>
-                            </li>
+                        <ul className={`${style.menu} ${isMenuOpen ? style.active : ''}`}>
+                            {menuItems.map(({ path, label }) => (
+                                <li key={path} className={activePath === path ? style.active : ''}>
+                                    <Link href={path} onClick={closeMenu}>
+                                        {label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                     <div className={style.headerRight}>
-                        <div className={style.login}>
-                            <Link href="/auth/register" onClick={closeMenu}>
-                                Đăng ký
-                            </Link>
-                            <Link href="/auth/login" onClick={closeMenu}>
-                                Đăng nhập
-                            </Link>
-                        </div>
+                        {user ? (
+                            <div className={style.userSection}>
+                                <p>Xin chào</p>
+                                <p className={style.userName}>{user.name}</p>
+                                <div className={style.avatarContainer} ref={menuAccountRef}>
+                                    <Image src={avata} alt="avata" width={30} height={30} onClick={toggleMenuAccount} />
+                                    {isMenuAccount && (
+                                        <div className={style.dropdownMenu}>
+                                            <Link href="/profile" className={style.menuItem}>
+                                                <AiOutlineIdcard />
+                                                Quản lý tài khoản
+                                            </Link>
+                                            <div className={style.logoutButton} onClick={handleLogout}>
+                                                <AiOutlineLogout />
+                                                Đăng xuất
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className={style.login}>
+                                <Link href={PATH.Register}>Đăng ký</Link>
+                                <Link href={PATH.Login}>Đăng nhập</Link>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

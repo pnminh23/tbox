@@ -1,0 +1,13 @@
+.loadingContainer {
+    width: 100vw;
+    height: 100vh;
+    background: var(--dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.lottieAnimation {
+    width: 200px;
+    height: 200px;
+}
