@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import clsx from 'clsx';
-import style from './Selection.module.scss';
+import style from './selection.module.scss';
 
 const Selection = ({ options = [], defaultValue = '--Tùy chọn--', onChange, className, ...props }) => {
     const [selected, setSelected] = useState(defaultValue);
