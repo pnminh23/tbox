@@ -2,12 +2,144 @@
     display: flex;
     .left {
         width: 75%;
+
+        .allFilm {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            row-gap: 20px;
+        }
+
+        .title {
+            width: fit-content;
+            margin: 20px 0;
+            // align-items: center;
+            font-size: 24px;
+            text-transform: uppercase;
+            position: relative;
+            padding-left: 15px;
+            line-height: 50px;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                border-radius: 3px;
+                left: 0;
+                width: 5px;
+                height: 50px;
+                background-color: var(--hightlight);
+            }
+            &:hover {
+                color: var(--hightlight);
+            }
+        }
+
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            list-style: none;
+            padding: 0;
+            gap: 10px; // Khoảng cách giữa các nút
+            color: #ccc; // Màu chữ
+
+            li {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 32px; // Kích thước nút
+                height: 32px;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 16px;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.1);
+                }
+
+                &.previous,
+                &.next {
+                    font-size: 20px;
+                }
+
+                &.active {
+                    background: #111;
+                    color: var(--hightlight);
+                    font-weight: bold;
+                }
+            }
+        }
     }
     .right {
+        height: fit-content;
+        padding: 20px;
+        margin-top: 20px;
         width: 25%;
-        height: 600px;
         border-radius: 10px;
         background: var(--gradient-grey-black);
         margin-left: 20px;
+        .options {
+            padding-bottom: 15px;
+            border-bottom: 1px solid #808080;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .category {
+            ul {
+                padding: 15px 0;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr); // Chia thành 2 cột bằng nhau
+                row-gap: 10px; // Khoảng cách giữa các cột và dòng
+                border-bottom: 1px solid #808080;
+                margin-bottom: 20px;
+            }
+        }
+        .year ul {
+            padding: 15px 0;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); // Chia thành 2 cột bằng nhau
+            gap: 5px;
+            .yearItem {
+                width: 100%;
+                height: 25px;
+                background-color: #2e2e2e;
+                border-radius: 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+
+                p {
+                    font-size: 12px;
+                }
+
+                &:hover {
+                    background: var(--gradient-yellow);
+                    color: var(--dark);
+                }
+            }
+        }
+    }
+    li {
+        cursor: pointer;
+        list-style: none;
+        font-size: 12px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        row-gap: 10px;
+        svg {
+            margin-right: 5px;
+        }
+        &:hover {
+            color: var(--hightlight);
+        }
+    }
+    h5 {
+        font-size: 14px;
     }
 }

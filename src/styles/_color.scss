@@ -13,7 +13,7 @@
 
     --title-color: #2f3d50;
     --text-color: #fff;
-    --text-color-light: #ffff;
+    --text-placehoder: #343434;
     --text-color-table: #202939;
     --text-color-secondary: #23262f;
     --text-color-secondary-2: #353945;
@@ -23,24 +23,10 @@
     --gradient-yellow: linear-gradient(90deg, #efeb77 0%, #f3b817 100%);
     --gradient-yellow-reverse: linear-gradient(90deg, #f3b817 0%, #efeb77 100%);
     --gradient-red-red: linear-gradient(90deg, #b80000 0%, #ff5e5e 100%);
-    --gradient-red-red-reverse: linear-gradient(
-        90deg,
-        #ff5e5e 0%,
-        #b80000 100%
-    );
+    --gradient-red-red-reverse: linear-gradient(90deg, #ff5e5e 0%, #b80000 100%);
 
-    --gradient-grey-black: linear-gradient(
-        180deg,
-        rgb(68, 68, 68) 0%,
-        rgb(26, 26, 26) 66.77%,
-        #151515 100%
-    );
+    --gradient-grey-black: linear-gradient(180deg, rgb(68, 68, 68) 0%, rgb(26, 26, 26) 66.77%, #151515 100%);
 
-    --gradient-blue-blue-blue: linear-gradient(
-        90deg,
-        #1da7df -8.49%,
-        #0b99d2 45.98%,
-        #13c0f2 106.91%
-    );
+    --gradient-blue-blue-blue: linear-gradient(90deg, #1da7df -8.49%, #0b99d2 45.98%, #13c0f2 106.91%);
     --gradient-blue-white: linear-gradient(90deg, #0fafe4 -25.26%, #fff 115.9%);
 }

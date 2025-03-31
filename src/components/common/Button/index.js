@@ -1,1 +1,1 @@
-export { default } from "./Button.module.scss";
+export { default } from './Button';

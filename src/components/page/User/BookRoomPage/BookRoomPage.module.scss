@@ -1,0 +1,162 @@
+.container {
+    position: relative;
+    padding-top: 20px;
+}
+.fromInfor {
+    position: relative;
+    background: url(../../../../../public/static/img/background/background_formInfor.jpg) no-repeat center center /
+        cover;
+
+    .login {
+        padding: 15px 20px;
+        background: rgba(30, 30, 30, 0.6);
+        a {
+            margin-left: 5px;
+            color: var(--hightlight);
+            // color: #ccc;
+        }
+    }
+    .infor {
+        padding: 20px 20px 0;
+        width: 40%;
+        .phone {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            button {
+                width: 30%;
+            }
+        }
+    }
+}
+
+.formBookRoom {
+    margin: 30px 0;
+    display: flex;
+    .left {
+        width: 75%;
+        .form {
+            font-size: 16px;
+            width: 70%;
+            margin: auto;
+            p {
+                margin-bottom: 10px;
+            }
+            .groupItems {
+                margin-bottom: 20px;
+            }
+            .date {
+                flex: 1;
+            }
+            .room {
+                width: 30%;
+            }
+            .combo {
+                width: 30%;
+            }
+            .warning {
+                border-radius: 5px;
+                border: 2px solid #907639;
+                padding: 20px;
+                background: #f8f3d6;
+                color: #907639;
+                .title {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    margin-bottom: 10px;
+                    svg {
+                        font-size: 20px;
+                    }
+                }
+                p {
+                    font-family: Roboto;
+                    font-size: 14px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: normal;
+                    letter-spacing: 0.28px;
+                    margin-bottom: 10px;
+                }
+            }
+            .time {
+                width: 100%;
+                height: 200px;
+                background-color: #343434;
+                border-radius: 10px;
+                display: flex;
+                flex-direction: row;
+                .typeRoom {
+                    width: 45%;
+                    height: 100%;
+                    padding: 20px;
+                    border-right: 1px solid #151515;
+                }
+                .timeFrame {
+                    padding: 20px;
+                    width: 55%;
+                    display: flex;
+                    flex-wrap: wrap;
+                    column-gap: 10px;
+                    .slot {
+                        cursor: pointer;
+                        width: 40px;
+                        height: 25px;
+                        border-radius: 5px;
+                        background: var(--dark);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 12px;
+                        &:hover {
+                            color: #151515;
+                            background: var(--gradient-yellow);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .right {
+        padding: 10px 20px;
+
+        width: 25%;
+        border-radius: 10px;
+        background: var(--gradient-grey-black);
+        .inforUser {
+            margin: 10px 0 20px;
+            padding: 20px 0;
+            border-top: 1px solid #151515;
+            border-bottom: 1px solid #151515;
+            display: flex;
+            flex-direction: column;
+            row-gap: 10px;
+        }
+        .inforRoom {
+            display: flex;
+            flex-direction: column;
+            row-gap: 10px;
+        }
+        .totalMoney {
+            padding: 20px 0 30px;
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+        }
+        .action {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        h5 {
+            text-align: center;
+        }
+    }
+    h5 {
+        font-size: 20px;
+        font-weight: 700;
+    }
+}
+.row {
+    display: flex;
+    gap: 20px;
+}

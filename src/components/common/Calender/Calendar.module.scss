@@ -1,0 +1,50 @@
+.calendarWrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 40px;
+}
+
+.calendarButton {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: #f3f3f3;
+    }
+}
+
+.calendarIcon {
+    margin-left: 8px;
+    width: 20px;
+    height: 20px;
+    color: #555;
+}
+
+.calendarPopover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    margin-top: 5px;
+}
+
+.customDatepicker {
+    border-radius: 8px;
+    font-size: 14px;
+}

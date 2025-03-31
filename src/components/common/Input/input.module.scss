@@ -1,0 +1,79 @@
+.container {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 40px; // Đảm bảo chiều cao tối thiểu
+    background: transparent;
+    transition: 0.2s;
+    margin-bottom: 20px;
+    &.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+        background: var(--disabled-bg);
+    }
+}
+
+.input {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    padding: 0 20px;
+    border: none;
+    outline: none;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 200;
+    letter-spacing: 1px;
+    color: var(--text-color);
+    padding-right: 32px; // Chừa khoảng trống cho icon
+
+    &::placeholder {
+        color: #ccc;
+    }
+
+    &:disabled {
+        color: #343434;
+        background: #232323;
+    }
+    &::selection {
+        background: #343434; // Màu nền khi chọn văn bản
+        color: var(--light); // Màu chữ khi chọn
+    }
+}
+
+.icon {
+    position: absolute;
+    right: 12px; // Đặt icon sát mép phải
+    top: 50%;
+    transform: translateY(-50%); // Căn giữa theo chiều dọc
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.magin_0_20 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.color_black {
+    color: #232323;
+}
+
+.magin_15_20 {
+    margin-top: 15;
+    margin-bottom: 20px;
+}
+
+.rounded_5 {
+    border-radius: 5px;
+}
+
+.rounded_10 {
+    border-radius: 10px;
+}
+
+.dark {
+    background-color: var(--dark);
+}
