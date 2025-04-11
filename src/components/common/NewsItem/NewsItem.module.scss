@@ -29,13 +29,15 @@
     }
 
     .detail {
-        padding: 0 10px;
         display: -webkit-box;
-        -webkit-line-clamp: 3; /* Số dòng muốn hiển thị */
+        -webkit-line-clamp: 3;
+        line-clamp: 3; /* <- thêm dòng này */
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
+        padding: 0 10px;
     }
+
     .date {
         position: absolute;
         right: 10px;
