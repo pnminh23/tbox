@@ -4,7 +4,7 @@ export const PATH = {
     Register: '/auth/register',
     ListFilm: '/listFilm',
     BookRoom: '/bookRoom',
-    Promotion: '/promotion',
+    Discount: '/discount',
     Combo: '/combo',
     Locations: '/locations',
 };

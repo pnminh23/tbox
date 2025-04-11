@@ -78,7 +78,7 @@ const Header = () => {
         { path: PATH.Home, label: 'Trang chủ' },
         { path: PATH.ListFilm, label: 'Danh sách phim' },
         { path: PATH.BookRoom, label: 'Đặt phòng' },
-        { path: PATH.Promotion, label: 'Khuyến mãi' },
+        { path: PATH.Discount, label: 'Khuyến mãi' },
         { path: PATH.Combo, label: 'Combo' },
         { path: PATH.Locations, label: 'Hệ thống PNM - BOX' },
     ];

@@ -3,6 +3,7 @@ import Box_J from '@public/static/icons/Box_J.svg';
 import Box_Q from '@public/static/icons/Box_Q.svg';
 import Box_K from '@public/static/icons/Box_K.svg';
 import { PATH } from '@/constants/config';
+import img1 from '@public/static/img/background/background_formInfor.jpg';
 import { AiOutlineWarning } from 'react-icons/ai';
 import Link from 'next/link';
 import Button from '@/components/common/Button';
@@ -13,6 +14,7 @@ import Calendar from '@/components/common/Calender';
 import clsx from 'clsx';
 import Image from 'next/image';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import Feedback from '@/components/common/Feedback';
 
 const BookRoomPage = () => {
     const [selectedDate, setSelectedDate] = useState(null);
@@ -141,6 +143,7 @@ const BookRoomPage = () => {
                                 </p>
                             </div>
                         </div>
+                        <Feedback />
                     </div>
                     <div className={style.right}>
                         <h5>Hóa Đơn</h5>

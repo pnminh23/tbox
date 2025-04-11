@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: ['phimimg.com', 'phimapi.com'], // Thêm domain ảnh API
+        domains: ['phimimg.com', 'phimapi.com', 'bizweb.dktcdn.net'], // Thêm domain ảnh API
     },
     reactStrictMode: true,
 };

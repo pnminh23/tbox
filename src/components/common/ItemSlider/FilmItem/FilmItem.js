@@ -1,26 +1,17 @@
-import style from "./FilmItem.module.scss";
-import Image from "next/image";
-import Link from "next/link";
+import style from './FilmItem.module.scss';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const FilmItem = ({ film }) => {
     return (
         <div className={style.item}>
             <div className={style.image}>
-                <Image
-                    src={`https://phimimg.com//${film.poster_url}`}
-                    alt={film.origin_name}
-                    fill
-                    objectFit="cover"
-                />
+                <Image src={`https://phimimg.com//${film.poster_url}`} alt={film.origin_name} fill objectFit="cover" />
             </div>
             <div className={style.overlay}></div>
             <Link href="/dat-hang" className={style.orderButton}>
                 Đặt phòng xem ngay
             </Link>
-
-            {/* Lớp overlay khi hover */}
-
-            {/* Nút đặt hàng */}
 
             <div className={style.content}>
                 <h5>{film.origin_name}</h5>
