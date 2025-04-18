@@ -2,38 +2,6 @@
     display: flex;
     .left {
         width: 75%;
-
-        .allFilm {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            row-gap: 20px;
-        }
-
-        .title {
-            width: fit-content;
-            margin: 20px 0;
-            // align-items: center;
-            font-size: 24px;
-            text-transform: uppercase;
-            position: relative;
-            padding-left: 15px;
-            line-height: 50px;
-
-            &::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                border-radius: 3px;
-                left: 0;
-                width: 5px;
-                height: 50px;
-                background-color: var(--hightlight);
-            }
-            &:hover {
-                color: var(--hightlight);
-            }
-        }
-
         .pagination {
             margin-top: 20px;
             display: flex;
@@ -69,6 +37,36 @@
                     color: var(--hightlight);
                     font-weight: bold;
                 }
+            }
+        }
+        .allFilm {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            row-gap: 20px;
+        }
+
+        .title {
+            width: fit-content;
+            margin: 20px 0;
+            // align-items: center;
+            font-size: 24px;
+            text-transform: uppercase;
+            position: relative;
+            padding-left: 15px;
+            line-height: 50px;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                border-radius: 3px;
+                left: 0;
+                width: 5px;
+                height: 50px;
+                background-color: var(--hightlight);
+            }
+            &:hover {
+                color: var(--hightlight);
             }
         }
     }

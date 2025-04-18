@@ -1,3 +1,4 @@
+import Title from '../Title';
 import style from './Feedback.module.scss';
 
 const Feedback = () => {
@@ -74,7 +75,7 @@ const Feedback = () => {
     return (
         <div className={style.container}>
             <div className={style.title}>
-                <h5>Đánh giá về cơ sở</h5>
+                <Title>Đánh giá về cơ sở</Title>
                 <select className={style.select}>
                     {ListLocations.map((opt) => (
                         <option key={opt} value={opt}>

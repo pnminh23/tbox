@@ -4,6 +4,7 @@ import NewsItem from '@/components/common/NewsItem';
 import ReactPaginate from 'react-paginate';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import { useRef, useState } from 'react';
+import Title from '@/components/common/Title';
 
 const ITEMS_PER_PAGE = 6;
 const listPromotionNews = [
@@ -98,9 +99,7 @@ const DiscountPage = () => {
         <>
             <Banner />
             <div className="container">
-                <div className={style.title}>
-                    <h1>Khuyến mãi</h1>
-                </div>
+                <Title>Khuyến mãi</Title>
                 <div className={style.content}>
                     <div className={style.allFilm}>
                         {currentItems.map((news) => (

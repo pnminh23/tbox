@@ -9,15 +9,18 @@ import clsx from 'clsx';
 import style from './FormLogin.module.scss';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
-import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
+import { AiFillEye, AiFillEyeInvisible, AiOutlineLeft } from 'react-icons/ai';
 import Button from '@/components/common/Button/Button';
 import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
+import { useRouter } from 'next/router';
+import { PATH } from '@/constants/config';
 
 const FormLogin = () => {
     const [hiddenPw, setHiddenPw] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({ email: '', password: '' });
+    const router = useRouter();
     const [loading, setLoading] = useState(false);
 
     const validateInput = (name, value) => {
@@ -60,7 +63,7 @@ const FormLogin = () => {
                 toast.success('Đăng nhập thành công!');
 
                 setTimeout(() => {
-                    window.location.href = '/'; // Chuyển hướng trang chủ
+                    router.push('/');
                 }, 1500);
             } else {
                 toast.error(response.message);
@@ -80,7 +83,10 @@ const FormLogin = () => {
             {loading && <LoadingFullPage />} {/* Loading toàn trang */}
             <div className={style.container}>
                 <form className={style.login} onSubmit={handleLogin}>
-                    <h3>Đăng nhập</h3>
+                    <div className={style.headerRow}>
+                        <h3>Đăng nhập</h3>
+                        <AiOutlineLeft className={style.back} onClick={() => router.back()} />
+                    </div>
                     <div className={clsx(style.groupItem, style.relative)}>
                         <Tippy content={errors.email} visible={!!errors.email} placement="right">
                             <input
@@ -136,7 +142,7 @@ const FormLogin = () => {
                         <span className={style.dividerText}>Bạn chưa có tài khoản?</span>
                     </div>
                     <div className={style.groupItem}>
-                        <Button p_14_24 light rounded_20 uppercase>
+                        <Button p_14_24 light rounded_20 uppercase href={PATH.Register}>
                             Đăng ký
                         </Button>
                     </div>

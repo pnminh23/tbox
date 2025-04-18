@@ -1,19 +1,17 @@
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay } from "swiper/modules";
-import {
-    AiOutlineLeft,
-    AiOutlineRight,
-    AiOutlineDoubleRight,
-} from "react-icons/ai";
-import style from "./Slider.module.scss";
-import { useState, useEffect, useRef } from "react";
-import Loading from "../Loading";
-import clsx from "clsx";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Autoplay } from 'swiper/modules';
+import { AiOutlineLeft, AiOutlineRight, AiOutlineDoubleRight } from 'react-icons/ai';
+import style from './Slider.module.scss';
+import { useState, useEffect, useRef } from 'react';
+import Loading from '../Loading';
+import clsx from 'clsx';
+import Title from '../Title';
+import { PATH } from '@/constants/config';
 
 const Slider = ({
     apiUrl,
     renderItem,
-    title = "Slider",
+    title = 'Slider',
     slidesPerView,
     autoplay = false,
     slidesPerGroup = 1,
@@ -33,19 +31,15 @@ const Slider = ({
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const result = await response.json();
-                console.log("API Response:", result);
+                console.log('API Response:', result);
 
-                if (
-                    result.status === "success" &&
-                    result.data &&
-                    result.data.items
-                ) {
+                if (result.status === 'success' && result.data && result.data.items) {
                     setItems(result.data.items);
                 } else {
-                    console.error("Dữ liệu API không hợp lệ");
+                    console.error('Dữ liệu API không hợp lệ');
                 }
             } catch (error) {
-                console.error("Lỗi khi fetch dữ liệu:", error);
+                console.error('Lỗi khi fetch dữ liệu:', error);
             } finally {
                 setLoading(false);
             }
@@ -56,10 +50,8 @@ const Slider = ({
 
     useEffect(() => {
         if (swiperRef.current && swiperRef.current.swiper) {
-            swiperRef.current.swiper.params.navigation.prevEl =
-                prevButtonRef.current;
-            swiperRef.current.swiper.params.navigation.nextEl =
-                nextButtonRef.current;
+            swiperRef.current.swiper.params.navigation.prevEl = prevButtonRef.current;
+            swiperRef.current.swiper.params.navigation.nextEl = nextButtonRef.current;
             swiperRef.current.swiper.navigation.init();
             swiperRef.current.swiper.navigation.update();
         }
@@ -69,7 +61,7 @@ const Slider = ({
         <div className={style.sliderContainer}>
             <div className={style.sliderTop}>
                 <div className={style.navLeft}>
-                    <h3 className={style.title}>{title}</h3>
+                    <Title>{title}</Title>
                 </div>
 
                 <div className={style.navRight}>
@@ -95,11 +87,7 @@ const Slider = ({
                     prevEl: prevButtonRef.current,
                     nextEl: nextButtonRef.current,
                 }}
-                autoplay={
-                    autoplay
-                        ? { delay: 7000, disableOnInteraction: false }
-                        : false
-                }
+                autoplay={autoplay ? { delay: 7000, disableOnInteraction: false } : false}
                 breakpoints={breakpoints}
             >
                 {loading
@@ -109,11 +97,7 @@ const Slider = ({
                           </SwiperSlide>
                       ))
                     : // <p>loading</p>
-                      items.map((item) => (
-                          <SwiperSlide key={item._id}>
-                              {renderItem(item)}
-                          </SwiperSlide>
-                      ))}
+                      items.map((item) => <SwiperSlide key={item._id}>{renderItem(item)}</SwiperSlide>)}
             </Swiper>
         </div>
     );

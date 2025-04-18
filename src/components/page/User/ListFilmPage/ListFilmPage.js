@@ -27,7 +27,7 @@ const ListFilmPage = () => {
     const handlePageClick = ({ selected }) => {
         setCurrentPage(selected);
 
-        if (allFimContainerRef.current) {
+        if (typeof window !== 'undefined' && allFimContainerRef.current) {
             const offset = 70; // Điều chỉnh khoảng cách lùi xuống
             const elementPosition = allFimContainerRef.current.getBoundingClientRect().top + window.scrollY;
             window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });

@@ -10,6 +10,20 @@ export const login = async (email, password) => {
         throw error.response?.data?.message || 'Đăng nhập thất bại!';
     }
 };
+
+export const register = async (name, phone, email, password) => {
+    try {
+        const response = await axios.post(
+            `${API_URL}/login`,
+            { name, phone, email, password },
+            { withCredentials: true }
+        );
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || 'Đăng nhập thất bại!';
+    }
+};
+
 export const logout = async () => {
     try {
         const response = await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });

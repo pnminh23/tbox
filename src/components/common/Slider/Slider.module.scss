@@ -12,29 +12,6 @@
             display: flex;
             align-items: center;
             transition: all 0.2s ease-in-out;
-
-            .title {
-                // align-items: center;
-                font-size: 24px;
-                text-transform: uppercase;
-                position: relative;
-                padding-left: 15px;
-                line-height: 50px;
-
-                &::after {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    border-radius: 3px;
-                    left: 0;
-                    width: 5px;
-                    height: 50px;
-                    background-color: var(--hightlight);
-                }
-            }
-            &:hover {
-                color: var(--hightlight);
-            }
         }
         .navRight {
             display: flex;
