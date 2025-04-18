@@ -1,7 +1,6 @@
 import Slider from '@/components/common/Slider';
 import style from './ListFilmPage.module.scss';
-import imgtest from '@public/static/Co_dau_hao_mon.jpg';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ReactPaginate from 'react-paginate';
 import { AiOutlineSearch, AiOutlineRight, AiOutlineLeft } from 'react-icons/ai';
 import FilmItem from '@/components/common/ItemSlider/FilmItem';
@@ -24,15 +23,17 @@ const ListFilmPage = () => {
     const currentItems = filmsData.slice(offset, offset + ITEMS_PER_PAGE);
     const pageCount = Math.ceil(filmsData.length / ITEMS_PER_PAGE);
 
-    const handlePageClick = ({ selected }) => {
-        setCurrentPage(selected);
+    const handlePageClick = (data) => {
+        setCurrentPage(data.selected);
+    };
 
+    useEffect(() => {
         if (typeof window !== 'undefined' && allFimContainerRef.current) {
-            const offset = 70; // Điều chỉnh khoảng cách lùi xuống
+            const offset = 70;
             const elementPosition = allFimContainerRef.current.getBoundingClientRect().top + window.scrollY;
             window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
         }
-    };
+    }, [currentPage]);
 
     const listCategoryFilm = [
         'Hành động',

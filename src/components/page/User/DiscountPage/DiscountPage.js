@@ -3,7 +3,7 @@ import style from './DiscountPage.module.scss';
 import NewsItem from '@/components/common/NewsItem';
 import ReactPaginate from 'react-paginate';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Title from '@/components/common/Title';
 
 const ITEMS_PER_PAGE = 6;
@@ -86,15 +86,17 @@ const DiscountPage = () => {
     const allFimContainerRef = useRef(null);
     const currentItems = listPromotionNews.slice(offset, offset + ITEMS_PER_PAGE);
     const pageCount = Math.ceil(listPromotionNews.length / ITEMS_PER_PAGE);
-    const handlePageClick = ({ selected }) => {
-        setCurrentPage(selected);
+    const handlePageClick = (data) => {
+        setCurrentPage(data.selected);
+    };
 
-        if (allFimContainerRef.current) {
-            const offset = 70; // Điều chỉnh khoảng cách lùi xuống
+    useEffect(() => {
+        if (typeof window !== 'undefined' && allFimContainerRef.current) {
+            const offset = 70;
             const elementPosition = allFimContainerRef.current.getBoundingClientRect().top + window.scrollY;
             window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
         }
-    };
+    }, [currentPage]);
     return (
         <>
             <Banner />
