@@ -73,10 +73,11 @@
 }
 
 .icon {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     position: relative;
     svg {
+        font-size: 20px;
         height: 100%;
     }
 }
@@ -131,6 +132,15 @@
 .light {
     background: var(--light);
     color: var(--dark);
+}
+
+.blue {
+    background: var(--blue);
+    color: var(--light);
+}
+.red {
+    background: var(--red-primary);
+    color: var(--light);
 }
 
 //**********************

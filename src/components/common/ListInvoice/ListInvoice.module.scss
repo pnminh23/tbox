@@ -1,0 +1,41 @@
+.listInvoiceItem {
+    width: 100%;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    background: var(--dark-primary);
+    justify-content: space-between;
+    .column {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .column0 {
+        width: 70px;
+    }
+    .column1 {
+        width: 200px;
+    }
+    .column2 {
+        width: 200px;
+    }
+    .column3 {
+        width: 120px;
+    }
+    .column4 {
+        width: 100px;
+    }
+    .column5 {
+        width: fit-content;
+        gap: 10px;
+    }
+
+    .item {
+        display: flex;
+        gap: 5px;
+        color: var(--grey);
+        p {
+            color: #fff;
+        }
+    }
+}

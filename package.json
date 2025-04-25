@@ -17,6 +17,7 @@
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.484.0",
     "next": "^13.4.0",
+    "next-paginate": "^0.1.0",
     "primereact": "^10.9.3",
     "react": "^18",
     "react-datepicker": "^8.2.1",

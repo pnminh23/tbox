@@ -27,10 +27,10 @@ const BookRoomPage = () => {
         setSelectedBox(value); // ✅ Lưu giá trị đã chọn
     };
     const handleSelectionComboChange = (value) => {
-        setSelectedCombo(value); // ✅ Lưu giá trị đã chọn
+        setSelectedCombo(value);
     };
     const handleSelectionDiscountChange = (value) => {
-        setSelectedDiscount(value); // ✅ Lưu giá trị đã chọn
+        setSelectedDiscount(value);
     };
     const ListLocations = [
         'PNM - BOX 175 Tây Sơn',

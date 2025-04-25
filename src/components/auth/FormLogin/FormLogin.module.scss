@@ -58,48 +58,11 @@
         justify-content: center;
         align-items: center;
         width: 450px;
-        .input {
-            pointer-events: auto; /* Đảm bảo input có thể nhận sự kiện */
-            user-select: auto !important; /* Cho phép bôi đen chữ */
-            font-size: 14px;
-            width: 100%;
-            height: 50px;
-            border-radius: 30px;
-            background: #2c2c2c;
-            padding: 13px 65px 10px 35px;
-            color: #fff;
-            // outline: none;
-            border: none;
-            transition: all 0.2s;
-            &::selection {
-                background: #007bff; /* Màu xanh nổi bật */
-                color: #fff; /* Chữ trắng */
-            }
-            &::placeholder {
-                font-size: 14px;
-            }
-        }
+
         .inputWrapper {
             width: 100%;
         }
 
-        .eye {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 25px;
-            cursor: pointer;
-            svg {
-                color: #ccc;
-                transition: color 0.2s;
-                &:hover {
-                    color: #fff;
-                }
-            }
-
-            // z-index: 99;
-        }
         .checkboxWrapper {
             position: relative;
             display: flex;

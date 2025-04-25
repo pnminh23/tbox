@@ -2,68 +2,78 @@
     display: flex;
     position: relative;
     width: 100%;
-    height: 40px; // Đảm bảo chiều cao tối thiểu
+    height: 40px;
     background: transparent;
     transition: 0.2s;
-    margin-bottom: 20px;
-    &.disabled {
-        opacity: 0.6;
-        pointer-events: none;
-        background: var(--disabled-bg);
-    }
 }
 
 .input {
     flex: 1;
     width: 100%;
     height: 100%;
-    padding: 0 20px;
+    padding: 0 40px 0 20px; // Padding trái phải để chừa chỗ cho cả icon trái và phải
     border: none;
     outline: none;
     background: #fff;
     font-size: 14px;
     font-weight: 200;
     letter-spacing: 1px;
-    color: var(--text-color);
-    padding-right: 32px; // Chừa khoảng trống cho icon
-
-    &::placeholder {
-        color: #ccc;
-    }
+    color: #151515;
 
     &:disabled {
         color: #343434;
-        background: #232323;
+        background: var(--disabled-bg);
     }
+
     &::selection {
-        background: #343434; // Màu nền khi chọn văn bản
-        color: var(--light); // Màu chữ khi chọn
+        background: var(--blue);
+        color: var(--light);
     }
 }
 
 .icon {
     position: absolute;
-    right: 12px; // Đặt icon sát mép phải
+    left: 12px;
     top: 50%;
-    transform: translateY(-50%); // Căn giữa theo chiều dọc
+    transform: translateY(-50%);
     width: 20px;
     height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #888;
 }
+
+.toggleIcon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+
+    &:hover {
+        color: #555;
+    }
+}
+
 .magin_0_20 {
     margin-top: 0;
     margin-bottom: 20px;
 }
 
-.color_black {
-    color: #232323;
+.magin_15_20 {
+    margin-top: 15px;
+    margin-bottom: 20px;
 }
 
-.magin_15_20 {
-    margin-top: 15;
-    margin-bottom: 20px;
+.color_black {
+    color: #232323;
 }
 
 .rounded_5 {
@@ -73,7 +83,11 @@
 .rounded_10 {
     border-radius: 10px;
 }
+.rounded_20 {
+    border-radius: 20px;
+}
 
 .dark {
-    background-color: var(--dark);
+    background-color: var(--dark-secondary);
+    color: var(--light);
 }

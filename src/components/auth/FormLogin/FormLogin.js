@@ -14,9 +14,9 @@ import Button from '@/components/common/Button/Button';
 import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
 import { useRouter } from 'next/router';
 import { PATH } from '@/constants/config';
+import Input from '@/components/common/Input';
 
 const FormLogin = () => {
-    const [hiddenPw, setHiddenPw] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({ email: '', password: '' });
@@ -89,28 +89,30 @@ const FormLogin = () => {
                     </div>
                     <div className={clsx(style.groupItem, style.relative)}>
                         <Tippy content={errors.email} visible={!!errors.email} placement="right">
-                            <input
-                                type="text"
-                                placeholder="Email hoặc số điện thoại"
-                                className={clsx(style.input, { [style.checked]: errors.email })}
-                                value={email}
-                                onChange={(e) => {
-                                    setEmail(e.target.value);
-                                    validateInput('email', e.target.value);
-                                }}
-                                onBlur={(e) => validateInput('email', e.target.value)}
-                            />
+                            <div className={style.inputWrapper}>
+                                <Input
+                                    type="text"
+                                    dark
+                                    rounded_20
+                                    placeholder="Email hoặc số điện thoại"
+                                    value={email}
+                                    onChange={(e) => {
+                                        setEmail(e.target.value);
+                                        validateInput('email', e.target.value);
+                                    }}
+                                    onBlur={(e) => validateInput('email', e.target.value)}
+                                />
+                            </div>
                         </Tippy>
                     </div>
                     <div className={clsx(style.groupItem, style.relative)}>
                         <Tippy content={errors.password} visible={!!errors.password} placement="right">
                             <div className={style.inputWrapper}>
-                                <input
-                                    type={hiddenPw ? 'text' : 'password'}
+                                <Input
+                                    dark
+                                    rounded_20
+                                    type="password"
                                     placeholder="Mật khẩu"
-                                    className={clsx(style.input, style.inpPassword, {
-                                        [style.checked]: errors.password,
-                                    })}
                                     value={password}
                                     onChange={(e) => {
                                         setPassword(e.target.value);
@@ -118,9 +120,6 @@ const FormLogin = () => {
                                     }}
                                     onBlur={(e) => validateInput('password', e.target.value)}
                                 />
-                                <div className={style.eye} onClick={() => setHiddenPw(!hiddenPw)}>
-                                    {hiddenPw ? <AiFillEye /> : <AiFillEyeInvisible />}
-                                </div>
                             </div>
                         </Tippy>
                     </div>

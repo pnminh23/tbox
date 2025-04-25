@@ -4,7 +4,7 @@ import { getdata } from '@/services/user';
 import { logout } from '@/services/auth';
 import { AiOutlineLogout, AiOutlineIdcard } from 'react-icons/ai';
 import logoSrc from '../../../../public/static/img/logoBOX.svg';
-import avata from '@public/static/img/avata/panda.png';
+import avatar from '@public/static/img/avatar/panda.png';
 import { AiOutlineMenu } from 'react-icons/ai';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -74,7 +74,7 @@ const Header = () => {
     const toggleMenuAccount = () => setIsMenuAccount(!isMenuAccount);
     const closeMenu = () => setIsMenuOpen(false);
 
-    const menuItems = [
+    const menuItemPath = [
         { path: PATH.Home, label: 'Trang chủ' },
         { path: PATH.ListFilm, label: 'Danh sách phim' },
         { path: PATH.BookRoom, label: 'Đặt phòng' },
@@ -95,7 +95,7 @@ const Header = () => {
                         <Image src={logoSrc} className={style.logo} alt="logo" priority />
 
                         <ul className={`${style.menu} ${isMenuOpen ? style.active : ''}`}>
-                            {menuItems.map(({ path, label }) => (
+                            {menuItemPath.map(({ path, label }) => (
                                 <li key={path} className={activePath === path ? style.active : ''}>
                                     <Link href={path} onClick={closeMenu}>
                                         {label}
@@ -110,10 +110,16 @@ const Header = () => {
                                 <p>Xin chào</p>
                                 <p className={style.userName}>{user.name}</p>
                                 <div className={style.avatarContainer} ref={menuAccountRef}>
-                                    <Image src={avata} alt="avata" width={30} height={30} onClick={toggleMenuAccount} />
+                                    <Image
+                                        src={avatar}
+                                        alt="avatar"
+                                        width={30}
+                                        height={30}
+                                        onClick={toggleMenuAccount}
+                                    />
                                     {isMenuAccount && (
                                         <div className={style.dropdownMenu}>
-                                            <Link href="/profile" className={style.menuItem}>
+                                            <Link href={PATH.Profile} className={style.menuItem}>
                                                 <AiOutlineIdcard />
                                                 Quản lý tài khoản
                                             </Link>

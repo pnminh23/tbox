@@ -1,5 +1,5 @@
-@import "./color";
-@import "./fontsGloball";
+@import './color';
+@import './fontsGloball';
 
 // :root {
 // 	--toastify-toast-min-height: 56px;
@@ -11,7 +11,7 @@ body {
     padding: 0;
     // padding: 0;
     margin: 0;
-    font-family: "Roboto";
+    font-family: 'Roboto';
     color: var(--text-color);
     background-color: var(--bg);
 
@@ -74,8 +74,13 @@ h2,
 h3,
 h4,
 h5,
+a,
 h6 {
     overflow-wrap: break-word;
+    &::selection {
+        background: #fff;
+        color: #000;
+    }
 }
 
 /* Chrome, Safari, Edge, Opera */
