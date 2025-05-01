@@ -18,7 +18,7 @@ export default function Account() {
 }
 Account.getLayout = function getLayout(page) {
     return (
-        <LayoutAdmin dark title={title}>
+        <LayoutAdmin user dark title={title}>
             {page}
         </LayoutAdmin>
     );

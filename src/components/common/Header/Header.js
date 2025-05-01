@@ -119,7 +119,7 @@ const Header = () => {
                                     />
                                     {isMenuAccount && (
                                         <div className={style.dropdownMenu}>
-                                            <Link href={PATH.Profile} className={style.menuItem}>
+                                            <Link href={PATH.Overview} className={style.menuItem}>
                                                 <AiOutlineIdcard />
                                                 Quản lý tài khoản
                                             </Link>

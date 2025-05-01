@@ -1,0 +1,17 @@
+.container {
+    width: 100%;
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    thead {
+        background-color: var(--dark);
+        height: 40px;
+        padding: 10px 15px;
+        color: #fff;
+        tr {
+            font-size: 14px;
+            font-weight: 500;
+        }
+    }
+}

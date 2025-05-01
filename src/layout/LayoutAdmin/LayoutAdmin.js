@@ -4,7 +4,7 @@ import MenuTab from '@/components/common/MenuTab';
 import { useState } from 'react';
 import clsx from 'clsx';
 
-const LayoutAdmin = ({ children, dark, title }) => {
+const LayoutAdmin = ({ user, children, dark, title }) => {
     const [collapsed, setCollapsed] = useState(false);
 
     const toggleSidebar = () => {
@@ -12,13 +12,13 @@ const LayoutAdmin = ({ children, dark, title }) => {
     };
 
     return (
-        <div className={style.container}>
+        <div className={clsx(style.container, user && style.user)}>
             <div className={clsx(style.header, collapsed && style.collapsed)}>
                 <HeaderAdmin dark={dark} title={title} onToggleSidebar={toggleSidebar} />
             </div>
 
             <div className={style.menutab}>
-                <MenuTab dark={dark} collapsed={collapsed} />
+                <MenuTab user={user} dark={dark} collapsed={collapsed} />
             </div>
 
             <main className={clsx(style.main, collapsed && style.collapsed)}>{children}</main>

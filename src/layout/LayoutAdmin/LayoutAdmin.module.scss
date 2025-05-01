@@ -1,5 +1,14 @@
 .container {
     display: flex;
+    background-color: #fff;
+    color: #000;
+    width: 100%;
+    // height: 100vh;
+}
+.container.user {
+    display: flex;
+    background-color: #1e1e1e;
+    color: #fff;
     // height: 100vh;
 }
 

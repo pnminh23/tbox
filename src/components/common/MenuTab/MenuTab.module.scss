@@ -58,9 +58,16 @@
 .none {
     display: none;
 }
-.active {
+.active.user {
     background: var(--gradient-yellow);
     a {
         color: var(--dark) !important;
+    }
+}
+
+.active {
+    background: var(--dark);
+    a {
+        color: var(--light) !important;
     }
 }

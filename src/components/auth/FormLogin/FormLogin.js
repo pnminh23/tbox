@@ -59,7 +59,7 @@ const FormLogin = () => {
         try {
             const response = await login(email, password);
 
-            if (response.sucess) {
+            if (response.success) {
                 toast.success('Đăng nhập thành công!');
 
                 setTimeout(() => {
@@ -124,7 +124,7 @@ const FormLogin = () => {
                         </Tippy>
                     </div>
                     <div className={clsx(style.groupItem, style.flexEnd)}>
-                        <Link href="#">Quên mật khẩu?</Link>
+                        <Link href={PATH.ForgotPassword}>Quên mật khẩu?</Link>
                     </div>
                     <div className={style.groupItem}>
                         <Button
@@ -141,7 +141,7 @@ const FormLogin = () => {
                         <span className={style.dividerText}>Bạn chưa có tài khoản?</span>
                     </div>
                     <div className={style.groupItem}>
-                        <Button p_14_24 light rounded_20 uppercase href={PATH.Register}>
+                        <Button light rounded_20 uppercase href={PATH.Register}>
                             Đăng ký
                         </Button>
                     </div>

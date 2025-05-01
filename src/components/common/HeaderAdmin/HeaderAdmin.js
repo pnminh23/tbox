@@ -14,7 +14,7 @@ const HeaderAdmin = ({ dark, title = 'HeaderAdmin', onToggleSidebar }) => {
             </div>
             <div className={style.account}>
                 <Button rounded_10 w_fit red href="/">
-                    Trở về trang chủ
+                    Trang chủ
                 </Button>
                 <p className={style.username}>User name</p>
                 <Image src={avatar} alt="avatar" className={style.avatar} />

@@ -1,0 +1,13 @@
+.container {
+    height: calc(100vh - 100px);
+}
+.header {
+    display: flex;
+    margin-bottom: 20px;
+    justify-content: space-between;
+    .search {
+        width: 50%;
+        display: flex;
+        gap: 10px;
+    }
+}

@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { login } from '@/services/auth';
+import { useState, useEffect, useRef } from 'react';
+import { register, verifyAccount } from '@/services/auth';
 import { toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookie from 'js-cookie';
 import Link from 'next/link';
 import clsx from 'clsx';
-import style from './FormRegister.module.scss';
+import styles from './FormRegister.module.scss';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { AiFillEye, AiFillEyeInvisible, AiOutlineLeft } from 'react-icons/ai';
@@ -14,14 +14,18 @@ import Button from '@/components/common/Button/Button';
 import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
 import { useRouter } from 'next/router';
 import { PATH } from '@/constants/config';
+import Input from '@/components/common/Input';
+import OtpVerification from '../VerifyOtp/VerifyOtp';
 
 const FormRegister = () => {
-    const [hiddenPw, setHiddenPw] = useState(false);
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [phonenumber, setPhonenumber] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [otp, setOtp] = useState(Array(6).fill('')); // 6 ô
+
     const [errors, setErrors] = useState({
         name: '',
         email: '',
@@ -67,155 +71,188 @@ const FormRegister = () => {
         });
     };
 
-    const handleLogin = async (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
-        if (errors.email || errors.password || !email || !password) {
-            toast.error('Vui lòng kiểm tra lại thông tin!');
-            return;
-        }
-
         setLoading(true);
         try {
-            const response = await login(email, password);
+            const response = await register(name, phonenumber, email, password);
 
-            if (response.sucess) {
-                toast.success('Đăng nhập thành công!');
-
-                setTimeout(() => {
-                    router.push('/');
-                }, 1500);
+            if (response.success) {
+                toast.success('Nhập mã OTP nhận từ Email');
+                handleShowPopup();
             } else {
                 toast.error(response.message);
             }
         } catch (error) {
             toast.error(error);
             setLoading(false);
+        } finally {
+            setLoading(false);
         }
     };
-    // useEffect(() => {
-    //     const handleRouteChange = () => setLoading(false);
-    //     window.addEventListener('load', handleRouteChange);
-    //     return () => window.removeEventListener('load', handleRouteChange);
-    // }, []);
+
+    const handleVerifyAccount = async () => {
+        const fullOtp = otp.join('');
+        if (fullOtp.length === 6) {
+            setLoading(true);
+            try {
+                const response = await verifyAccount(email, fullOtp);
+
+                if (response.success) {
+                    toast.success('Xác nhận OTP thành công');
+                    router.push(PATH.Login);
+                } else {
+                    toast.error(response.message);
+                }
+            } catch (error) {
+                toast.error(error);
+                setLoading(false);
+            }
+        } else {
+            toast.error('Vui lòng nhập đủ 6 số!');
+        }
+    };
+
+    const handleShowPopup = () => {
+        setIsPopupVisible(true);
+    };
+
     return (
         <>
             {loading && <LoadingFullPage />} {/* Loading toàn trang */}
-            <div className={style.container}>
-                <form className={style.login} onSubmit={handleLogin}>
-                    <div className={style.headerRow}>
-                        <h3>Đăng ký</h3>
-                        <AiOutlineLeft className={style.back} onClick={() => router.back()} />
-                    </div>
-                    <div className={clsx(style.groupItem, style.relative)}>
-                        <Tippy content={errors.name} visible={!!errors.name} placement="right">
-                            <input
-                                type="text"
-                                placeholder="Họ và tên"
-                                className={clsx(style.input, { [style.checked]: errors.name })}
-                                value={name}
-                                onChange={(e) => {
-                                    setName(e.target.value);
-                                    validateInput('name', e.target.value);
-                                }}
-                                onBlur={(e) => validateInput('name', e.target.value)}
-                            />
-                        </Tippy>
-                    </div>
-                    <div className={clsx(style.groupItem, style.relative)}>
-                        <Tippy content={errors.email} visible={!!errors.email} placement="right">
-                            <input
-                                type="text"
-                                placeholder="Email hoặc số điện thoại"
-                                className={clsx(style.input, { [style.checked]: errors.email })}
-                                value={email}
-                                onChange={(e) => {
-                                    setEmail(e.target.value);
-                                    validateInput('email', e.target.value);
-                                }}
-                                onBlur={(e) => validateInput('email', e.target.value)}
-                            />
-                        </Tippy>
-                    </div>
-                    <div className={clsx(style.groupItem, style.relative)}>
-                        <Tippy content={errors.phonenumber} visible={!!errors.phonenumber} placement="right">
-                            <input
-                                type="text"
-                                placeholder="Số điện thoại"
-                                className={clsx(style.input, { [style.checked]: errors.phonenumber })}
-                                value={phonenumber}
-                                onChange={(e) => {
-                                    setPhonenumber(e.target.value);
-                                    validateInput('phonenumber', e.target.value);
-                                }}
-                                onBlur={(e) => validateInput('phonenumber', e.target.value)}
-                            />
-                        </Tippy>
-                    </div>
-                    <div className={clsx(style.groupItem, style.relative)}>
-                        <Tippy content={errors.password} visible={!!errors.password} placement="right">
-                            <div className={style.inputWrapper}>
-                                <input
-                                    type={hiddenPw ? 'text' : 'password'}
-                                    placeholder="Mật khẩu"
-                                    className={clsx(style.input, style.inpPassword, {
-                                        [style.checked]: errors.password,
-                                    })}
-                                    value={password}
-                                    onChange={(e) => {
-                                        setPassword(e.target.value);
-                                        validateInput('password', e.target.value);
-                                    }}
-                                    onBlur={(e) => validateInput('password', e.target.value)}
-                                />
-                                <div className={style.eye} onClick={() => setHiddenPw(!hiddenPw)}>
-                                    {hiddenPw ? <AiFillEye /> : <AiFillEyeInvisible />}
+            <div className={styles.container}>
+                {isPopupVisible ? (
+                    <OtpVerification email={email} otp={otp} setOtp={setOtp} onVerify={handleVerifyAccount} />
+                ) : (
+                    <div className={styles.registerContainer}>
+                        <div>
+                            <form className={styles.register} onSubmit={handleRegister}>
+                                <div className={styles.headerRow}>
+                                    <p className={styles.title}>Đăng ký</p>
+                                    <AiOutlineLeft className={styles.back} onClick={() => router.back()} />
                                 </div>
-                            </div>
-                        </Tippy>
-                    </div>
-                    <div className={clsx(style.groupItem, style.relative)}>
-                        <Tippy content={errors.confirmPassword} visible={!!errors.confirmPassword} placement="right">
-                            <div className={style.inputWrapper}>
-                                <input
-                                    type={hiddenPw ? 'text' : 'password '}
-                                    placeholder="Nhập lại mật khẩu"
-                                    className={clsx(style.input, style.inpPassword, {
-                                        [style.checked]: errors.confirmPassword,
-                                    })}
-                                    value={confirmPassword}
-                                    onChange={(e) => {
-                                        setConfirmPassword(e.target.value);
-                                        validateInput('confirmPassword', e.target.value);
-                                    }}
-                                    onBlur={(e) => validateInput('confirmPassword', e.target.value)}
-                                />
-                                <div className={style.eye} onClick={() => setHiddenPw(!hiddenPw)}>
-                                    {hiddenPw ? <AiFillEye /> : <AiFillEyeInvisible />}
+                                <div className={clsx(styles.groupItem, styles.relative)}>
+                                    <Tippy content={errors.name} visible={!!errors.name} placement="right">
+                                        <div className={styles.inputWrapper}>
+                                            <Input
+                                                type="text"
+                                                dark
+                                                rounded_20
+                                                placeholder="Họ và tên"
+                                                value={name}
+                                                onChange={(e) => {
+                                                    setName(e.target.value);
+                                                    validateInput('name', e.target.value);
+                                                }}
+                                                onBlur={(e) => validateInput('name', e.target.value)}
+                                            />
+                                        </div>
+                                    </Tippy>
                                 </div>
-                            </div>
-                        </Tippy>
-                    </div>
+                                <div className={clsx(styles.groupItem, styles.relative)}>
+                                    <Tippy content={errors.email} visible={!!errors.email} placement="right">
+                                        <div className={styles.inputWrapper}>
+                                            <Input
+                                                type="text"
+                                                dark
+                                                rounded_20
+                                                placeholder="Email"
+                                                value={email}
+                                                onChange={(e) => {
+                                                    setEmail(e.target.value);
+                                                    validateInput('email', e.target.value);
+                                                }}
+                                                onBlur={(e) => validateInput('email', e.target.value)}
+                                            />
+                                        </div>
+                                    </Tippy>
+                                </div>
+                                <div className={clsx(styles.groupItem, styles.relative)}>
+                                    <Tippy
+                                        content={errors.phonenumber}
+                                        visible={!!errors.phonenumber}
+                                        placement="right"
+                                    >
+                                        <div className={styles.inputWrapper}>
+                                            <Input
+                                                type="text"
+                                                dark
+                                                rounded_20
+                                                placeholder="Số điện thoại"
+                                                value={phonenumber}
+                                                onChange={(e) => {
+                                                    setPhonenumber(e.target.value);
+                                                    validateInput('phonenumber', e.target.value);
+                                                }}
+                                                onBlur={(e) => validateInput('phonenumber', e.target.value)}
+                                            />
+                                        </div>
+                                    </Tippy>
+                                </div>
+                                <div className={clsx(styles.groupItem, styles.relative)}>
+                                    <Tippy content={errors.password} visible={!!errors.password} placement="right">
+                                        <div className={styles.inputWrapper}>
+                                            <Input
+                                                dark
+                                                rounded_20
+                                                type="password"
+                                                placeholder="Mật khẩu"
+                                                value={password}
+                                                onChange={(e) => {
+                                                    setPassword(e.target.value);
+                                                    validateInput('password', e.target.value);
+                                                }}
+                                                onBlur={(e) => validateInput('password', e.target.value)}
+                                            />
+                                        </div>
+                                    </Tippy>
+                                </div>
+                                <div className={clsx(styles.groupItem, styles.relative)}>
+                                    <Tippy
+                                        content={errors.confirmPassword}
+                                        visible={!!errors.confirmPassword}
+                                        placement="right"
+                                    >
+                                        <div className={styles.inputWrapper}>
+                                            <Input
+                                                dark
+                                                rounded_20
+                                                type="password"
+                                                placeholder="Nhập lại mật khẩu"
+                                                value={confirmPassword}
+                                                onChange={(e) => {
+                                                    setConfirmPassword(e.target.value);
+                                                    validateInput('confirmPassword', e.target.value);
+                                                }}
+                                                onBlur={(e) => validateInput('confirmPassword', e.target.value)}
+                                            />
+                                        </div>
+                                    </Tippy>
+                                </div>
 
-                    <div className={style.groupItem}>
-                        <Button
-                            type="submit"
-                            yellowLinear
-                            rounded_20
-                            uppercase
-                            disabled={
-                                loading ||
-                                !name ||
-                                !email ||
-                                !phonenumber ||
-                                !password ||
-                                !confirmPassword ||
-                                Object.values(errors).some((e) => e)
-                            }
-                        >
-                            Đăng ký
-                        </Button>
+                                <div className={styles.groupItem}>
+                                    <Button
+                                        type="submit"
+                                        yellowLinear
+                                        rounded_20
+                                        uppercase
+                                        disabled={
+                                            loading ||
+                                            !name ||
+                                            !email ||
+                                            !phonenumber ||
+                                            !password ||
+                                            !confirmPassword ||
+                                            Object.values(errors).some((e) => e)
+                                        }
+                                    >
+                                        Đăng ký
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </form>
+                )}
             </div>
         </>
     );

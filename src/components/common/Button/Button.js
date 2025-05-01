@@ -32,6 +32,7 @@ const Button = ({
                 styles.container,
                 {
                     [styles.maxContent]: props.maxContent,
+                    [styles.w_fit]: props.w_fit,
                     [styles.maxHeight]: props.maxHeight,
                     [styles.disabled]: disabled, // Thêm class khi disabled
                 },

@@ -8,10 +8,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    h3 {
+    .title {
         text-transform: uppercase;
+        font-weight: 500;
     }
 }
+
 .headerRow {
     position: relative;
     width: 450px;
@@ -29,16 +31,16 @@
         }
     }
 }
-.login {
+.register {
     a {
         font-size: 14px;
     }
     padding: 35px 0;
     width: 650px;
-    height: 550px;
+    height: fit-content;
     flex-shrink: 0;
     border-radius: 30px;
-    background: rgba(21, 21, 21, 0.9);
+    background: var(--dark);
     box-shadow: 4px 4px 6px 1px rgba(0, 0, 0, 0.3);
     display: flex;
     // justify-content: center;
