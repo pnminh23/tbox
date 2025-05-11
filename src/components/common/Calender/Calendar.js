@@ -3,25 +3,22 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import style from './Calendar.module.scss';
+import { useStyleClass } from '@/hooks/useStyleClass';
+import clsx from 'clsx';
 
-const Calendar = ({ selectedDate, onChange, currentDay = false, type = 'day' }) => {
+const Calendar = ({ selectedDate, onChange, currentDay = false, type = 'day', disabled = false, ...props }) => {
     const [open, setOpen] = useState(false);
-    const [date, setDate] = useState(selectedDate || (currentDay ? new Date() : null));
-    const wrapperRef = useRef(null); // ref cho calendar wrapper
+    const wrapperRef = useRef(null);
+    const styleClass = useStyleClass(props, style);
 
+    // Nếu currentDay === true và selectedDate chưa có → tự set ngày hôm nay
     useEffect(() => {
         if (currentDay && !selectedDate) {
             const today = new Date();
-            setDate(today);
             onChange(today);
         }
     }, [currentDay, selectedDate, onChange]);
 
-    useEffect(() => {
-        setDate(selectedDate);
-    }, [selectedDate]);
-
-    // Đóng popover khi click ra ngoài
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -40,26 +37,31 @@ const Calendar = ({ selectedDate, onChange, currentDay = false, type = 'day' }) 
         };
     }, [open]);
 
+    const formattedDate = selectedDate
+        ? type === 'month'
+            ? `${selectedDate.getMonth() + 1}/${selectedDate.getFullYear()}`
+            : selectedDate.toLocaleDateString()
+        : type === 'month'
+        ? 'Chọn tháng'
+        : 'Chọn ngày';
+
     return (
-        <div className={style.calendarWrapper} ref={wrapperRef}>
-            <button className={style.calendarButton} onClick={() => setOpen(!open)}>
-                {date
-                    ? type === 'month'
-                        ? `${date.getMonth() + 1}/${date.getFullYear()}`
-                        : date.toLocaleDateString()
-                    : type === 'month'
-                    ? 'Chọn tháng'
-                    : 'Chọn ngày'}
+        <div className={clsx(style.calendarWrapper, styleClass)} ref={wrapperRef}>
+            <div
+                className={clsx(style.calendarButton, disabled && style.disable, styleClass)}
+                onClick={() => !disabled && setOpen(!open)}
+                disabled={disabled}
+            >
+                {formattedDate}
                 <CalendarIcon className={style.calendarIcon} />
-            </button>
-            {open && (
+            </div>
+            {open && !disabled && (
                 <div className={style.calendarPopover}>
                     <DatePicker
                         key={type}
-                        selected={date}
-                        onChange={(selectedDate) => {
-                            setDate(selectedDate);
-                            onChange(selectedDate);
+                        selected={selectedDate}
+                        onChange={(newDate) => {
+                            onChange(newDate);
                             setOpen(false);
                         }}
                         inline

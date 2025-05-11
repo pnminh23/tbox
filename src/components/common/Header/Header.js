@@ -1,10 +1,9 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
-import { getdata } from '@/services/user';
+import { getdata, useUserData } from '@/services/account';
 import { logout } from '@/services/auth';
 import { AiOutlineLogout, AiOutlineIdcard } from 'react-icons/ai';
 import logoSrc from '../../../../public/static/img/logoBOX.svg';
-import avatar from '@public/static/img/avatar/panda.png';
 import { AiOutlineMenu } from 'react-icons/ai';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -14,14 +13,14 @@ import 'swiper/css/navigation';
 import { PATH } from '@/constants/config';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AccountBadge from '../AccountBadge';
 
 const Header = () => {
     const router = useRouter();
     const [activePath, setActivePath] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isMenuAccount, setIsMenuAccount] = useState(false);
-    const [user, setUser] = useState(null);
-    const menuAccountRef = useRef(null);
+
+    const { user, isLoading, isError } = useUserData();
 
     useEffect(() => {
         setActivePath(router.pathname);
@@ -31,47 +30,8 @@ const Header = () => {
         document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
     }, [isMenuOpen]);
 
-    useEffect(() => {
-        // Gọi API để lấy thông tin user nếu đã đăng nhập
-        const fetchUser = async () => {
-            try {
-                const userData = await getdata();
-                setUser(userData.data);
-            } catch (error) {
-                setUser(null);
-            }
-        };
-
-        fetchUser();
-    }, []);
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuAccountRef.current && !menuAccountRef.current.contains(event.target)) {
-                setIsMenuAccount(false);
-            }
-        };
-        document.addEventListener('click', handleClickOutside);
-        return () => {
-            document.removeEventListener('click', handleClickOutside);
-        };
-    }, []);
-
-    const handleLogout = async () => {
-        try {
-            await logout();
-            setUser(null);
-
-            setTimeout(() => {
-                router.push(PATH.Home);
-            }, 2000);
-        } catch (error) {
-            toast.error('Lỗi khi đăng xuất!', { autoClose: 2000 });
-        }
-    };
-
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-    const toggleMenuAccount = () => setIsMenuAccount(!isMenuAccount);
+
     const closeMenu = () => setIsMenuOpen(false);
 
     const menuItemPath = [
@@ -105,31 +65,12 @@ const Header = () => {
                         </ul>
                     </div>
                     <div className={style.headerRight}>
-                        {user ? (
+                        {isLoading ? (
+                            <p>Đang tải...</p> // hoặc spinner
+                        ) : user ? (
                             <div className={style.userSection}>
                                 <p>Xin chào</p>
-                                <p className={style.userName}>{user.name}</p>
-                                <div className={style.avatarContainer} ref={menuAccountRef}>
-                                    <Image
-                                        src={avatar}
-                                        alt="avatar"
-                                        width={30}
-                                        height={30}
-                                        onClick={toggleMenuAccount}
-                                    />
-                                    {isMenuAccount && (
-                                        <div className={style.dropdownMenu}>
-                                            <Link href={PATH.Overview} className={style.menuItem}>
-                                                <AiOutlineIdcard />
-                                                Quản lý tài khoản
-                                            </Link>
-                                            <div className={style.logoutButton} onClick={handleLogout}>
-                                                <AiOutlineLogout />
-                                                Đăng xuất
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                <AccountBadge user={user} />
                             </div>
                         ) : (
                             <div className={style.login}>

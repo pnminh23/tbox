@@ -109,6 +109,10 @@
     height: 100%;
 }
 
+.noText {
+    display: none; // Ẩn text khi không có children
+}
+
 .inhenrit {
     background: inherit;
     color: inherit;
@@ -138,9 +142,34 @@
     background: var(--blue);
     color: var(--light);
 }
+
+.blueIcon {
+    background: var(--blue-bg);
+    color: var(--blue);
+}
+
 .red {
     background: var(--red-primary);
     color: var(--light);
+}
+
+.redIcon {
+    background: var(--red-bg);
+    color: var(--red-hightlight);
+}
+
+.green {
+    background: var(--green);
+    color: var(--light);
+}
+
+.greenIcon {
+    background: var(--green-bg);
+    color: var(--green);
+}
+
+.outline {
+    border: 1px solid #000;
 }
 
 //**********************
@@ -199,7 +228,7 @@
 }
 
 .p_4_4 {
-    padding: 0px;
+    padding: 4px;
 }
 
 .p_4_8 {

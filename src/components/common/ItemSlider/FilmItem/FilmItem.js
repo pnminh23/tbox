@@ -1,12 +1,15 @@
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css'; // Import CSS mặc định của Tippy
 import style from './FilmItem.module.scss';
 import Image from 'next/image';
 import Link from 'next/link';
 
 const FilmItem = ({ film }) => {
+    const currentYear = new Date().getFullYear();
     return (
         <div className={style.item}>
             <div className={style.image}>
-                <Image src={`https://phimimg.com//${film.poster_url}`} alt={film.origin_name} fill objectFit="cover" />
+                <Image src={film.image} alt={film.name} fill objectFit="cover" />
             </div>
             <div className={style.overlay}></div>
             <Link href="/dat-hang" className={style.orderButton}>
@@ -14,13 +17,27 @@ const FilmItem = ({ film }) => {
             </Link>
 
             <div className={style.content}>
-                <h5>{film.origin_name}</h5>
-                <p>{film.category[0].name}</p>
+                <h5 className={style.name}>{film.name}</h5>
+
+                <p className={style.nameEnglish}>{film.nameEnglish}</p>
+
                 <div className={style.info}>
-                    <span>{film.year}</span>
-                    <span>{film.time}</span>
+                    <span>{film.release_date}</span>
+                    <span>{film.duration}</span>
+                    <span>{film.country}</span>
                 </div>
-                <p>new</p>
+                <div className={style.categories}>
+                    {film.category.map((cat, index) => (
+                        <span key={index} className={style.categoryItem}>
+                            {cat}
+                        </span>
+                    ))}
+                </div>
+                {film.release_date == currentYear && (
+                    <div className={style.status}>
+                        <p>new</p>
+                    </div>
+                )}
             </div>
         </div>
     );

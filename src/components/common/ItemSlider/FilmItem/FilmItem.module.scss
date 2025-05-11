@@ -38,7 +38,7 @@
         top: 0;
         left: 10px;
         width: calc(100% - 20px);
-        height: 100%;
+        height: 300px;
         background: rgba(0, 0, 0, 0.5);
         opacity: 0;
         transition: opacity 0.3s ease-in-out;
@@ -73,34 +73,65 @@
     border-bottom-right-radius: 10px; /* Bo góc trên bên phải */
     background-color: #151515;
     padding: 10px;
-    h5 {
+
+    height: 150px;
+    .name {
         white-space: nowrap; /* Ngăn chữ xuống dòng */
         overflow: hidden; /* Ẩn phần nội dung bị tràn */
         text-overflow: ellipsis; /* Hiển thị dấu "..." khi nội dung bị cắt */
         // height: 50px;
         font-size: 16px;
         font-weight: 700;
-        margin-bottom: 10px;
+    }
+    .nameEnglish {
+        white-space: nowrap; /* Ngăn chữ xuống dòng */
+        overflow: hidden; /* Ẩn phần nội dung bị tràn */
+        text-overflow: ellipsis;
+        color: var(--grey);
+        margin-bottom: 5px;
+    }
+    .categoryItem {
+        display: inline;
+        position: relative;
+        padding-right: 10px;
+        margin-right: 8px;
+        color: var(--grey);
+        &::after {
+            content: '|';
+            position: absolute;
+            right: 0;
+        }
+
+        &:last-child::after {
+            content: '';
+        }
     }
     .info {
         span {
             position: relative;
+            color: var(--grey);
+            padding-right: 10px;
+            margin-right: 8px;
 
-            margin-right: 20px;
             &::after {
-                content: "";
+                content: '-';
                 position: absolute;
-                right: -10px;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 1px;
-                height: 15px;
-                background-color: #ccc;
+                right: 0;
             }
 
             &:last-child::after {
-                display: none; // Ẩn đường kẻ ở thẻ cuối cùng
+                content: '';
             }
+        }
+    }
+    .status {
+        display: flex;
+
+        p {
+            padding: 0 6px;
+            border-radius: 8px;
+            border: 1px solid #fff;
+            margin-left: auto;
         }
     }
 }

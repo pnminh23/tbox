@@ -10,6 +10,7 @@
         margin-bottom: 2%;
         .navLeft {
             display: flex;
+
             align-items: center;
             transition: all 0.2s ease-in-out;
         }
@@ -44,6 +45,11 @@
                 background-color: rgba(0, 0, 0, 0.7);
             }
         }
+    }
+    .subtitle {
+        width: 100%;
+        padding: 0 20px;
+        margin-bottom: 20px;
     }
     // margin: 20px;
 }

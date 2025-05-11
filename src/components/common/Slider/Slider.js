@@ -9,44 +9,47 @@ import Title from '../Title';
 import { PATH } from '@/constants/config';
 
 const Slider = ({
-    apiUrl,
+    data = [],
+    isLoading,
     renderItem,
     title = 'Slider',
+    subtitle,
     slidesPerView,
     autoplay = false,
     slidesPerGroup = 1,
     breakpoints,
+    children,
 }) => {
-    const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(true);
+    // const [items, setItems] = useState([]);
+    // const [loading, setLoading] = useState(true);
     const swiperRef = useRef(null); // Ref cho Swiper
     const prevButtonRef = useRef(null);
     const nextButtonRef = useRef(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const result = await response.json();
-                console.log('API Response:', result);
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await fetch(apiUrl);
+    //             if (!response.ok) {
+    //                 throw new Error(`HTTP error! Status: ${response.status}`);
+    //             }
+    //             const result = await response.json();
+    //             console.log('API Response:', result);
 
-                if (result.status === 'success' && result.data && result.data.items) {
-                    setItems(result.data.items);
-                } else {
-                    console.error('Dữ liệu API không hợp lệ');
-                }
-            } catch (error) {
-                console.error('Lỗi khi fetch dữ liệu:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    //             if (result.status === 'success' && result.data && result.data.items) {
+    //                 setItems(result.data.items);
+    //             } else {
+    //                 console.error('Dữ liệu API không hợp lệ');
+    //             }
+    //         } catch (error) {
+    //             console.error('Lỗi khi fetch dữ liệu:', error);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
 
-        fetchData();
-    }, [apiUrl]);
+    //     fetchData();
+    // }, [apiUrl]);
 
     useEffect(() => {
         if (swiperRef.current && swiperRef.current.swiper) {
@@ -55,7 +58,7 @@ const Slider = ({
             swiperRef.current.swiper.navigation.init();
             swiperRef.current.swiper.navigation.update();
         }
-    }, [items]); // Chỉ chạy khi items được tải xong
+    }, [data]); // Chỉ chạy khi items được tải xong
 
     return (
         <div className={style.sliderContainer}>
@@ -63,7 +66,6 @@ const Slider = ({
                 <div className={style.navLeft}>
                     <Title>{title}</Title>
                 </div>
-
                 <div className={style.navRight}>
                     <div ref={prevButtonRef} className={clsx(style.prevButton)}>
                         <AiOutlineLeft />
@@ -73,7 +75,7 @@ const Slider = ({
                     </div>
                 </div>
             </div>
-
+            {children}
             <Swiper
                 ref={swiperRef}
                 className={style.swiperSlider}
@@ -90,14 +92,14 @@ const Slider = ({
                 autoplay={autoplay ? { delay: 7000, disableOnInteraction: false } : false}
                 breakpoints={breakpoints}
             >
-                {loading
+                {isLoading
                     ? Array.from({ length: slidesPerView }).map((_, index) => (
                           <SwiperSlide key={index}>
                               <Loading />
                           </SwiperSlide>
                       ))
                     : // <p>loading</p>
-                      items.map((item) => <SwiperSlide key={item._id}>{renderItem(item)}</SwiperSlide>)}
+                      data.map((item, index) => <SwiperSlide key={index}>{renderItem(item)}</SwiperSlide>)}
             </Swiper>
         </div>
     );

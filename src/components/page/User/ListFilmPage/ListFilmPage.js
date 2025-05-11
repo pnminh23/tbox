@@ -1,52 +1,27 @@
 import Slider from '@/components/common/Slider';
 import style from './ListFilmPage.module.scss';
 import { useState, useRef, useEffect } from 'react';
-import ReactPaginate from 'react-paginate';
 import { AiOutlineSearch, AiOutlineRight, AiOutlineLeft } from 'react-icons/ai';
 import FilmItem from '@/components/common/ItemSlider/FilmItem';
 import Banner from '@/components/common/Banner';
 import clsx from 'clsx';
 import Input from '@/components/common/Input/input';
-const ITEMS_PER_PAGE = 12; // Số phim mỗi trang
-const filmsData = Array.from({ length: 30 }, (_, index) => ({
-    origin_name: `Cô dâu hào môn ${index + 1}`, // Thêm số thứ tự vào tên phim
-    category: [{ name: 'Tâm lý tình cảm' }],
-    year: 2025,
-    time: '120 phút',
-    poster_url: 'upload/vod/20231211-1/8a6139abc918a034f878e69bd5472138.jpg',
-}));
+import { categoryFilms, useAllFilms, useFilmsByCurrentYear } from '@/services/films';
+import Pagination from '@/components/common/Pagonation';
 
 const ListFilmPage = () => {
-    const [currentPage, setCurrentPage] = useState(0);
+    const { filmsCurrentyear, isLoadingFilmsByCurrentYear, isErrorFilmsByCurrentYear, mutateFilmsByCurrentYear } =
+        useFilmsByCurrentYear();
+    const { films, isLoadingFilms, isErrorFilms, mutateFilms } = useAllFilms();
+    const [currentPage, setCurrentPage] = useState(1); // bắt đầu từ 1
+    const [limit, setLimit] = useState(8); // mặc định 8 phim/trang
+    const totalItems = films?.length || 0;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    // Lấy danh sách phim hiện tại để hiển thị
+    const paginatedFilms = films?.slice((currentPage - 1) * limit, currentPage * limit) || [];
+
     const allFimContainerRef = useRef(null);
-    const offset = currentPage * ITEMS_PER_PAGE;
-    const currentItems = filmsData.slice(offset, offset + ITEMS_PER_PAGE);
-    const pageCount = Math.ceil(filmsData.length / ITEMS_PER_PAGE);
-
-    const handlePageClick = (data) => {
-        setCurrentPage(data.selected);
-    };
-
-    useEffect(() => {
-        if (typeof window !== 'undefined' && allFimContainerRef.current) {
-            const offset = 70;
-            const elementPosition = allFimContainerRef.current.getBoundingClientRect().top + window.scrollY;
-            window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
-        }
-    }, [currentPage]);
-
-    const listCategoryFilm = [
-        'Hành động',
-        'Phiêu lưu',
-        'Kinh dị',
-        'Khoa học viễn tưởng',
-        'Hài hước',
-        'Tình cảm',
-        'Tâm lý - Chính kịch',
-        'Hình sự - Tội phạm',
-        'Hoạt hình',
-        'Viễn Tây',
-    ];
 
     const getLast15Years = () => {
         const currentYear = new Date().getFullYear();
@@ -60,8 +35,8 @@ const ListFilmPage = () => {
             <div className={clsx('container', style.container)}>
                 <div className={style.left}>
                     <Slider
-                        apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
-                        title="Phim mới ra mắt"
+                        data={filmsCurrentyear}
+                        title="Phim mới ra mắt năm nay"
                         slidesPerView={4}
                         renderItem={(film) => <FilmItem film={film} />}
                     />
@@ -70,22 +45,26 @@ const ListFilmPage = () => {
                             <h3>Tất cả các Phim tại PNM - BOX</h3>
                         </div>
                         <div className={style.allFilm}>
-                            {currentItems.map((film, index) => (
-                                <FilmItem key={index} film={film} />
-                            ))}
+                            {isLoadingFilms ? (
+                                <p>Đang tải phim...</p>
+                            ) : isErrorFilms ? (
+                                <p>Lỗi khi tải phim.</p>
+                            ) : (
+                                paginatedFilms.map((film, index) => <FilmItem key={index} film={film} />)
+                            )}
                         </div>
 
                         {/* Phân trang */}
-                        <ReactPaginate
-                            previousLabel={<AiOutlineLeft />}
-                            nextLabel={<AiOutlineRight />}
-                            breakLabel={'...'}
-                            pageCount={pageCount}
-                            marginPagesDisplayed={1}
-                            pageRangeDisplayed={2}
-                            onPageChange={handlePageClick}
-                            containerClassName={style.pagination}
-                            activeClassName={style.active}
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalItems={totalItems}
+                            limit={limit}
+                            onPageChange={(page) => setCurrentPage(page)}
+                            onLimitChange={(newLimit) => {
+                                setLimit(newLimit);
+                                setCurrentPage(1); // reset về trang đầu
+                            }}
                         />
                     </div>
                 </div>
@@ -105,7 +84,7 @@ const ListFilmPage = () => {
                     <div className={style.category}>
                         <h5>Thể loại</h5>
                         <ul>
-                            {listCategoryFilm.map((category, index) => (
+                            {categoryFilms.map((category, index) => (
                                 <li key={index}>
                                     <AiOutlineRight />
                                     {category}

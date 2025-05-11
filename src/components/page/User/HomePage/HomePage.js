@@ -21,10 +21,20 @@ import menu3 from '@public/static/img/menuItem/menu3.jpg';
 import comboDat from '@public/static/img/menuItem/comboDating.jpg';
 // import backgroundContent3 from "@public/static/img/menuItem/background.jpg";
 import clsx from 'clsx';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Feedback from '@/components/common/Feedback';
+import { useAllFilms, useFilmsByCurrentYear } from '@/services/films';
 const Home = () => {
+    // const { films, isLoadingAllFimls, isErrorAllFimls, mutateFilms } = useAllFilms();
+    const { filmsCurrentyear, isLoadingFilmsByCurrentYear, isErrorFilmsByCurrentYear, mutateFilmsByCurrentYear } =
+        useFilmsByCurrentYear();
+
+    const top10RecentFilms = useMemo(() => {
+        if (!filmsCurrentyear) return [];
+        return [...filmsCurrentyear].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10);
+    }, [filmsCurrentyear]);
+
     const prevRef = useRef(null);
     const nextRef = useRef(null);
     return (
@@ -32,8 +42,10 @@ const Home = () => {
             <Banner />
             <div className="container">
                 <Slider
-                    apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
-                    title="Phim hot tại PNM - BOX"
+                    // apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
+                    data={top10RecentFilms}
+                    isLoading={isLoadingFilmsByCurrentYear}
+                    title="Phim mới ra mắt"
                     slidesPerView={5}
                     renderItem={(film) => <FilmItem film={film} />}
                     breakpoints={{

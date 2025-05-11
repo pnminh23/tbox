@@ -61,7 +61,7 @@ const FormLogin = () => {
 
             if (response.success) {
                 toast.success('Đăng nhập thành công!');
-
+                localStorage.setItem('email', email);
                 setTimeout(() => {
                     router.push('/');
                 }, 1500);

@@ -26,25 +26,9 @@
     gap: 20px;
     align-self: stretch;
 }
-.fileInput {
-    display: none;
-}
-.uploadImage {
-    display: flex;
-    flex-direction: column;
-}
+
 .changePassword {
     font-weight: 700;
     cursor: pointer;
     color: var(--hightlight);
-}
-
-.hide {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.unhide {
-    opacity: 1;
-    pointer-events: auto;
 }

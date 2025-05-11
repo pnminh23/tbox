@@ -1,75 +1,118 @@
 import Button from '@/components/common/Button';
 import style from './AccountPage.module.scss';
 import { AiOutlineEye, AiOutlineUpload } from 'react-icons/ai';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Input from '@/components/common/Input';
 import Calendar from '@/components/common/Calender';
 import clsx from 'clsx';
+import UploadFileImage from '@/components/common/UploadFileImage/UploadFileImage';
+import { toast } from 'react-toastify';
+import { editAccountByEmail, getAccountByEmail } from '@/services/account';
+import Link from 'next/link';
+import { PATH } from '@/constants/config';
 
 const AccountPage = () => {
-    const [changePassword, setChangePassword] = useState(false);
-    const fileInputRef = useRef(null);
-    const handleFileInputClick = () => {
-        fileInputRef.current.click();
+    const [email, setEmail] = useState('');
+    const [editFile, setEditFile] = useState(null);
+    const [editAccount, setEditAccount] = useState({
+        name: '',
+        phone: '',
+        email: '',
+        image: '',
+    });
+
+    useEffect(() => {
+        const storedEmail = localStorage.getItem('email');
+
+        const fetchAccount = async () => {
+            try {
+                console.log('email:', storedEmail);
+
+                const response = await getAccountByEmail(storedEmail);
+
+                if (response.success) {
+                    toast.success(response.message);
+                    setEditAccount({
+                        name: response.data.name || '',
+                        phone: response.data.phone || '',
+                        email: response.data.email || '',
+                        image: response.data.image || '',
+                    });
+                } else {
+                    toast.error(response.message);
+                }
+                console.log('defaultImage:', editAccount.image);
+            } catch (err) {
+                toast.error(err.message || 'Có lỗi xảy ra');
+            }
+        };
+
+        fetchAccount();
+    }, []);
+
+    const handleEdit = async () => {
+        try {
+            const formData = new FormData();
+            formData.append('email', editAccount.email); // bắt buộc
+
+            if (editAccount.name) formData.append('name', editAccount.name);
+            if (editAccount.phone) formData.append('phone', editAccount.phone);
+
+            if (editFile) formData.append('image', editFile); // nếu có file mới
+
+            const response = await editAccountByEmail(formData);
+
+            if (response.success) {
+                toast.success('Cập nhật tài khoản thành công!');
+            } else {
+                toast.error(response.message);
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error('Đã xảy ra lỗi khi cập nhật!');
+        }
     };
 
-    const handleFileChange = (event) => {
-        const fileName = event.target.files[0]?.name || '';
-        console.log('Tệp đã chọn:', fileName);
-    };
     return (
         <form className={style.container}>
             <div className={style.groupItem}>
                 <p className={style.label}>Thông tin tài khoản</p>
-                <div className={style.row}>
-                    <div className={style.avatar}></div>
-                    <div className={style.uploadImage}>
-                        <p>Hình ảnh tải lên đạt kích thước tối thiểu 300 x 300 pixel</p>
-                        <p className={style.subText}>Định dạng hỗ trợL JPG, JPEG, PNG</p>
-                        <input type="file" className={style.fileInput} ref={fileInputRef} onChange={handleFileChange} />
-                        <Button light w_fit rounded_10 icon={<AiOutlineUpload />} onClick={handleFileInputClick}>
-                            Chọn ảnh
-                        </Button>
-                    </div>
-                </div>
+                <UploadFileImage
+                    avatar
+                    defaultImage={editAccount.image}
+                    onFileSelected={(file) => {
+                        setEditFile(file);
+                        // Xử lý thêm nếu cần
+                    }}
+                />
                 <div className={style.groupItem}>
                     <p className={style.label}>Họ và tên</p>
-                    <Input rounded_10 />
+                    <Input
+                        rounded_10
+                        value={editAccount.name}
+                        onChange={(e) => setEditAccount((prev) => ({ ...prev, name: e.target.value }))}
+                    />
                 </div>
                 <div className={style.row}>
                     <div className={style.groupItem}>
                         <p className={style.label}>Email</p>
-                        <Input rounded_10 />
+                        <Input rounded_10 disabled value={editAccount.email} />
                     </div>
                     <div className={style.groupItem}>
                         <p className={style.label}>Số điện thoại</p>
-                        <Input rounded_10 />
-                    </div>
-                    <div className={style.groupItem}>
-                        <p className={style.label}>Ngày sinh</p>
-                        <Calendar rounded_10 />
+                        <Input
+                            rounded_10
+                            value={editAccount.phone}
+                            onChange={(e) => setEditAccount((prev) => ({ ...prev, phone: e.target.value }))}
+                        />
                     </div>
                 </div>
-                <div className={style.row}>
-                    <div className={style.groupItem}>
-                        <p className={style.label}>Mật khẩu</p>
-                        <Input type="password" value={'hello'} disabled rounded_10 password />
-                    </div>
 
-                    <div className={clsx(style.groupItem, style.hide, changePassword && style.unhide)}>
-                        <p className={style.label}>Nhập mật khẩu mới</p>
-                        <Input type="password" rounded_10 password />
-                    </div>
-                    <div className={clsx(style.groupItem, style.hide, changePassword && style.unhide)}>
-                        <p className={style.label}>Nhập lại mật khẩu mới</p>
-                        <Input type="password" rounded_10 password />
-                    </div>
-                </div>
-                <p className={style.changePassword} onClick={() => setChangePassword((prev) => !prev)}>
+                <Link href={PATH.ForgotPassword} className={style.changePassword}>
                     Thay đổi mật khẩu
-                </p>
+                </Link>
                 <div className={style.groupItem}>
-                    <Button yellowLinear rounded_10 w_fit>
+                    <Button yellowLinear type={'button'} rounded_10 w_fit onClick={handleEdit}>
                         Cập nhật thông tin cá nhân
                     </Button>
                 </div>

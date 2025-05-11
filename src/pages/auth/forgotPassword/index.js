@@ -1,8 +1,7 @@
+import ForgotPassword from '@/components/auth/ForgotPassword/ForgotPassword';
 import Head from 'next/head';
 import React, { Fragment } from 'react';
 // import WrapperAuth from "~/components/layouts/WrapperAuth";
-
-import ForgotPassword from '@/components/auth/ForgotPassword/ForgotPassword';
 
 export default function PageForgotPassword() {
     return (

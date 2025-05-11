@@ -92,7 +92,7 @@ const ForgotPassword = () => {
 
             if (response.success) {
                 toast.success('Nhập mã OTP nhận từ Email');
-                localStorage.setItem('email', email); // Lưu email
+                localStorage.setItem('email', email);
                 setStep('otp');
             } else {
                 toast.error(response.message);
@@ -112,8 +112,7 @@ const ForgotPassword = () => {
 
             if (response.success) {
                 toast.success('Đổi mật khẩu thành công');
-                localStorage.removeItem('email'); // Xoá sau khi dùng xong
-                router.push(PATH.Login);
+                router.back();
             } else {
                 toast.error(response.message);
             }

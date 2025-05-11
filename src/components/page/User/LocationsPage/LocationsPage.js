@@ -2,43 +2,48 @@ import Banner from '@/components/common/Banner';
 import style from './LocationsPage.module.scss';
 import Slider from '@/components/common/Slider';
 import BoxItem from '@/components/common/ItemSlider/BoxItem';
+import { useAllBranches } from '@/services/branch';
 
 const LocationsPage = () => {
+    const { branches, isLoadingAllBranches, isErrorAllBranches, mutateBranches } = useAllBranches();
     return (
         <>
+            {/* <Slider
+                    // apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
+                    key={branch._id}
+                    data={branch.image}
+                    isLoading={isLoadingAllBranches}
+                    title={branch.name}
+                    slidesPerView={5}
+                    renderItem={(box) => <BoxItem box={box} />}
+                    breakpoints={{
+                        0: { slidesPerView: 2 },
+                        480: { slidesPerView: 3 },
+                        980: { slidesPerView: 5 },
+                    }}
+                />; */}
             <Banner />
-            <Slider
-                apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
-                title="Box 175 Tây Sơn"
-                slidesPerView={3}
-                renderItem={(box) => <BoxItem box={box} />}
-                autoplay={true}
-                slidesPerGroup={3}
-            />
-            <Slider
-                apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
-                title="Box 139 Nguyễn Ngọc Vũ"
-                slidesPerView={3}
-                renderItem={(box) => <BoxItem box={box} />}
-                autoplay={true}
-                slidesPerGroup={3}
-            />
-            <Slider
-                apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
-                title="Box 7 Thiền Quang"
-                slidesPerView={3}
-                renderItem={(box) => <BoxItem box={box} />}
-                autoplay={true}
-                slidesPerGroup={3}
-            />
-            <Slider
-                apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
-                title="Box 19C Hoàng Diệu"
-                slidesPerView={3}
-                renderItem={(box) => <BoxItem box={box} />}
-                autoplay={true}
-                slidesPerGroup={3}
-            />
+            {branches?.map((branch) => (
+                <Slider
+                    // apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
+                    key={branch._id}
+                    data={branch.image}
+                    isLoading={isLoadingAllBranches}
+                    title={branch.name}
+                    slidesPerView={3}
+                    renderItem={(box) => <BoxItem box={box} />}
+                    breakpoints={{
+                        0: { slidesPerView: 2 },
+                        480: { slidesPerView: 3 },
+                        980: { slidesPerView: 5 },
+                    }}
+                >
+                    <div className={style.subContent}>
+                        <p className={style.address}>{`Địa chỉ: ${branch.address}`}</p>
+                        <p className={style.typeRoom}></p>
+                    </div>
+                </Slider>
+            ))}
         </>
     );
 };
