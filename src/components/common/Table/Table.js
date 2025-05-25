@@ -44,6 +44,8 @@ const Table = ({ columns, data, renderActions }) => {
                                             width={40}
                                             height={60}
                                         />
+                                    ) : column.render ? (
+                                        column.render(item)
                                     ) : (
                                         item[column.key]
                                     )}

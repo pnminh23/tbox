@@ -3,10 +3,10 @@ import { Navigation, Autoplay } from 'swiper/modules';
 import { AiOutlineLeft, AiOutlineRight, AiOutlineDoubleRight } from 'react-icons/ai';
 import style from './Slider.module.scss';
 import { useState, useEffect, useRef } from 'react';
-import Loading from '../Loading';
 import clsx from 'clsx';
 import Title from '../Title';
 import { PATH } from '@/constants/config';
+import LoadingItem from '../LoadingItem/LoadingItem';
 
 const Slider = ({
     data = [],
@@ -66,6 +66,7 @@ const Slider = ({
                 <div className={style.navLeft}>
                     <Title>{title}</Title>
                 </div>
+                <div>{subtitle}</div>
                 <div className={style.navRight}>
                     <div ref={prevButtonRef} className={clsx(style.prevButton)}>
                         <AiOutlineLeft />
@@ -95,7 +96,7 @@ const Slider = ({
                 {isLoading
                     ? Array.from({ length: slidesPerView }).map((_, index) => (
                           <SwiperSlide key={index}>
-                              <Loading />
+                              <LoadingItem />
                           </SwiperSlide>
                       ))
                     : // <p>loading</p>

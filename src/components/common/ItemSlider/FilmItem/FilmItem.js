@@ -3,6 +3,7 @@ import 'tippy.js/dist/tippy.css'; // Import CSS mặc định của Tippy
 import style from './FilmItem.module.scss';
 import Image from 'next/image';
 import Link from 'next/link';
+import { PATH } from '@/constants/config';
 
 const FilmItem = ({ film }) => {
     const currentYear = new Date().getFullYear();
@@ -12,7 +13,7 @@ const FilmItem = ({ film }) => {
                 <Image src={film.image} alt={film.name} fill objectFit="cover" />
             </div>
             <div className={style.overlay}></div>
-            <Link href="/dat-hang" className={style.orderButton}>
+            <Link href={{ pathname: PATH.BookRoom, query: { f_Id: film._id } }} className={style.orderButton}>
                 Đặt phòng xem ngay
             </Link>
 

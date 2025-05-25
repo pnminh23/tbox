@@ -11,3 +11,57 @@
         margin-left: auto;
     }
 }
+
+.formPopup {
+    width: 700px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    .title {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 500;
+    }
+    .groupItem {
+        flex: auto;
+        display: flex;
+        flex-direction: column;
+        label {
+            font-weight: 500;
+        }
+        .item {
+            margin-bottom: 10px;
+        }
+    }
+    .row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .date {
+        width: 50%;
+    }
+
+    .btnAdd {
+        margin-top: 10px;
+        margin-left: auto;
+    }
+}
+
+.typeRoomContainer {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    .typeRoomItem {
+        padding: 4px 8px;
+        font-size: 14px;
+        background: var(--gradient-yellow);
+        border-radius: 5px;
+    }
+}
+
+.nameBranchContainer {
+    text-align: center;
+    font-weight: 500;
+}

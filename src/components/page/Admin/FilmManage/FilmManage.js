@@ -26,7 +26,7 @@ const FilmManage = () => {
     const paginatedFilms = films?.slice((currentPage - 1) * limit, currentPage * limit) || [];
     const [selectedFilmId, setSelectedFilmId] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState([]);
-    const { films: selectedFilm, mutateFilm } = useFilm(selectedFilmId);
+    const { film: selectedFilm, mutateFilm } = useFilm(selectedFilmId);
     const [editFile, setEditFile] = useState(null);
     const [isPopupEdit, setIsPopupEdit] = useState(false);
     const [isPopupCreate, setIsPopupCreate] = useState(false);
@@ -195,11 +195,13 @@ const FilmManage = () => {
                 <Popup
                     handleClose={() => {
                         setIsPopupEdit(false);
+
+                        setEditFile(null);
                         setSelectedFilmId(null);
                     }}
                 >
                     <div className={styles.formPopup}>
-                        <p className={styles.title}>Thêm phim mới</p>
+                        <p className={styles.title}>Chi tiết phim</p>
                         <div className={styles.groupItem}>
                             <label>Ảnh:</label>
                             <UploadFileImage

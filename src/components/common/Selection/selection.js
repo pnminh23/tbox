@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import style from './selection.module.scss';
 import { useStyleClass } from '@/hooks/useStyleClass';
@@ -10,55 +10,60 @@ const Selection = ({
     onChange,
     className,
     multiple = false,
+    optionLabel = 'name',
+    optionValue = 'id',
     ...props
 }) => {
-    const initialSelected = multiple ? (Array.isArray(defaultValue) ? defaultValue : []) : defaultValue;
+    const getOptionValue = (option) => (typeof option === 'object' ? option[optionValue] : option);
+    const getOptionLabel = (option) => (typeof option === 'object' ? option[optionLabel] : option);
 
-    const [selected, setSelected] = useState(initialSelected);
+    const [selected, setSelected] = useState(
+        multiple ? (Array.isArray(defaultValue) ? defaultValue : []) : defaultValue
+    );
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
     const styleClass = useStyleClass(props, style);
 
-    useEffect(() => {
-        const updatedSelected = multiple ? (Array.isArray(defaultValue) ? defaultValue : []) : defaultValue;
-
-        setSelected(updatedSelected);
-    }, [options, defaultValue, multiple]);
-
     const handleSelect = (option) => {
+        const value = getOptionValue(option);
         if (multiple) {
             setSelected((prevSelected) => {
-                const isSelected = prevSelected.includes(option);
+                const isSelected = prevSelected.includes(value);
                 const newSelected = isSelected
-                    ? prevSelected.filter((item) => item !== option)
-                    : [...prevSelected, option];
+                    ? prevSelected.filter((item) => item !== value)
+                    : [...prevSelected, value];
                 onChange?.(newSelected);
                 return newSelected;
             });
         } else {
-            setSelected(option);
+            setSelected(value);
             setIsOpen(false);
-            onChange?.(option);
+            onChange?.(value);
         }
     };
 
-    const handleClickOutside = useCallback((event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-            setIsOpen(false);
-        }
-    }, []);
+    const isSelected = (option) => {
+        const value = getOptionValue(option);
+        return multiple ? selected.includes(value) : selected === value;
+    };
 
+    const getLabelByValue = (value) => {
+        const option = options.find((opt) => getOptionValue(opt) === value);
+        return option ? getOptionLabel(option) : '--Tùy chọn--';
+    };
+
+    const displaySelected = multiple
+        ? selected.length > 0
+            ? selected.map(getLabelByValue).join(', ')
+            : '--Tùy chọn--'
+        : getLabelByValue(selected);
+
+    // ✅ Reset khi defaultValue thay đổi
     useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [handleClickOutside]);
-
-    const isSelected = (option) => (multiple ? selected.includes(option) : selected === option);
-
-    const displaySelected = multiple ? (selected.length > 0 ? selected.join(', ') : '--Tùy chọn--') : selected;
+        const initial = multiple ? (Array.isArray(defaultValue) ? defaultValue : []) : defaultValue;
+        setSelected(initial);
+    }, [defaultValue, multiple]);
 
     return (
         <div ref={dropdownRef} className={clsx(styleClass, style.container, className)}>
@@ -68,16 +73,24 @@ const Selection = ({
             {isOpen && (
                 <ul className={clsx(styleClass, style.dropdown)}>
                     {options.length > 0 ? (
-                        options.map((option) => (
-                            <li
-                                key={option}
-                                className={clsx(styleClass, style.option, isSelected(option) && style.selectedOption)}
-                                onClick={() => handleSelect(option)}
-                            >
-                                {option}
-                                {isSelected(option) && multiple && <AiOutlineCheckCircle color="#3772ff" />}
-                            </li>
-                        ))
+                        options.map((option) => {
+                            const value = getOptionValue(option);
+                            const label = getOptionLabel(option);
+                            return (
+                                <li
+                                    key={value}
+                                    className={clsx(
+                                        styleClass,
+                                        style.option,
+                                        isSelected(option) && style.selectedOption
+                                    )}
+                                    onClick={() => handleSelect(option)}
+                                >
+                                    {label}
+                                    {isSelected(option) && multiple && <AiOutlineCheckCircle color="#3772ff" />}
+                                </li>
+                            );
+                        })
                     ) : (
                         <li className={clsx(styleClass, style.option, style.emptyOption)}>&nbsp;</li>
                     )}

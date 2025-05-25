@@ -69,7 +69,8 @@ export const createFilm = async (formData) => {
 };
 
 export const useFilm = (_id) => {
-    const endpoint = `${API_URL}/get-film/${_id}`;
+    const shouldFetch = _id != null && _id !== '';
+    const endpoint = shouldFetch ? `${API_URL}/get-film/${_id}` : null;
     const { data, error, isLoading } = useSWR(endpoint, fetcher, {
         shouldRetryOnError: true,
         revalidateOnFocus: true,
@@ -78,7 +79,7 @@ export const useFilm = (_id) => {
 
     const mutateFilm = () => mutate(endpoint);
     return {
-        films: data?.data,
+        film: data?.data,
         isLoading,
         isError: error,
         mutateFilm,

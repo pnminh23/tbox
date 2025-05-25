@@ -128,6 +128,11 @@
     color: var(--dark);
 }
 
+.black {
+    background: var(--dark-primary);
+    color: var(--grey);
+}
+
 .redLinear {
     background: var(--gradient-red-red);
     color: var(--light);

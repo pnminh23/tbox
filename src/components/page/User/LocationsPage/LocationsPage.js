@@ -6,6 +6,7 @@ import { useAllBranches } from '@/services/branch';
 
 const LocationsPage = () => {
     const { branches, isLoadingAllBranches, isErrorAllBranches, mutateBranches } = useAllBranches();
+
     return (
         <>
             {/* <Slider
@@ -23,27 +24,33 @@ const LocationsPage = () => {
                     }}
                 />; */}
             <Banner />
-            {branches?.map((branch) => (
-                <Slider
-                    // apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
-                    key={branch._id}
-                    data={branch.image}
-                    isLoading={isLoadingAllBranches}
-                    title={branch.name}
-                    slidesPerView={3}
-                    renderItem={(box) => <BoxItem box={box} />}
-                    breakpoints={{
-                        0: { slidesPerView: 2 },
-                        480: { slidesPerView: 3 },
-                        980: { slidesPerView: 5 },
-                    }}
-                >
-                    <div className={style.subContent}>
-                        <p className={style.address}>{`Địa chỉ: ${branch.address}`}</p>
-                        <p className={style.typeRoom}></p>
-                    </div>
-                </Slider>
-            ))}
+            {branches?.map((branch) => {
+                const roomImages = branch.rooms.map((room) => ({
+                    image: room.image,
+                    name: room.name,
+                }));
+                return (
+                    <Slider
+                        key={branch._id}
+                        data={roomImages}
+                        subtitle={`Địa chỉ: ${branch.address}`}
+                        isLoading={isLoadingAllBranches}
+                        title={branch.name}
+                        slidesPerView={3}
+                        renderItem={(box) => <BoxItem box={box} />}
+                        breakpoints={{
+                            0: { slidesPerView: 2 },
+                            480: { slidesPerView: 3 },
+                            980: { slidesPerView: 5 },
+                        }}
+                    >
+                        {/* <div className={style.subContent}>
+                            <p className={style.address}>{`Địa chỉ: ${branch.address}`}</p>
+                            <p className={style.typeRoom}></p>
+                        </div> */}
+                    </Slider>
+                );
+            })}
         </>
     );
 };

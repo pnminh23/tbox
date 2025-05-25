@@ -16,8 +16,11 @@ import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import Slider from '@/components/common/Slider';
 import BoxItem from '@/components/common/ItemSlider/BoxItem';
 import Feedback from '@/components/common/Feedback';
+import { useAllCombo } from '@/services/combo';
 
 const ComboPage = () => {
+    const { allCombo, isLoading: loadingAllCombo, error: erroAllCombo } = useAllCombo();
+
     const prevRef = useRef(null);
     const nextRef = useRef(null);
     return (
@@ -26,83 +29,40 @@ const ComboPage = () => {
             <div className="container">
                 <Title>Combo đặt phòng</Title>
                 <div className={style.listCombo}>
-                    <div className={style.combo}>
-                        <div className={style.title}>Combo 1</div>
-                        <div className={style.utility}>
-                            <p>2 tiếng sử dụng phòng</p>
-                            <p>2 nước đóng chai</p>
-                            <p>1 đĩa Khô gà</p>
-                        </div>
-                        <div className={style.price}>
-                            <div className={style.item}>
-                                <p className={style.nameCombo}>BoxJ</p>
-                                <p>199K</p>
+                    {allCombo?.map((combo) => {
+                        const arrayDescription = combo?.description
+                            .split('.') // 1. Tách chuỗi thành mảng các phần tử, mỗi phần tử là đoạn text trước dấu chấm
+                            .map((item) => item.trim()) // 2. Duyệt từng phần tử, loại bỏ khoảng trắng đầu và cuối (dùng trim)
+                            .filter((item) => item.length > 0); // 3. Loại bỏ những phần tử rỗng (nếu có phần tử nào chỉ chứa khoảng trắng hoặc rỗng)
+
+                        return (
+                            <div className={style.combo}>
+                                <div className={style.title}>{combo.name}</div>
+                                <div className={style.utility}>
+                                    {arrayDescription.map((item, index) => (
+                                        <p key={index}>{item}</p>
+                                    ))}
+                                </div>
+                                <div className={style.price}>
+                                    <div className={style.item}>
+                                        <p className={style.nameCombo}>BoxJ</p>
+                                        <p>199K</p>
+                                    </div>
+                                    <div className={style.item}>
+                                        <p className={style.nameCombo}>BoxQ</p>
+                                        <p>259K</p>
+                                    </div>
+                                    <div className={style.item}>
+                                        <p className={style.nameCombo}>BoxJ</p>
+                                        <p>299K</p>
+                                    </div>
+                                </div>
+                                <Button yellowLinear rounded_10 href={PATH.BookRoom}>
+                                    Đặt phòng ngay
+                                </Button>
                             </div>
-                            <div className={style.item}>
-                                <p className={style.nameCombo}>BoxQ</p>
-                                <p>259K</p>
-                            </div>
-                            <div className={style.item}>
-                                <p className={style.nameCombo}>BoxJ</p>
-                                <p>299K</p>
-                            </div>
-                        </div>
-                        <Button yellowLinear rounded_10 href={PATH.BookRoom}>
-                            Đặt phòng ngay
-                        </Button>
-                    </div>
-                    <div className={style.combo}>
-                        <div className={style.title}>Combo 2</div>
-                        <div className={style.utility}>
-                            <p>2 tiếng sử dụng phòng</p>
-                            <p>2 nước trà tự chọn</p>
-                            <p>1 mỳ ý số bò băm</p>
-                            <p>1 gà viên(12 viên)</p>
-                        </div>
-                        <div className={style.price}>
-                            <div className={style.item}>
-                                <p className={style.nameCombo}>BoxJ</p>
-                                <p>199K</p>
-                            </div>
-                            <div className={style.item}>
-                                <p className={style.nameCombo}>BoxQ</p>
-                                <p>259K</p>
-                            </div>
-                            <div className={style.item}>
-                                <p className={style.nameCombo}>BoxJ</p>
-                                <p>299K</p>
-                            </div>
-                        </div>
-                        <Button yellowLinear rounded_10 href={PATH.BookRoom}>
-                            Đặt phòng ngay
-                        </Button>
-                    </div>
-                    <div className={style.combo}>
-                        <div className={style.title}>Combo 3</div>
-                        <div className={style.utility}>
-                            <p>2 tiếng sử dụng phòng</p>
-                            <p>2 nước tự chọn</p>
-                            <p>1 Pizza bò băm</p>
-                            <p>1 set đùi gà Couples</p>
-                        </div>
-                        <div className={style.price}>
-                            <div className={style.item}>
-                                <p className={style.nameCombo}>BoxJ</p>
-                                <p>199K</p>
-                            </div>
-                            <div className={style.item}>
-                                <p className={style.nameCombo}>BoxQ</p>
-                                <p>259K</p>
-                            </div>
-                            <div className={style.item}>
-                                <p className={style.nameCombo}>BoxJ</p>
-                                <p>299K</p>
-                            </div>
-                        </div>
-                        <Button yellowLinear rounded_10 href={PATH.BookRoom}>
-                            Đặt phòng ngay
-                        </Button>
-                    </div>
+                        );
+                    })}
                 </div>
                 <div className={style.comboDecorate}>
                     <h1 className={style.titleDecerate}>Combo trang trí</h1>
