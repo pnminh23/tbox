@@ -195,6 +195,7 @@
         }
         .rowInforBetween {
             display: flex;
+            margin-bottom: 10px;
             justify-content: space-between;
         }
         .label {
@@ -212,9 +213,8 @@
             border-top: 1px solid #ccc;
         }
         .action {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            display: flex;
+            gap: 10px;
         }
         h5 {
             text-align: center;
@@ -280,13 +280,14 @@
 }
 
 .popupPayment {
-    width: 400px;
+    width: 500px;
     display: flex;
     flex-direction: column;
+    gap: 10px;
     align-items: center;
     svg {
         font-size: 32px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
     .success {
         color: #5cb85c;

@@ -1,12 +1,21 @@
 .container {
     width: 100%;
+    min-height: calc(100vh - 100px);
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: 20px;
     h1 {
         font-size: 20px;
     }
+}
+.listInvoiceContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    background-color: var(--dark-secondary);
+    padding: 20px;
+    border-radius: 10px;
 }
 
 .statistics {

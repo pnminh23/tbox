@@ -10,7 +10,7 @@ import Link from 'next/link';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
 import Selection from '@/components/common/Selection';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import Calendar from '@/components/common/Calender';
 import clsx from 'clsx';
 import Image from 'next/image';
@@ -24,7 +24,7 @@ import { useAllBranches } from '@/services/branch';
 import { useAllCombo } from '@/services/combo';
 import { useAllTimeSlots } from '@/services/timeSlots';
 import { useUserData } from '@/services/account';
-import { createBooking, useBookingByID } from '@/services/booking';
+import { createBooking, useBookingByOrderCode } from '@/services/booking';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import { useAllFilms, useFilm } from '@/services/films';
@@ -55,12 +55,13 @@ const BookRoomPage = () => {
     const { allCombo } = useAllCombo();
     const { timeSlots } = useAllTimeSlots();
     const { user } = useUserData();
+    console.log('email: ', user?.email);
     const router = useRouter();
     const { f_Id } = router.query;
     const { status, orderCode } = router.query;
     // console.log('status:', status);
     // console.log('orderCode:', orderCode);
-    const { booking: bookingByID } = useBookingByID(orderCode);
+    const { booking: bookingByID } = useBookingByOrderCode(orderCode);
     // console.log('bookingByID:', bookingByID);
 
     const [initialFilmId, setInitialFilmId] = useState(null);
@@ -77,7 +78,7 @@ const BookRoomPage = () => {
             setBooking(bookingByID);
             console.log('bookingByID: ', bookingByID);
             if (status) {
-                setIsPopupPayment(true);
+                setIsPopupPaymentStatus(true);
             }
         }
     }, [bookingByID, status]);
@@ -90,8 +91,12 @@ const BookRoomPage = () => {
         id: film._id,
         image: film.image, // hoặc room.id nếu backend trả id thường
     }));
+
     const [isPopupConfirm, setIsPopupConfirm] = useState(false);
-    const [isPopupPayment, setIsPopupPayment] = useState(false);
+    const [isPopupDeposit, setIsPopupDeposit] = useState(false);
+    const [messageDeposit, setMessageDeposit] = useState('');
+    const [halfPay, setHalfPay] = useState(0);
+    const [isPopupPaymentStatus, setIsPopupPaymentStatus] = useState(false);
     const [contentConfirm, setContentConfirm] = useState('');
     const [confirmedOverDuration, setConfirmedOverDuration] = useState(false);
     const disabledTimeSlots = bookedRoom?.bookedTimeSlots || [];
@@ -183,6 +188,19 @@ const BookRoomPage = () => {
         }
     };
 
+    const validate = () => {
+        if (!selectedFilm) return 'Vui lòng chọn phim';
+        if (!selectedBranch) return 'Vui lòng chọn cơ sở';
+        if (!selectedTypeRoom) return 'Vui lòng chọn loại phòng';
+        if (!selectedRoom) return 'Vui lòng chọn phòng';
+        if (!selectedName && !user?.name) return 'Vui lòng cung cấp họ và tên';
+        if (!selectedEmail && !user?.email) return 'Vui lòng cung cấp email';
+        if (!selectedPhone && !user?.phone) return 'Vui lòng cung cấp số điện thoại';
+        if (!selectedTimeSlots || selectedTimeSlots.length === 0) return 'Vui lòng chọn khung giờ';
+        return '';
+    };
+    const errorMessage = validate();
+
     const handleBooking = async () => {
         const selectedSlotDetails = timeSlots.filter((slot) => selectedTimeSlots.includes(slot._id));
         const totalSlotDuration = selectedSlotDetails.reduce((acc, slot) => acc + (slot.slot_duration || 0), 0);
@@ -217,15 +235,24 @@ const BookRoomPage = () => {
             time_slots: selectedTimeSlots,
             promotion: selectedDiscount,
         };
+        console.log('email newBooking:', newBooking.email);
 
         try {
             const result = await createBooking(newBooking);
-
+            console.log('result: ', result);
             if (result.success) {
-                toast.success(result.message);
-                setSelectedTimeSlots([]);
+                if (result.data.paymentRequired) {
+                    setIsPopupDeposit(true);
+                    setMessageDeposit(result.message);
+                    setHalfPay(result.data.money);
+                } else {
+                    toast.success(result.message);
+                    setSelectedTimeSlots([]);
+
+                    // console.log('result data:', booking);
+                }
+                console.log('result booking: ', result);
                 setBooking(result.data.data);
-                // console.log('result data:', booking);
             } else {
                 toast.error(result.message);
             }
@@ -239,17 +266,46 @@ const BookRoomPage = () => {
 
     const handlePayment = async () => {
         const description = `${booking?.id_booking} đặt phòng`;
+        console.log('id_booking: ', booking?.id_booking);
+
         const newPayment = {
-            orderCode: booking?.id_booking,
+            id_booking: booking?.id_booking,
+            email: selectedEmail || user.email,
             amount: booking?.total_money || 0,
+            description: description,
+            returnUrl: `http://localhost:3000/overview`,
+            cancelUrl: `http://localhost:3000/bookRoom`,
+        };
+        console.log('newPayment: ', newPayment);
+        try {
+            const result = await createPayment(newPayment); // gọi đến backend
+            // console.log('result: ', result);
+            if (result?.checkoutUrl) {
+                window.location.href = result.checkoutUrl; // chuyển tới trang thanh toán
+            } else {
+                alert('Không lấy được link thanh toán!');
+            }
+        } catch (error) {
+            console.error('Lỗi khi tạo đơn hàng:', error);
+            alert('Có lỗi xảy ra khi khởi tạo thanh toán!');
+        }
+    };
+    const handleHalfPayment = async () => {
+        const description = `${booking?.id_booking} đặt cọc`;
+        console.log('halfPay: ', halfPay);
+        console.log('id_booking: ', booking?.id_booking);
+
+        const newPayment = {
+            id_booking: booking?.id_booking,
+            amount: halfPay || 0,
             description: description,
             returnUrl: `http://localhost:3000/bookRoom`,
             cancelUrl: `http://localhost:3000/bookRoom`,
         };
         // console.log('newPayment: ', newPayment);
         try {
-            const result = await createPayment(newPayment); // gọi đến backend
-            // console.log('result: ', result);
+            const result = await createPayment(newPayment);
+
             if (result?.checkoutUrl) {
                 window.location.href = result.checkoutUrl; // chuyển tới trang thanh toán
             } else {
@@ -279,6 +335,7 @@ const BookRoomPage = () => {
         selectedTypeRoom &&
         selectedRoom &&
         selectedDate &&
+        selectedFilm &&
         selectedTimeSlots.length > 0
     );
 
@@ -313,19 +370,51 @@ const BookRoomPage = () => {
                     </div>
                 </Popup>
             )}
-            {isPopupPayment && (
+            {isPopupDeposit && (
                 <Popup
                     handleClose={() => {
-                        setIsPopupPayment(false);
+                        setIsPopupDeposit(false);
+                    }}
+                >
+                    <div className={style.formConfirm}>
+                        <p className={style.titleConfirm}>Yêu cầu cọc trước</p>
+                        <p className={style.contentConfirm}>{messageDeposit}</p>
+                        <div className={style.row}>
+                            <Button type={'button'} rounded_10 red onClick={handleHalfPayment}>
+                                Thanh toán 50%
+                            </Button>
+                            <Button type={'button'} rounded_10 yellowLinear onClick={handlePayment}>
+                                Thanh toán 100%
+                            </Button>
+                        </div>
+                    </div>
+                </Popup>
+            )}
+            {isPopupPaymentStatus && (
+                <Popup
+                    handleClose={() => {
+                        setIsPopupPaymentStatus(false);
                     }}
                 >
                     <div className={style.popupPayment}>
                         {status === 'PAID' ? (
-                            <AiOutlineCheckCircle className={style.success} />
+                            <>
+                                <AiOutlineCheckCircle className={style.success} />
+                                <p>Thanh toán thành công</p>
+                                <Button rounded_10 yellowLinear>
+                                    Kiểm tra đơn đặt phòng
+                                </Button>
+                            </>
                         ) : (
-                            <AiOutlineCloseCircle className={style.cancel} />
+                            <>
+                                <AiOutlineCloseCircle className={style.cancel} />
+                                <p>Thanh toán thất bại</p>
+                                <Button rounded_10 yellowLinear>
+                                    Kiểm tra đơn đặt phòng
+                                </Button>
+                            </>
                         )}
-                        <p>{status === 'PAID' ? 'Thanh toán thành công' : 'Thanh toán thất bại'}</p>
+                        {/* <p>{status === 'PAID' ? 'Thanh toán thành công' : 'Thanh toán thất bại'}</p> */}
                     </div>
                 </Popup>
             )}
@@ -477,10 +566,18 @@ const BookRoomPage = () => {
                                         </div>
                                     ))}
                                 </div>
-
                                 <div className={style.timeFrame}>
                                     {timeSlots?.map((time) => {
-                                        const isDisabled = disabledTimeSlots.includes(time._id);
+                                        const now = dayjs().subtract(10, 'minute'); // thời điểm hiện tại
+                                        const isToday = dayjs(selectedDate).isSame(now, 'day'); // kiểm tra có phải hôm nay không
+
+                                        const todayStart = dayjs(selectedDate)
+                                            .hour(Number(time.start_time.split(':')[0]))
+                                            .minute(Number(time.start_time.split(':')[1]));
+
+                                        const isPast = isToday && todayStart.isBefore(now); // chỉ disable nếu là hôm nay và đã qua
+                                        const isDisabled = disabledTimeSlots.includes(time._id) || isPast;
+
                                         const slotContent = (
                                             <div
                                                 key={time._id}
@@ -499,7 +596,7 @@ const BookRoomPage = () => {
 
                                         return isDisabled ? (
                                             <Tippy
-                                                content="Khung giờ này đã được đặt"
+                                                content={isPast ? 'Khung giờ đã qua' : 'Khung giờ này đã được đặt'}
                                                 key={time._id}
                                                 placement="bottom"
                                                 theme="light-border"
@@ -520,11 +617,13 @@ const BookRoomPage = () => {
                                     onChange={(e) => setSelectedDiscount(e.target.value)}
                                 />
                             </div>
-                            <div className={style.groupItems}>
-                                <Button rounded_10 redLinear onClick={handleBooking} disabled={isBookingDisabled}>
-                                    Đặt phòng
-                                </Button>
-                            </div>
+                            <Tippy content={errorMessage} placement="bottom" theme="light">
+                                <div className={style.groupItems}>
+                                    <Button rounded_10 redLinear onClick={handleBooking} disabled={isBookingDisabled}>
+                                        Đặt phòng
+                                    </Button>
+                                </div>
+                            </Tippy>
                             <div className={clsx(style.groupItems, style.warning)}>
                                 <div className={style.title}>
                                     <AiOutlineWarning />
@@ -640,16 +739,22 @@ const BookRoomPage = () => {
                                         <p>Tổng tiền thanh toán:</p>
                                         <p>{formatMoney(booking?.total_money)}</p>
                                     </div>
+                                    <div className={style.rowInforBetween}>
+                                        <p>Trạng thái:</p>
+                                        <p>{booking.status}</p>
+                                    </div>
+                                    <div className={style.rowInforBetween}>
+                                        <p>Thanh toán:</p>
+                                        <p>{booking.isPay}</p>
+                                    </div>
                                 </div>
                                 <div className={style.action}>
-                                    {booking.isPay?.toLowerCase() !== 'paid' ? (
+                                    {booking.isPay !== 'ĐÃ THANH TOÁN' && (
                                         <Button rounded_10 yellowLinear onClick={handlePayment}>
                                             Thanh toán ngay
                                         </Button>
-                                    ) : (
-                                        <p className={style.paid}>Đã thanh toán</p>
                                     )}
-                                    <Button rounded_10 red onClick={handlePayment}>
+                                    <Button rounded_10 red>
                                         Quản lý đặt phòng
                                     </Button>
                                 </div>

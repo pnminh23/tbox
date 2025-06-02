@@ -4,14 +4,27 @@ import Button from '../Button';
 import iconRoom from '@public/static/img/Group_1000006539.svg';
 import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
 import Image from 'next/image';
+import RoomDisplay from '../RoomDisplay/RoomDisplay';
 
-const ListInvoice = ({ image, phone, id, date, location, checkIn, checkOut, combo, prepayment, status }) => {
+const ListInvoice = ({
+    phone,
+    id,
+    date,
+    location,
+    checkIn,
+    checkOut,
+    combo,
+    prepayment,
+    status,
+    roomName,
+    roomType,
+}) => {
     return (
         <div className={style.listInvoiceItem}>
-            <div className={clsx(style.image)}>
-                <Image src={iconRoom} width={70} height={70} />
+            <div className={clsx(style.column)}>
+                <RoomDisplay roomName={roomName} roomType={roomType} />
             </div>
-            <div className={clsx(style.column, style.column1)}>
+            <div className={clsx(style.column)}>
                 {id && (
                     <div className={style.item}>
                         Mã đơn: <p>{id}</p>
@@ -28,7 +41,7 @@ const ListInvoice = ({ image, phone, id, date, location, checkIn, checkOut, comb
                     </div>
                 )}
             </div>
-            <div className={clsx(style.column, style.column2)}>
+            <div className={clsx(style.column)}>
                 {location && (
                     <div className={style.item}>
                         Cơ sở: <p>{location}</p>
@@ -41,14 +54,14 @@ const ListInvoice = ({ image, phone, id, date, location, checkIn, checkOut, comb
                 )}
                 {combo && (
                     <div className={style.item}>
-                        Ngày: <p>{combo}</p>
+                        Combo: <p>{combo}</p>
                     </div>
                 )}
             </div>
-            <div className={clsx(style.column3)}>
+            <div className={clsx(style.column)}>
                 <p>{prepayment}</p>
             </div>
-            <div className={clsx(style.column4, style.column, style.item)}>
+            <div className={clsx(style.column, style.item)}>
                 Trạng thái <p>{status}</p>
             </div>
             <div className={clsx(style.column5, style.column)}>

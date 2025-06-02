@@ -42,7 +42,6 @@ export const useFilmsByCurrentYear = () => {
     const { data, error, isLoading } = useSWR(endpoint, fetcher, {
         shouldRetryOnError: true,
         revalidateOnFocus: true,
-        refreshInterval: 5000,
     });
 
     const mutateFilmsByCurrentYear = () => mutate(endpoint);
@@ -51,6 +50,52 @@ export const useFilmsByCurrentYear = () => {
         isLoadingFilmsByCurrentYear: isLoading,
         isErrorFilmsByCurrentYear: error,
         mutateFilmsByCurrentYear,
+    };
+};
+
+export const useFilmsByCategory = (category) => {
+    const shouldFetch = category?.trim(); // kiểm tra category không rỗng và không chỉ chứa khoảng trắng
+
+    const endpoint = shouldFetch ? `${API_URL}/get-film-by-category?name=${encodeURIComponent(category)}` : null;
+    const { data, error, isLoading } = useSWR(endpoint, fetcher, {
+        shouldRetryOnError: true,
+        revalidateOnFocus: true,
+    });
+
+    return {
+        film: data?.data,
+        isLoading,
+        error,
+    };
+};
+
+export const useFilmsByYear = (year) => {
+    const shouldFetch = year?.trim(); // kiểm tra year không rỗng và không chỉ chứa khoảng trắng
+
+    const endpoint = shouldFetch ? `${API_URL}/get-film-by-year?release_date=${encodeURIComponent(year)}` : null;
+    const { data, error, isLoading } = useSWR(endpoint, fetcher, {
+        shouldRetryOnError: true,
+        revalidateOnFocus: true,
+    });
+
+    return {
+        film: data?.data,
+        isLoading,
+        error,
+    };
+};
+
+export const useTop10Film = () => {
+    const endpoint = `${API_URL}/get-top10-film`;
+    const { data, error, isLoading } = useSWR(endpoint, fetcher, {
+        shouldRetryOnError: true,
+        revalidateOnFocus: true,
+    });
+
+    return {
+        film: data?.data,
+        isLoading,
+        error,
     };
 };
 

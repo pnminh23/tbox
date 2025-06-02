@@ -4,7 +4,7 @@ import { useStyleClass } from '@/hooks/useStyleClass';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import { useState } from 'react';
 
-const Input = ({ type = 'text', placeholder, value, onChange, icon, className, disabled, ...props }) => {
+const Input = ({ type = 'text', placeholder, value, onChange, icon, className, disabled, readOnly, ...props }) => {
     const styleClass = useStyleClass(props, styles);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -27,6 +27,7 @@ const Input = ({ type = 'text', placeholder, value, onChange, icon, className, d
                 value={value}
                 onChange={onChange}
                 disabled={disabled}
+                readOnly={readOnly}
                 {...props}
             />
 

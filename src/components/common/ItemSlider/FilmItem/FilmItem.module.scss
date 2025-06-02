@@ -135,6 +135,36 @@
         }
     }
 }
+.rankNumber {
+    position: absolute;
+    top: 0;
+    left: 8px;
+    background-color: var(--hightlight);
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    width: 32px; /* Chiều rộng của bounding box */
+    height: 40px; /* Tổng chiều cao (bao gồm cả mũi nhọn) */
+    display: flex;
+    align-items: center; /* Căn giữa nội dung theo chiều dọc trong phần hình chữ nhật */
+    justify-content: center;
+    z-index: 1000;
+    /* Sử dụng clip-path để tạo hình dạng mong muốn */
+    clip-path: polygon(
+        0% 0%,
+        /* Góc trên bên trái */ 100% 0%,
+        /* Góc trên bên phải */ 100% calc(100% - 8px),
+        /* Góc dưới bên phải của phần chữ nhật (8px là chiều cao mũi nhọn) */ 50% 100%,
+        /* Đỉnh của mũi nhọn ở giữa dưới cùng */ 0% calc(100% - 8px) /* Góc dưới bên trái của phần chữ nhật */
+    );
+    /* Điều chỉnh padding để nội dung không bị che bởi mũi nhọn nếu cần */
+    /* Ví dụ: padding-bottom: 8px; */ /* Nếu bạn muốn nội dung chỉ nằm trong phần chữ nhật */
+    /* Tuy nhiên, với flex align-items: center, nó sẽ căn giữa trong tổng chiều cao trước khi clip */
+    /* Nếu muốn căn giữa trong phần chữ nhật phía trên mũi nhọn: */
+    /* align-items: flex-start; padding-top: Xpx; (cần tính toán X) */
+    /* Hoặc điều chỉnh height và padding-bottom cho phù hợp */
+}
+
 @media screen and (max-width: 980px) {
     .image {
         height: 200px !important;

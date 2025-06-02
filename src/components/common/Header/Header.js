@@ -21,7 +21,7 @@ const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const { user, isLoading, isError } = useUserData();
-
+    console.log('role user:', user?.role);
     useEffect(() => {
         setActivePath(router.pathname);
     }, [router.pathname]);

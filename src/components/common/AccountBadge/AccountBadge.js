@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './AccountBadge.module.scss';
 import avatar from '@public/static/img/avatar/panda.png';
 
-import { AiOutlineIdcard, AiOutlineLogout } from 'react-icons/ai';
+import { AiOutlineAppstore, AiOutlineIdcard, AiOutlineLogout } from 'react-icons/ai';
 import { PATH } from '@/constants/config';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -54,6 +54,12 @@ const AccountBadge = ({ user }) => {
                 />
                 {isMenuAccount && (
                     <div className={styles.dropdownMenu}>
+                        {user?.role === 'admin' && (
+                            <div className={styles.menuItem}>
+                                <AiOutlineAppstore />
+                                <Link href={PATH.BookRoomManagement}>Trang admin</Link>
+                            </div>
+                        )}
                         <div className={styles.menuItem}>
                             <AiOutlineIdcard />
                             <Link href={PATH.Overview}>Quản lý tài khoản</Link>

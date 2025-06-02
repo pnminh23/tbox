@@ -51,19 +51,17 @@ const InvoiceDetailPage = () => {
                 </div>
             </div>
             <div className={style.listInvoiceContainer}>
-                <div className={style.listInvoiceContainer}>
-                    <ListInvoice
-                        id="291103"
-                        phone="033576548"
-                        date="29/11/2003"
-                        location="175 Tây Sơn"
-                        combo="Combo 1"
-                        checkIn="7:30"
-                        checkOut="9:30"
-                        prepayment="Chưa thanh toán"
-                        status="Hoàn thành"
-                    />
-                </div>
+                <ListInvoice
+                    id="291103"
+                    phone="033576548"
+                    date="29/11/2003"
+                    location="175 Tây Sơn"
+                    combo="Combo 1"
+                    checkIn="7:30"
+                    checkOut="9:30"
+                    prepayment="Chưa thanh toán"
+                    status="Hoàn thành"
+                />
             </div>
         </div>
     );

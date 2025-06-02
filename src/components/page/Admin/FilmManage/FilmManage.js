@@ -2,10 +2,10 @@ import Table from '@/components/common/Table';
 import styles from './FilmManage.module.scss';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
-import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus, AiOutlineSearch } from 'react-icons/ai';
+import { AiOutlineDelete, AiOutlineEdit, AiOutlineEye, AiOutlinePlus, AiOutlineSearch } from 'react-icons/ai';
 import { categoryFilms, createFilm, deleteFilmById, editFilmById, useAllFilms, useFilm } from '@/services/films';
 import Popup from '@/components/common/Popup/Popup';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Tippy from '@tippyjs/react';
 import UploadFileImage from '@/components/common/UploadFileImage/UploadFileImage';
 import Calendar from '@/components/common/Calender';
@@ -14,34 +14,48 @@ import clsx from 'clsx';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
 import Pagination from '@/components/common/Pagonation';
+// import SearchBar from '@/components/common/SearchBar'; // SearchBar hiện tại của bạn (nếu vẫn dùng)
 
 const FilmManage = () => {
     const { films, isLoadingFilms, isErrorFilms, mutateFilms } = useAllFilms();
-    const [currentPage, setCurrentPage] = useState(1); // bắt đầu từ 1
-    const [limit, setLimit] = useState(5); // mặc định 8 phim/trang
-    const totalItems = films?.length || 0;
-    const totalPages = Math.ceil(totalItems / limit);
 
-    // Lấy danh sách phim hiện tại để hiển thị
-    const paginatedFilms = films?.slice((currentPage - 1) * limit, currentPage * limit) || [];
+    const FilmOptions = films?.map((film) => ({
+        name: `${film.name} - ${film.nameEnglish}`,
+        id: film._id,
+        image: film.image,
+    }));
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState(5);
+
+    const [searchInput, setSearchInput] = useState('');
+    const [activeSearchQuery, setActiveSearchQuery] = useState('');
+
     const [selectedFilmId, setSelectedFilmId] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState([]);
-    const { film: selectedFilm, mutateFilm } = useFilm(selectedFilmId);
+    const { film: selectedFilm } = useFilm(selectedFilmId); // Bỏ mutateFilm đã khai báo ở useAllFilms
     const [editFile, setEditFile] = useState(null);
     const [isPopupEdit, setIsPopupEdit] = useState(false);
     const [isPopupCreate, setIsPopupCreate] = useState(false);
     const [isPopupDelete, setIsPopupDelete] = useState(false);
-    const tableData =
-        paginatedFilms?.map((film, index) => ({
-            _id: film._id, // để làm key cho row
-            index: index + 1,
-            name: film.name,
-            duration: film.duration,
-            country: film.country,
-            image: film.image,
-            release_date: film.release_date,
-            createdAt: film.createdAt,
-        })) || [];
+
+    const initialEditFilm = {
+        name: '',
+        nameEnglish: '',
+        category: [],
+        duration: '',
+        image: '',
+        country: '',
+        createdAt: '',
+        release_date: '',
+    };
+    const [editFilm, setEditFilm] = useState(initialEditFilm);
+
+    const resetEditFilm = () => {
+        setEditFilm(initialEditFilm);
+        setSelectedCategory([]);
+        setEditFile(null);
+    };
 
     useEffect(() => {
         if (selectedFilm) {
@@ -55,18 +69,50 @@ const FilmManage = () => {
                 createdAt: selectedFilm.createdAt || '',
                 release_date: selectedFilm.release_date || '',
             });
+            setSelectedCategory(selectedFilm.category || []);
         }
     }, [selectedFilm]);
 
-    const [editFilm, setEditFilm] = useState({
-        name: '',
-        nameEnglish: '',
-        category: [],
-        duration: '',
-        image: '',
-        country: '',
-        createdAt: '',
-    });
+    // Lọc phim dựa trên activeSearchQuery - Đã cập nhật logic tìm kiếm
+    const filteredFilms = useMemo(() => {
+        if (!activeSearchQuery) {
+            return films || [];
+        }
+        const query = activeSearchQuery.toLowerCase();
+        return (films || []).filter((film) => {
+            const nameMatch =
+                film.name?.toLowerCase().includes(query) || film.nameEnglish?.toLowerCase().includes(query);
+
+            const releaseDateMatch = film.release_date?.toString().toLowerCase().includes(query);
+
+            const categoryMatch =
+                Array.isArray(film.category) && film.category.some((cat) => cat?.toLowerCase().includes(query));
+
+            const countryMatch = film.country?.toLowerCase().includes(query);
+
+            return nameMatch || releaseDateMatch || categoryMatch || countryMatch;
+        });
+    }, [films, activeSearchQuery]);
+
+    const totalItems = filteredFilms.length;
+    const totalPages = Math.ceil(totalItems / limit) || 1;
+
+    const paginatedFilms = useMemo(() => {
+        return filteredFilms.slice((currentPage - 1) * limit, currentPage * limit);
+    }, [filteredFilms, currentPage, limit]);
+
+    const tableData =
+        paginatedFilms?.map((film, index) => ({
+            _id: film._id,
+            index: (currentPage - 1) * limit + index + 1,
+            name: film.name,
+            duration: film.duration,
+            country: film.country,
+            image: film.image,
+            release_date: film.release_date, // Năm phát hành
+            category: Array.isArray(film.category) ? film.category.join(', ') : '', // Hiển thị thể loại
+            createdAt: film.createdAt,
+        })) || [];
 
     const handleGetFilm = async (_id) => {
         setSelectedFilmId(_id);
@@ -79,16 +125,8 @@ const FilmManage = () => {
             if (response.success) {
                 toast.success('Xóa phim thành công!');
                 setIsPopupDelete(false);
-                setEditFilm({
-                    name: '',
-                    nameEnglish: '',
-                    category: [],
-                    duration: '',
-                    image: '',
-                    country: '',
-                    createdAt: '',
-                });
-                mutateFilms(); // reload data
+                setSelectedFilmId(null);
+                mutateFilms();
             } else {
                 toast.error(response.message);
             }
@@ -98,42 +136,36 @@ const FilmManage = () => {
         }
     };
 
+    const handlePerformSearch = () => {
+        setActiveSearchQuery(searchInput);
+        setCurrentPage(1);
+    };
+
     const handleCreate = async () => {
         try {
             const formData = new FormData();
-            // KHÔNG cần append email vào formData nữa (vì truyền qua params)
-            // formData.append('email', editAccount.email); ❌ bỏ dòng này
-            console.log('nameEnglish:', editFilm.nameEnglish);
             if (editFilm.name) formData.append('name', editFilm.name);
             if (editFilm.nameEnglish) formData.append('nameEnglish', editFilm.nameEnglish);
             if (editFilm.duration) formData.append('duration', editFilm.duration);
             if (editFilm.release_date) formData.append('release_date', editFilm.release_date);
             if (editFilm.country) formData.append('country', editFilm.country);
+
             if (selectedCategory && Array.isArray(selectedCategory)) {
-                selectedCategory.forEach((category) => {
-                    formData.append('category', category);
-                    console.log('category:', category); // hoặc chỉ 'categories' nếu backend không yêu cầu dấu []
+                selectedCategory.forEach((categoryValue) => {
+                    // Đổi tên biến để tránh nhầm lẫn
+                    formData.append('category', categoryValue);
                 });
             }
 
-            if (editFile) formData.append('image', editFile); // nếu có file mới
-            console.log('formData:', formData);
+            if (editFile) formData.append('image', editFile);
+
             const response = await createFilm(formData);
 
             if (response.success) {
                 toast.success('Thêm phim mới thành công!');
-                setIsPopupCreate(false); // đóng popup
-                setSelectedCategory([]);
-                setEditFilm({
-                    name: '',
-                    nameEnglish: '',
-                    category: [],
-                    duration: '',
-                    image: '',
-                    country: '',
-                    createdAt: '',
-                });
-                mutateFilms(); // reload data
+                setIsPopupCreate(false);
+                resetEditFilm();
+                mutateFilms();
             } else {
                 toast.error(response.message);
             }
@@ -146,40 +178,32 @@ const FilmManage = () => {
     const handleEdit = async () => {
         try {
             const formData = new FormData();
-            // KHÔNG cần append email vào formData nữa (vì truyền qua params)
-            // formData.append('email', editAccount.email); ❌ bỏ dòng này
-
             if (editFilm.name) formData.append('name', editFilm.name);
             if (editFilm.nameEnglish) formData.append('nameEnglish', editFilm.nameEnglish);
             if (editFilm.duration) formData.append('duration', editFilm.duration);
             if (editFilm.release_date) formData.append('release_date', editFilm.release_date);
             if (editFilm.country) formData.append('country', editFilm.country);
+
             if (selectedCategory && Array.isArray(selectedCategory)) {
-                selectedCategory.forEach((category) => {
-                    formData.append('category', category);
-                    console.log('category:', category); // hoặc chỉ 'categories' nếu backend không yêu cầu dấu []
+                selectedCategory.forEach((categoryValue) => {
+                    formData.append('category', categoryValue);
+                });
+            } else if (editFilm.category && Array.isArray(editFilm.category)) {
+                editFilm.category.forEach((categoryValue) => {
+                    formData.append('category', categoryValue);
                 });
             }
 
-            if (editFile) formData.append('image', editFile); // nếu có file mới
+            if (editFile) formData.append('image', editFile);
 
-            // gọi API: TRUYỀN EMAIL qua param + formData
             const response = await editFilmById(selectedFilmId, formData);
 
             if (response.success) {
                 toast.success('Cập nhật phim thành công!');
-                setIsPopupEdit(false); // đóng popup
-                setSelectedCategory([]);
-                setEditFilm({
-                    name: '',
-                    nameEnglish: '',
-                    category: [],
-                    duration: '',
-                    image: '',
-                    country: '',
-                    createdAt: '',
-                });
-                mutateFilms(); // reload data
+                setIsPopupEdit(false);
+                resetEditFilm();
+                setSelectedFilmId(null);
+                mutateFilms();
             } else {
                 toast.error(response.message);
             }
@@ -189,14 +213,19 @@ const FilmManage = () => {
         }
     };
 
+    const handleOpenCreatePopup = () => {
+        resetEditFilm();
+        setIsPopupCreate(true);
+    };
+
     return (
         <div className={styles.container}>
+            {/* Popup Sửa Phim */}
             {isPopupEdit && (
                 <Popup
                     handleClose={() => {
                         setIsPopupEdit(false);
-
-                        setEditFile(null);
+                        resetEditFilm();
                         setSelectedFilmId(null);
                     }}
                 >
@@ -207,10 +236,7 @@ const FilmManage = () => {
                             <UploadFileImage
                                 filmImage
                                 defaultImage={editFilm.image}
-                                onFileSelected={(file) => {
-                                    setEditFile(file);
-                                    // Xử lý thêm nếu cần
-                                }}
+                                onFileSelected={(file) => setEditFile(file)}
                             />
                         </div>
                         <div className={styles.groupItem}>
@@ -255,19 +281,22 @@ const FilmManage = () => {
                             <label>Thể loại:</label>
                             <Selection
                                 options={categoryFilms}
-                                defaultValue={editFilm.category}
+                                defaultValue={selectedCategory} // Bind với selectedCategory được set từ useEffect
                                 rounded_10
                                 multiple
                                 onChange={(selected) => {
                                     setSelectedCategory(selected);
-                                    console.log('selected:', selected);
                                 }}
                             ></Selection>
                         </div>
                         <div className={styles.row}>
                             <div className={clsx(styles.groupItem, styles.date)}>
                                 <label>Ngày tạo:</label>
-                                <Calendar selectedDate={new Date(editFilm.createdAt)} disabled={true} rounded_10 />
+                                <Calendar
+                                    selectedDate={editFilm.createdAt ? new Date(editFilm.createdAt) : null}
+                                    disabled={true}
+                                    rounded_10
+                                />
                             </div>
                             <div className={clsx(styles.groupItem, styles.country)}>
                                 <label>Quốc gia:</label>
@@ -279,26 +308,29 @@ const FilmManage = () => {
                                 />
                             </div>
                         </div>
-                        <div className={styles.row}></div>
                         <Button rounded_10 blue w_fit className={styles.btnAdd} onClick={handleEdit}>
                             Cập nhật
                         </Button>
                     </div>
                 </Popup>
             )}
+
+            {/* Popup Tạo Phim Mới */}
             {isPopupCreate && (
-                <Popup handleClose={() => setIsPopupCreate(false)}>
+                <Popup
+                    handleClose={() => {
+                        setIsPopupCreate(false);
+                        resetEditFilm();
+                    }}
+                >
                     <div className={styles.formPopup}>
                         <p className={styles.title}>Thêm phim mới</p>
                         <div className={styles.groupItem}>
                             <label>Ảnh:</label>
                             <UploadFileImage
                                 filmImage
-                                defaultImage={''}
-                                onFileSelected={(file) => {
-                                    setEditFile(file);
-                                    // Xử lý thêm nếu cần
-                                }}
+                                defaultImage={editFilm.image || ''}
+                                onFileSelected={(file) => setEditFile(file)}
                             />
                         </div>
                         <div className={styles.groupItem}>
@@ -306,6 +338,7 @@ const FilmManage = () => {
                             <Input
                                 rounded_10
                                 outLine
+                                value={editFilm.name}
                                 onChange={(e) => setEditFilm((prev) => ({ ...prev, name: e.target.value }))}
                             />
                         </div>
@@ -314,6 +347,7 @@ const FilmManage = () => {
                             <Input
                                 rounded_10
                                 outLine
+                                value={editFilm.nameEnglish}
                                 onChange={(e) => setEditFilm((prev) => ({ ...prev, nameEnglish: e.target.value }))}
                             />
                         </div>
@@ -323,6 +357,7 @@ const FilmManage = () => {
                                 <Input
                                     rounded_10
                                     outLine
+                                    value={editFilm.duration}
                                     onChange={(e) => setEditFilm((prev) => ({ ...prev, duration: e.target.value }))}
                                 />
                             </div>
@@ -331,33 +366,29 @@ const FilmManage = () => {
                                 <Input
                                     rounded_10
                                     outLine
+                                    value={editFilm.release_date}
                                     onChange={(e) => setEditFilm((prev) => ({ ...prev, release_date: e.target.value }))}
                                 />
                             </div>
                         </div>
-                        <div className={styles.row}>
-                            {/* <div className={clsx(styles.groupItem, styles.date)}>
-                                <label>Ngày tạo:</label>
-                                <Calendar selectedDate={new Date(editFilm.createdAt)} disabled={true} rounded_10 />
-                            </div> */}
-                            <div className={clsx(styles.groupItem, styles.category)}>
-                                <label>Thể loại:</label>
-                                <Selection
-                                    options={categoryFilms}
-                                    rounded_10
-                                    multiple
-                                    onChange={(selected) => {
-                                        setSelectedCategory(selected);
-                                        console.log('selected:', selected);
-                                    }}
-                                ></Selection>
-                            </div>
+                        <div className={clsx(styles.groupItem, styles.category)}>
+                            <label>Thể loại:</label>
+                            <Selection
+                                options={categoryFilms}
+                                defaultValue={editFilm.category}
+                                rounded_10
+                                multiple
+                                onChange={(selected) => {
+                                    setSelectedCategory(selected);
+                                }}
+                            ></Selection>
                         </div>
                         <div className={styles.groupItem}>
                             <label>Quốc gia:</label>
                             <Input
                                 rounded_10
                                 outLine
+                                value={editFilm.country}
                                 onChange={(e) => setEditFilm((prev) => ({ ...prev, country: e.target.value }))}
                             />
                         </div>
@@ -367,23 +398,39 @@ const FilmManage = () => {
                     </div>
                 </Popup>
             )}
+
+            {/* Popup Xác Nhận Xóa */}
             {isPopupDelete && (
                 <Popup
                     handleClose={() => {
                         setIsPopupDelete(false);
+                        setSelectedFilmId(null);
                     }}
                 >
                     <div className={styles.formPopup}>
                         <p className={styles.title}>Xác nhận xóa</p>
                         <div className={styles.row}>
-                            <Image src={selectedFilm?.image} width={50} height={70} alt={selectedFilm?.nameEnglish} />
+                            <Image
+                                src={selectedFilm?.image || '/path/to/default/image_placeholder.png'}
+                                width={50}
+                                height={70}
+                                alt={selectedFilm?.nameEnglish || 'Không có ảnh'}
+                            />
                             <div className={styles.groupItem}>
                                 <label>{selectedFilm?.name}</label>
                                 <p>{selectedFilm?.nameEnglish}</p>
                             </div>
                         </div>
                         <div className={styles.row}>
-                            <Button rounded_10 outline light onClick={() => setIsPopupDelete(false)}>
+                            <Button
+                                rounded_10
+                                outline
+                                light
+                                onClick={() => {
+                                    setIsPopupDelete(false);
+                                    setSelectedFilmId(null);
+                                }}
+                            >
                                 Hủy
                             </Button>
                             <Button rounded_10 red onClick={handelDeleteFilm}>
@@ -393,25 +440,32 @@ const FilmManage = () => {
                     </div>
                 </Popup>
             )}
+
             <div className={styles.header}>
                 <div className={styles.search}>
-                    <Input rounded_10 grey placeholder="Nhập từ khóa" />
-                    <Button w_fit rounded_10 yellowLinear icon={<AiOutlineSearch />}>
+                    <Input
+                        placeholder="Tìm theo tên, năm, thể loại, quốc gia..." // Cập nhật placeholder
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        rounded_10
+                        outLine
+                        className={styles.searchInput}
+                        onKeyPress={(event) => {
+                            // Thêm tìm kiếm khi nhấn Enter
+                            if (event.key === 'Enter') {
+                                handlePerformSearch();
+                            }
+                        }}
+                    />
+                    <Button w_fit rounded_10 yellowLinear icon={<AiOutlineSearch />} onClick={handlePerformSearch}>
                         Tìm kiếm
                     </Button>
                 </div>
-                <Button
-                    w_fit
-                    rounded_10
-                    blue
-                    icon={<AiOutlinePlus />}
-                    onClick={() => {
-                        setIsPopupCreate(true);
-                    }}
-                >
+                <Button w_fit rounded_10 blue icon={<AiOutlinePlus />} onClick={handleOpenCreatePopup}>
                     Thêm phim mới
                 </Button>
             </div>
+
             <div className={styles.content}>
                 {isLoadingFilms ? (
                     <p>Đang tải dữ liệu...</p>
@@ -426,7 +480,8 @@ const FilmManage = () => {
                                 { key: 'name', label: 'Tên phim' },
                                 { key: 'image', label: 'Ảnh' },
                                 { key: 'duration', label: 'Thời lượng' },
-                                { key: 'release_date', label: 'Năm phát hành' },
+                                { key: 'release_date', label: 'Năm PH' }, // Sửa label
+                                { key: 'category', label: 'Thể loại' }, // Thêm cột thể loại
                                 { key: 'country', label: 'Quốc gia' },
                                 { key: 'createdAt', label: 'Ngày đăng' },
                             ]}
@@ -439,12 +494,11 @@ const FilmManage = () => {
                                                 rounded_10
                                                 p_10_14
                                                 blueIcon
-                                                icon={<AiOutlineEdit />}
+                                                icon={<AiOutlineEye />}
                                                 onClick={() => handleGetFilm(item._id)}
                                             ></Button>
                                         </div>
                                     </Tippy>
-
                                     <Tippy content="Xóa" placement="bottom">
                                         <div>
                                             <Button
@@ -454,8 +508,8 @@ const FilmManage = () => {
                                                 redIcon
                                                 icon={<AiOutlineDelete />}
                                                 onClick={() => {
-                                                    setIsPopupDelete(true);
                                                     setSelectedFilmId(item._id);
+                                                    setIsPopupDelete(true);
                                                 }}
                                             ></Button>
                                         </div>
@@ -472,7 +526,7 @@ const FilmManage = () => {
                             onPageChange={(page) => setCurrentPage(page)}
                             onLimitChange={(newLimit) => {
                                 setLimit(newLimit);
-                                setCurrentPage(1); // reset về trang đầu
+                                setCurrentPage(1);
                             }}
                         />
                     </>

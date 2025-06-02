@@ -1,6 +1,7 @@
 .listInvoiceItem {
     width: 100%;
     padding: 15px 30px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     background: var(--dark-primary);
@@ -9,22 +10,9 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
+        width: fit-content;
     }
-    .column0 {
-        width: 70px;
-    }
-    .column1 {
-        width: 200px;
-    }
-    .column2 {
-        width: 200px;
-    }
-    .column3 {
-        width: 120px;
-    }
-    .column4 {
-        width: 100px;
-    }
+
     .column5 {
         width: fit-content;
         gap: 10px;

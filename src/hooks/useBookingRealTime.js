@@ -55,6 +55,38 @@ export const useBookingsRealtime = (roomID, dateISO) => {
             });
         });
 
+        // Khi booking bị chỉnh sửa
+        socket.on('editBooking', (bk) => {
+            console.log('🛠️ editBooking received:', bk);
+
+            const bkDate = new Date(bk.date).toISOString().slice(0, 10);
+            const cmpDate = new Date(dateISO).toISOString().slice(0, 10);
+            if (bkDate !== cmpDate) return console.log('date không giống nhau');
+
+            if (bk.room.toString() !== roomID.toString()) return console.log('room không giống nhau');
+
+            const editedBookingId = bk._id || bk.id;
+            const newSlots = bk.time_slots;
+
+            setRoomData((prev) => {
+                if (!prev) return prev;
+
+                // Loại bỏ các timeSlot có cùng bookingId, sau đó thêm các timeSlot mới
+                const updatedSlots = [
+                    ...prev.bookedTimeSlots.filter((ts) => ts.bookingId !== editedBookingId),
+                    ...newSlots.map((slot) => ({
+                        ...slot,
+                        bookingId: editedBookingId,
+                    })),
+                ];
+
+                return {
+                    ...prev,
+                    bookedTimeSlots: updatedSlots,
+                };
+            });
+        });
+
         // Khi booking bị xoá
         socket.on('deleteBooking', ({ id, roomId }) => {
             if (roomId !== roomID) return;
@@ -71,6 +103,7 @@ export const useBookingsRealtime = (roomID, dateISO) => {
         return () => {
             socket.off('newBooking');
             socket.off('deleteBooking');
+            socket.off('editBooking');
         };
     }, [roomID, dateISO, loadData]);
 

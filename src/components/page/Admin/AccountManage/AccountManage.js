@@ -83,8 +83,6 @@ const AccountManage = () => {
         e.preventDefault();
         try {
             const formData = new FormData();
-            // KHÔNG cần append email vào formData nữa (vì truyền qua params)
-            // formData.append('email', editAccount.email); ❌ bỏ dòng này
 
             if (editAccount.name) formData.append('name', editAccount.name);
             if (editAccount.phone) formData.append('phone', editAccount.phone);
@@ -111,6 +109,24 @@ const AccountManage = () => {
         } catch (err) {
             console.error(err);
             toast.error('Đã xảy ra lỗi khi cập nhật!');
+        }
+    };
+
+    const handleChangeRole = async (email, currentRole) => {
+        try {
+            const newRole = currentRole === 'admin' ? 'user' : 'admin';
+            const formData = new FormData();
+            formData.append('role', newRole);
+
+            const response = await editAccountByEmail(email, formData);
+            if (response.success) {
+                toast.success(`Đã đổi quyền sang ${newRole}`);
+                mutateAccounts();
+            } else {
+                toast.error(response.message);
+            }
+        } catch (err) {
+            toast.error('Đã xảy ra lỗi khi đổi quyền!');
         }
     };
 
@@ -170,15 +186,31 @@ const AccountManage = () => {
                         <div className={styles.row}>
                             <div className={clsx(styles.groupItem, styles.role)}>
                                 <label>Quyền:</label>
-                                <Selection options={['user', 'admin']} defaultValue={editAccount.role} rounded_10 />
+                                <Selection
+                                    options={['user', 'admin']}
+                                    defaultValue={editAccount.role}
+                                    rounded_10
+                                    onChange={(value) =>
+                                        setEditAccount((prev) => ({
+                                            ...prev,
+                                            role: value,
+                                        }))
+                                    }
+                                />
                             </div>
                             <div className={clsx(styles.groupItem, styles.status)}>
                                 <label>Trạng thái:</label>
                                 <Selection
                                     options={['Hoạt Động', 'Đã khóa']}
-                                    defaultValue={editAccount.isLock ? 'Đã khóa' : 'Hoạt động'}
+                                    defaultValue={editAccount.isLock ? 'Đã khóa' : 'Hoạt Động'}
+                                    onChange={(value) =>
+                                        setEditAccount((prev) => ({
+                                            ...prev,
+                                            isLock: value === 'Đã khóa',
+                                        }))
+                                    }
                                     rounded_10
-                                ></Selection>
+                                />
                             </div>
                             <div className={clsx(styles.groupItem, styles.date)}>
                                 <label>Ngày tạo:</label>
@@ -266,6 +298,7 @@ const AccountManage = () => {
                                             p_10_14
                                             greenIcon
                                             icon={<AiOutlineInteraction />}
+                                            onClick={() => handleChangeRole(item.email, item.role)}
                                         ></Button>
                                     </div>
                                 </Tippy>

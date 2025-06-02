@@ -24,6 +24,10 @@
         color: var(--text-color-secondary-3);
         background: var(--disabled-bg);
     }
+    &:read-only {
+        color: #151515;
+        background: var(--disabled-bg);
+    }
 
     &::selection {
         background: var(--blue);

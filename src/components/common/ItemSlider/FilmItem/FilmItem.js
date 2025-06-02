@@ -7,8 +7,10 @@ import { PATH } from '@/constants/config';
 
 const FilmItem = ({ film }) => {
     const currentYear = new Date().getFullYear();
+
     return (
         <div className={style.item}>
+            {film.index !== undefined && <div className={style.rankNumber}>{film.index + 1}</div>}
             <div className={style.image}>
                 <Image src={film.image} alt={film.name} fill objectFit="cover" />
             </div>
@@ -43,4 +45,5 @@ const FilmItem = ({ film }) => {
         </div>
     );
 };
+
 export default FilmItem;
