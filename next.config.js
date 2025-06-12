@@ -2,7 +2,6 @@
 const nextConfig = {
     reactStrictMode: true,
     images: {
-        domains: ['phimimg.com', 'phimapi.com', 'bizweb.dktcdn.net'], // Thêm domain ảnh API
         remotePatterns: [
             {
                 protocol: 'http',

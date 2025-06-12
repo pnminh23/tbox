@@ -10,7 +10,6 @@ export const useAllBranches = () => {
     const { data, error, isLoading } = useSWR(endpoint, fetcher, {
         shouldRetryOnError: true,
         revalidateOnFocus: true,
-        refreshInterval: 5000,
     });
 
     const mutateBranches = () => mutate(endpoint);
@@ -27,7 +26,6 @@ export const useBranch = (_id) => {
     const { data, error, isLoading } = useSWR(endpoint, fetcher, {
         shouldRetryOnError: true,
         revalidateOnFocus: true,
-        refreshInterval: 5000,
     });
 
     const mutateBranch = () => mutate(endpoint);

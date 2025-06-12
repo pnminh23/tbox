@@ -78,6 +78,8 @@
         border-radius: 10px;
         background: var(--gradient-grey-black);
         margin-left: 20px;
+        display: flex;
+        flex-direction: column;
         .options {
             padding-bottom: 15px;
             border-bottom: 1px solid #808080;
@@ -121,6 +123,9 @@
                 }
             }
         }
+        .btnFilter {
+            margin-left: auto;
+        }
     }
     li {
         cursor: pointer;
@@ -139,5 +144,56 @@
     }
     h5 {
         font-size: 14px;
+    }
+}
+.active {
+    color: var(--hightlight);
+}
+@media (max-width: 980px) {
+    .container {
+        flex-direction: column-reverse; // Chuyển layout chính thành 1 cột
+    }
+
+    .left,
+    .right {
+        width: 100% !important; // Cả 2 phần chiếm toàn bộ chiều rộng
+        margin-left: 0;
+    }
+
+    .left {
+        .allFilm {
+            grid-template-columns: repeat(3, 1fr); // Hiển thị 3 phim mỗi hàng
+        }
+    }
+
+    .right {
+        margin: 0 !important;
+        margin-top: 40px; // Tạo khoảng cách khi sidebar nằm dưới
+        .year ul {
+            grid-template-columns: repeat(4, 1fr); // Hiển thị 4 năm mỗi hàng
+        }
+    }
+}
+
+/* 2. CHO ĐIỆN THOẠI */
+@media (max-width: 481px) {
+    .left {
+        .allFilm {
+            grid-template-columns: repeat(2, 1fr); // Hiển thị 2 phim mỗi hàng
+            gap: 15px; // Giảm khoảng cách
+        }
+        .title h3 {
+            font-size: 20px; // Giảm cỡ chữ tiêu đề
+        }
+    }
+
+    .right {
+        padding: 15px; // Giảm padding của sidebar
+        .category ul {
+            grid-template-columns: repeat(1, 1fr); // Thể loại chỉ còn 1 cột
+        }
+        .year ul {
+            grid-template-columns: repeat(3, 1fr); // Hiển thị 3 năm mỗi hàng
+        }
     }
 }

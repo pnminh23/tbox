@@ -36,6 +36,7 @@ const Button = ({
                     [styles.w_fit]: props.w_fit,
                     [styles.maxHeight]: props.maxHeight,
                     [styles.disabled]: disabled,
+                    [styles.h30]: props.h30,
                 },
                 className
             )}

@@ -58,10 +58,10 @@ const BookRoomPage = () => {
     console.log('email: ', user?.email);
     const router = useRouter();
     const { f_Id } = router.query;
-    const { status, orderCode } = router.query;
+
     // console.log('status:', status);
     // console.log('orderCode:', orderCode);
-    const { booking: bookingByID } = useBookingByOrderCode(orderCode);
+    // const { booking: bookingByID } = useBookingByOrderCode(orderCode);
     // console.log('bookingByID:', bookingByID);
 
     const [initialFilmId, setInitialFilmId] = useState(null);
@@ -73,15 +73,15 @@ const BookRoomPage = () => {
         }
     }, [f_Id, initialFilmId]);
 
-    useEffect(() => {
-        if (bookingByID) {
-            setBooking(bookingByID);
-            console.log('bookingByID: ', bookingByID);
-            if (status) {
-                setIsPopupPaymentStatus(true);
-            }
-        }
-    }, [bookingByID, status]);
+    // useEffect(() => {
+    //     if (bookingByID) {
+    //         setBooking(bookingByID);
+    //         console.log('bookingByID: ', bookingByID);
+    //         if (status) {
+    //             setIsPopupPaymentStatus(true);
+    //         }
+    //     }
+    // }, [bookingByID, status]);
 
     // Ưu tiên selectedFilm, nếu không có thì lấy initialFilmId
     const { film, isLoading: loadingFilm } = useFilm(selectedFilm || initialFilmId);
@@ -189,7 +189,7 @@ const BookRoomPage = () => {
     };
 
     const validate = () => {
-        if (!selectedFilm) return 'Vui lòng chọn phim';
+        if (!selectedFilm && !initialFilmId) return 'Vui lòng chọn phim';
         if (!selectedBranch) return 'Vui lòng chọn cơ sở';
         if (!selectedTypeRoom) return 'Vui lòng chọn loại phòng';
         if (!selectedRoom) return 'Vui lòng chọn phòng';
@@ -227,7 +227,7 @@ const BookRoomPage = () => {
         const newBooking = {
             name_client: user?.name || selectedName,
             email: user?.email || selectedEmail,
-            film: film._id,
+            film: film?._id,
             phone: user?.phone || selectedPhone,
             room: selectedRoom,
             date: selectedDate,
@@ -235,24 +235,26 @@ const BookRoomPage = () => {
             time_slots: selectedTimeSlots,
             promotion: selectedDiscount,
         };
-        console.log('email newBooking:', newBooking.email);
+        console.log('new booking: ', newBooking);
 
         try {
             const result = await createBooking(newBooking);
             console.log('result: ', result);
             if (result.success) {
+                const newBookingData = result.data.data;
+                setBooking(newBookingData);
                 if (result.data.paymentRequired) {
                     setIsPopupDeposit(true);
                     setMessageDeposit(result.message);
                     setHalfPay(result.data.money);
                 } else {
                     toast.success(result.message);
+                    router.push(`/bookRoom/${newBookingData._id}`);
                     setSelectedTimeSlots([]);
 
                     // console.log('result data:', booking);
                 }
                 console.log('result booking: ', result);
-                setBooking(result.data.data);
             } else {
                 toast.error(result.message);
             }
@@ -265,16 +267,15 @@ const BookRoomPage = () => {
     };
 
     const handlePayment = async () => {
-        const description = `${booking?.id_booking} đặt phòng`;
         console.log('id_booking: ', booking?.id_booking);
 
         const newPayment = {
             id_booking: booking?.id_booking,
             email: selectedEmail || user.email,
-            amount: booking?.total_money || 0,
-            description: description,
-            returnUrl: `http://localhost:3000/overview`,
-            cancelUrl: `http://localhost:3000/bookRoom`,
+            amount: booking?.payment_amount || 0,
+            description: `${booking?._id}`,
+            returnUrl: `http://localhost:3000/bookRoom/${booking._id}`,
+            cancelUrl: `http://localhost:3000/bookRoom/${booking._id}`,
         };
         console.log('newPayment: ', newPayment);
         try {
@@ -291,16 +292,13 @@ const BookRoomPage = () => {
         }
     };
     const handleHalfPayment = async () => {
-        const description = `${booking?.id_booking} đặt cọc`;
-        console.log('halfPay: ', halfPay);
-        console.log('id_booking: ', booking?.id_booking);
-
+        const description = `${booking?._id}`;
         const newPayment = {
             id_booking: booking?.id_booking,
             amount: halfPay || 0,
             description: description,
-            returnUrl: `http://localhost:3000/bookRoom`,
-            cancelUrl: `http://localhost:3000/bookRoom`,
+            returnUrl: `http://localhost:3000/bookRoom/${booking._id}`,
+            cancelUrl: `http://localhost:3000/bookRoom/${booking._id}`,
         };
         // console.log('newPayment: ', newPayment);
         try {
@@ -335,7 +333,7 @@ const BookRoomPage = () => {
         selectedTypeRoom &&
         selectedRoom &&
         selectedDate &&
-        selectedFilm &&
+        (selectedFilm || initialFilmId) &&
         selectedTimeSlots.length > 0
     );
 
@@ -401,13 +399,13 @@ const BookRoomPage = () => {
                             <>
                                 <AiOutlineCheckCircle className={style.success} />
                                 <p>Thanh toán thành công</p>
-                                <Button rounded_10 yellowLinear>
+                                <Button rounded_10 yellowLinear href={PATH.Overview}>
                                     Kiểm tra đơn đặt phòng
                                 </Button>
                             </>
                         ) : (
                             <>
-                                <AiOutlineCloseCircle className={style.cancel} />
+                                <AiOutlineCloseCircle className={style.cancel} href={PATH.Overview} />
                                 <p>Thanh toán thất bại</p>
                                 <Button rounded_10 yellowLinear>
                                     Kiểm tra đơn đặt phòng
@@ -462,65 +460,65 @@ const BookRoomPage = () => {
                 </div>
 
                 <div className={style.formBookRoom}>
-                    <div className={style.left}>
-                        <div className={style.form}>
-                            <div className={style.groupItems}>
-                                <p>Tìm kiếm phim</p>
-                                <SearchBar
-                                    data={FilmOptions}
-                                    onSelect={(item) => {
-                                        // console.log('item', item);
-                                        setSelectedFilm(item.id);
-                                    }}
-                                    heightImage={70}
-                                    widthImage={50}
+                    <div className={style.form}>
+                        <div className={style.groupItems}>
+                            <p>Tìm kiếm phim</p>
+                            <SearchBar
+                                data={FilmOptions}
+                                onSelect={(item) => {
+                                    // console.log('item', item);
+                                    setSelectedFilm(item.id);
+                                }}
+                                heightImage={70}
+                                widthImage={50}
+                            />
+                        </div>
+                        <div className={style.groupItems}>
+                            {loadingFilm ? (
+                                <Lottie
+                                    animationData={loadingAnimation}
+                                    loop={true}
+                                    autoplay={true}
+                                    className={style.loading}
                                 />
-                            </div>
-                            <div className={style.groupItems}>
-                                {loadingFilm ? (
-                                    <Lottie
-                                        animationData={loadingAnimation}
-                                        loop={true}
-                                        autoplay={true}
-                                        className={style.loading}
-                                    />
-                                ) : (
-                                    film && (
-                                        <div className={style.groupItems}>
-                                            <p>Phim bạn chọn</p>
-                                            <div className={style.filmItem}>
-                                                <div className={style.filmImage}>
-                                                    <Image
-                                                        src={film.image}
-                                                        alt="film image"
-                                                        width={200}
-                                                        height={300}
-                                                        style={{ objectFit: 'cover' }} // dùng style thay vì objectFit props
-                                                    />
-                                                </div>
-                                                <div className={style.filmContent}>
-                                                    <p className={style.filmName}>{film.name}</p>
-                                                    <p className={style.subName}>{film.nameEnglish}</p>
-                                                    <p className={style.release_date}>
-                                                        {`Năm phát hành:\u2003${film.release_date}`}
-                                                    </p>
-                                                    <p className={style.duration}>
-                                                        {`Thời lượng:\u2003${film.duration}`}
-                                                    </p>
-                                                    <p className={style.country}>{`Quốc gia:\u2003${film.country}`}</p>
-                                                    <div className={style.Listcategory}>
-                                                        {`Thể loại:\u2003`}
-                                                        {film.category.map((item, index) => (
-                                                            <div key={index} className={style.category}>
-                                                                {item}
-                                                            </div>
-                                                        ))}
-                                                    </div>
+                            ) : (
+                                film && (
+                                    <div className={style.groupItems}>
+                                        <p>Phim bạn chọn</p>
+                                        <div className={style.filmItem}>
+                                            <div className={style.filmImage}>
+                                                <Image
+                                                    src={film.image}
+                                                    alt="film image"
+                                                    width={200}
+                                                    height={300}
+                                                    style={{ objectFit: 'cover' }} // dùng style thay vì objectFit props
+                                                />
+                                            </div>
+                                            <div className={style.filmContent}>
+                                                <p className={style.filmName}>{film.name}</p>
+                                                <p className={style.subName}>{film.nameEnglish}</p>
+                                                <p className={style.release_date}>
+                                                    {`Năm phát hành:\u2003${film.release_date}`}
+                                                </p>
+                                                <p className={style.duration}>{`Thời lượng:\u2003${film.duration}`}</p>
+                                                <p className={style.country}>{`Quốc gia:\u2003${film.country}`}</p>
+                                                <div className={style.Listcategory}>
+                                                    {`Thể loại:\u2003`}
+                                                    {film.category.map((item, index) => (
+                                                        <div key={index} className={style.category}>
+                                                            {item}
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </div>
                                         </div>
-                                    )
-                                )}
+                                    </div>
+                                )
+                            )}
+                        </div>
+                        {(film || initialFilmId) && (
+                            <div className={style.groupItems}>
                                 <p>Chọn cơ sở bạn muốn đến</p>
                                 <Selection
                                     options={BranchOptions}
@@ -530,6 +528,9 @@ const BookRoomPage = () => {
                                     onChange={handleSelectionBranchChange}
                                 />
                             </div>
+                        )}
+
+                        {selectedBranch && (
                             <div className={clsx(style.groupItems, style.row)}>
                                 <div className={style.date}>
                                     <p>Ngày đặt phòng</p>
@@ -541,20 +542,16 @@ const BookRoomPage = () => {
                                     <p>Chọn loại phòng</p>
                                     <Selection
                                         options={TypeRoomOptions}
-                                        defaultValue={selectedBranch}
+                                        defaultValue={selectedTypeRoom}
                                         optionLabel="name"
                                         optionValue="id"
                                         onChange={handleSelectionBoxChange}
                                     />
                                 </div>
-
-                                <div className={style.combo}>
-                                    <p>Chọn Combo</p>
-
-                                    <Selection options={ComboOptions} onChange={handleSelectionComboChange} />
-                                </div>
                             </div>
-                            <div className={clsx(style.groupItems, style.time)}>
+                        )}
+                        <div className={clsx(style.groupItems, style.time)}>
+                            {selectedTypeRoom && (
                                 <div className={style.typeRoom}>
                                     {rooms?.map((room) => (
                                         <div
@@ -566,6 +563,8 @@ const BookRoomPage = () => {
                                         </div>
                                     ))}
                                 </div>
+                            )}
+                            {selectedRoom && (
                                 <div className={style.timeFrame}>
                                     {timeSlots?.map((time) => {
                                         const now = dayjs().subtract(10, 'minute'); // thời điểm hiện tại
@@ -608,159 +607,54 @@ const BookRoomPage = () => {
                                         );
                                     })}
                                 </div>
-                            </div>
-                            <div className={style.groupItems}>
-                                <p>Mã giảm giá</p>
-                                <Input
-                                    rounded_10
-                                    placeholder={'Nhập mã giảm giá'}
-                                    onChange={(e) => setSelectedDiscount(e.target.value)}
-                                />
-                            </div>
-                            <Tippy content={errorMessage} placement="bottom" theme="light">
+                            )}
+                        </div>
+
+                        {selectedTimeSlots.length > 0 && (
+                            <div className={style.row}>
                                 <div className={style.groupItems}>
-                                    <Button rounded_10 redLinear onClick={handleBooking} disabled={isBookingDisabled}>
-                                        Đặt phòng
-                                    </Button>
+                                    <p>Chọn Combo</p>
+
+                                    <Selection options={ComboOptions} onChange={handleSelectionComboChange} />
                                 </div>
-                            </Tippy>
-                            <div className={clsx(style.groupItems, style.warning)}>
-                                <div className={style.title}>
-                                    <AiOutlineWarning />
-                                    <h5>Lưu ý</h5>
+                                <div className={style.groupItems}>
+                                    <p>Mã giảm giá</p>
+                                    <Input
+                                        rounded_10
+                                        placeholder={'Nhập mã giảm giá'}
+                                        onChange={(e) => setSelectedDiscount(e.target.value)}
+                                    />
                                 </div>
-                                <p>
-                                    - Các đơn đặt phòng từ 300.000 VNĐ trở lên và đơn đặt phòng trước 2 ngày vui lòng
-                                    thanh toán trước 50% giá trị hóa đơn
-                                </p>
-                                <p>
-                                    - Những tài khoản đặt phòng nhưng không đến và không báo lại cho PNM - BOX, chúng
-                                    tôi xin phép khóa tài khoản.
-                                </p>
-                                <p>
-                                    - PNM - BOX chỉ nhận đặt phòng qua website và fanpage facebook, chúng tôi không chịu
-                                    trách nhiệm với những đơn đặt hằng qua nền tảng khác.
-                                </p>
                             </div>
-                        </div>
-                        <Feedback />
-                    </div>
-                    <div className={style.right}>
-                        <h5>Chi tiết đặt phòng</h5>
-                        <div className={style.inforUser}>
-                            <div className={style.rowInfor}>
-                                {booking && (
-                                    <>
-                                        <p className={style.label}>Mã hóa đơn:</p>
-                                        <p>{booking.id_booking}</p>
-                                    </>
-                                )}
-                            </div>
-                            <div className={style.rowInfor}>
-                                <p className={style.label}>Họ và tên:</p>
-                                <p>{user?.name || selectedName}</p>
-                            </div>
-                            <div className={style.rowInfor}>
-                                <p className={style.label}>Email:</p>
-                                <p>{user?.email || selectedEmail}</p>
-                            </div>
-                            <div className={style.rowInfor}>
-                                <p className={style.label}>Số điện thoại:</p>
-                                <p>{user?.phone || selectedPhone}</p>
-                            </div>
-                        </div>
-                        {booking && (
-                            <>
-                                <div className={style.inforRoom}>
-                                    <div className={style.rowInfor}>
-                                        <p className={style.label}>Phim</p>
-                                        {booking && <p>{booking?.film?.name}</p>}
-                                    </div>
-                                    <div className={style.rowInfor}>
-                                        <p className={style.label}>Cơ sở:</p>
-                                        {booking && <p>{booking?.room?.branch?.name}</p>}
-                                    </div>
-                                    <div className={style.rowInfor}>
-                                        <p className={style.label}>Phòng:</p>
-                                        {booking && <p>{booking?.room?.name}</p>}
-                                    </div>
-                                    <div className={style.rowInfor}>
-                                        <p className={style.label}>Ngày đặt:</p>
-                                        {booking && <p>{dayjs(booking?.date).format('DD/MM/YYYY')}</p>}
-                                    </div>
-                                    <div className={style.rowInfor}>
-                                        <p className={style.label}>Loại phòng:</p>
-                                        {booking && <p>{booking.room?.type.name}</p>}
-                                    </div>
-                                    {booking && booking.combo && (
-                                        <div className={style.rowInfor}>
-                                            <p className={style.label}>combo</p>
-                                            {booking && <p>{booking?.combo?.name}</p>}
-                                        </div>
-                                    )}
-                                    <div className={style.rowInfor}>
-                                        <p className={style.label}>Giờ bắt đầu</p>
-                                        <p>{booking.time_slots[0].start_time}</p>
-                                    </div>
-                                    <div className={style.rowInfor}>
-                                        <p className={style.label}>Thời gian sử dụng:</p>
-                                        {booking && (
-                                            <p>
-                                                {booking?.time_slots?.reduce(
-                                                    (total, slot) => total + slot.slot_duration,
-                                                    0
-                                                )}{' '}
-                                                phút{' '}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className={style.rowInforBetween}>
-                                        <p className={style.label}>Tổng tiền</p>
-                                        {booking && (
-                                            <p>
-                                                {formatMoney(
-                                                    booking.time_slots?.reduce(
-                                                        (total, slot) => total + slot.slot_duration,
-                                                        0
-                                                    ) * booking?.room?.type.base_price_per_minute
-                                                )}
-                                            </p>
-                                        )}
-                                    </div>
-                                    {booking && booking.promotion && (
-                                        <div className={style.rowInfor}>
-                                            <p className={style.label}>Mã giảm giá</p>
-                                            {booking && <p>{booking?.promotion?.name || ''}</p>}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className={style.totalMoney}>
-                                    <div className={style.rowInforBetween}>
-                                        <p>Tổng tiền thanh toán:</p>
-                                        <p>{formatMoney(booking?.total_money)}</p>
-                                    </div>
-                                    <div className={style.rowInforBetween}>
-                                        <p>Trạng thái:</p>
-                                        <p>{booking.status}</p>
-                                    </div>
-                                    <div className={style.rowInforBetween}>
-                                        <p>Thanh toán:</p>
-                                        <p>{booking.isPay}</p>
-                                    </div>
-                                </div>
-                                <div className={style.action}>
-                                    {booking.isPay !== 'ĐÃ THANH TOÁN' && (
-                                        <Button rounded_10 yellowLinear onClick={handlePayment}>
-                                            Thanh toán ngay
-                                        </Button>
-                                    )}
-                                    <Button rounded_10 red>
-                                        Quản lý đặt phòng
-                                    </Button>
-                                </div>
-                            </>
                         )}
+
+                        <Tippy content={errorMessage} placement="bottom" theme="light">
+                            <div className={style.groupItems}>
+                                <Button rounded_10 redLinear onClick={handleBooking} disabled={isBookingDisabled}>
+                                    Đặt phòng
+                                </Button>
+                            </div>
+                        </Tippy>
+                        <div className={clsx(style.groupItems, style.warning)}>
+                            <div className={style.title}>
+                                <AiOutlineWarning />
+                                <h5>Lưu ý</h5>
+                            </div>
+                            <p>
+                                - Các đơn đặt phòng từ 300.000 VNĐ trở lên và đơn đặt phòng trước 2 ngày vui lòng thanh
+                                toán trước 50% giá trị hóa đơn
+                            </p>
+                            <p>
+                                - Những tài khoản đặt phòng nhưng không đến và không báo lại cho PNM - BOX, chúng tôi
+                                xin phép khóa tài khoản.
+                            </p>
+                            <p>
+                                - PNM - BOX chỉ nhận đặt phòng qua website và fanpage facebook, chúng tôi không chịu
+                                trách nhiệm với những đơn đặt hằng qua nền tảng khác.
+                            </p>
+                        </div>
                     </div>
+                    <Feedback />
                 </div>
             </div>
         </div>

@@ -46,25 +46,11 @@ const OverviewPage = () => {
             </div>
 
             <div className={styles.listInvoiceContainer}>
-                <h1>Đơn đặt phòng hiện tại</h1>
-                <div className={styles.listInvoiceContainer}>
-                    {allBookingCurrent?.map((booking) => (
-                        <ListInvoice
-                            key={booking._id}
-                            id={booking.id_booking}
-                            phone={booking.phone}
-                            date={dayjs(booking.date).format('DD/MM/YYYY')}
-                            roomName={booking.room.name}
-                            roomType={booking.room.type.name.slice(-1)}
-                            location={booking.room.branch.name}
-                            combo={booking.combo?.name || 'không có'}
-                            checkIn={booking.time_slots[0].start_time}
-                            checkOut={booking.time_slots.at(-1).end_time}
-                            prepayment={booking.isPay}
-                            status={booking.status}
-                        />
-                    ))}
-                </div>
+                <h1>Đơn đặt phòng hôm nay</h1>
+
+                {allBookingCurrent?.map((booking) => (
+                    <ListInvoice key={booking._id} booking={booking} />
+                ))}
             </div>
         </div>
     );

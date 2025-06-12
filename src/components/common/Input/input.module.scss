@@ -23,6 +23,12 @@
     &:disabled {
         color: var(--text-color-secondary-3);
         background: var(--disabled-bg);
+        &.dark {
+            // Màu nền sáng hơn để nổi bật trên nền tối
+            background: var(--grey);
+            // Màu chữ xám hơn để thể hiện trạng thái vô hiệu hóa
+            color: #000;
+        }
     }
     &:read-only {
         color: #151515;

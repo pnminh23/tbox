@@ -19,7 +19,7 @@ const RoomDisplay = ({ roomType, roomName }) => {
             </div>
 
             <div className={styles.roomName}>
-                {`${roomType}-${roomName}`} {/* Hoặc chỉ {roomName} */}
+                {`${roomType} - ${roomName}`} {/* Hoặc chỉ {roomName} */}
             </div>
         </div>
     );

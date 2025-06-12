@@ -147,6 +147,10 @@
     background: var(--blue);
     color: var(--light);
 }
+.grey {
+    background: var(--grey);
+    color: #000;
+}
 
 .blueIcon {
     background: var(--blue-bg);
@@ -180,6 +184,9 @@
 //**********************
 //* CUSTOM STYLE
 //**********************
+.h30 {
+    height: 30px;
+}
 .bold {
     font-weight: 700;
 }

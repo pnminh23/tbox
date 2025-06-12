@@ -1,20 +1,26 @@
 import Image from 'next/image';
-import style from './NewsItem.module.scss';
+import styles from './NewsItem.module.scss';
 import Link from 'next/link';
+import noImage from '@public/static/img/avatar/no_image.jpg';
 
 const NewsItem = ({ news }) => {
+    if (!news) return null;
+    const detailUrl = news._id ? `/news/${news._id}` : '#'; // Tạo URL động
+
     return (
-        <div className={style.container}>
-            <div className={style.img}>
-                <Image src={news.image_url} alt="News Image" fill objectFit="cover" />
+        <div className={styles.container}>
+            <div className={styles.img}>
+                <Image src={news?.image || noImage} alt="News Image" fill objectFit="cover" sizes="100vw" />
             </div>
-            <div className={style.content}>
-                <Link href="/Promotion-new-detail" className={style.title}>
-                    {news.title}
+            <div className={styles.content}>
+                <Link href={detailUrl} legacyBehavior={false}>
+                    {' '}
+                    {/* Bỏ legacyBehavior nếu không cần thiết cho style đặc biệt */}
+                    <a className={styles.title}>{news.title}</a>
                 </Link>
-                <p className={style.detail}>{news.detail}</p>
-                <div className={style.date}>
-                    {new Date(news.create_at).toLocaleString('vi-VN', {
+                <div className={styles.detail} dangerouslySetInnerHTML={{ __html: news?.content }} />
+                <div className={styles.date}>
+                    {new Date(news.createdAt).toLocaleString('vi-VN', {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric',

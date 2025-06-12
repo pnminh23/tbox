@@ -1,4 +1,4 @@
-import { createRoom, useRoomByBranchAndType } from '@/services/room';
+import { createRoom, deleteRoomById, editRoomById, useRoomByBranchAndType } from '@/services/room';
 import styles from './RoomList.module.scss';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -12,22 +12,28 @@ import UploadFileImage from '../../../common/UploadFileImage/UploadFileImage';
 import Input from '../../../common/Input';
 import Button from '../../../common/Button';
 import { toast } from 'react-toastify';
+import clsx from 'clsx';
 
 const RoomList = ({ branchId, typeRoomId }) => {
-    const { RoomsByBranchAndType, isLoadingAllRooms, isErrorAllRooms } = useRoomByBranchAndType(branchId, typeRoomId);
+    const { RoomsByBranchAndType, isLoadingAllRooms, isErrorAllRooms, mutateRoom } = useRoomByBranchAndType(
+        branchId,
+        typeRoomId
+    );
     const [isPopupCreate, setIsPopupCreate] = useState(false);
     const [isPopupEdit, setIsPopupEdit] = useState(false);
     const [nameRoom, setNameRoom] = useState('');
     const [imageUrl, setImageUrl] = useState('');
+    const [selectedRoomId, setSelectedRoomId] = useState(null);
     const [editFile, setEditFile] = useState(null);
 
     // if (!branchId || !typeRoomId) return <p>Chưa có chi nhánh hoặc loại phòng</p>;
     // if (isErrorAllRooms) return <p>Lỗi khi tải danh sách phòng.</p>;
 
-    const handelDetail = (image, name) => {
+    const handelDetail = (room) => {
         setIsPopupEdit(true);
-        setNameRoom(name);
-        setImageUrl(image);
+        setNameRoom(room.name);
+        setImageUrl(room.image);
+        setSelectedRoomId(room._id);
     };
 
     const handleCreate = async () => {
@@ -45,12 +51,52 @@ const RoomList = ({ branchId, typeRoomId }) => {
                 toast.success('Thêm phòng mới thành công!');
                 setIsPopupCreate(false); // đóng popup
                 setNameRoom('');
+                mutateRoom();
             } else {
                 toast.error(response.message);
             }
         } catch (err) {
             console.error(err);
             toast.error('Đã xảy ra lỗi khi thêm mới!');
+        }
+    };
+
+    const handleEdit = async () => {
+        try {
+            const formData = new FormData();
+            if (nameRoom) formData.append('name', nameRoom);
+            if (editFile) formData.append('image', editFile);
+
+            const response = await editRoomById(selectedRoomId, formData);
+
+            if (response.success) {
+                toast.success('Cập nhật tin tức thành công!');
+                setIsPopupEdit(false);
+                setSelectedRoomId(null);
+                mutateRoom();
+            } else {
+                toast.error(response.message);
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error('Đã xảy ra lỗi khi cập nhật!');
+        }
+    };
+
+    const handelDeleteNews = async () => {
+        try {
+            const response = await deleteRoomById(selectedRoomId);
+            if (response.success) {
+                toast.success('Xóa phòng thành công!');
+                setSelectedRoomId(null);
+                setIsPopupEdit(false);
+                mutateRoom();
+            } else {
+                toast.error(response.message);
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error('Đã xảy ra lỗi khi xóa!');
         }
     };
 
@@ -71,10 +117,16 @@ const RoomList = ({ branchId, typeRoomId }) => {
                 <label>Tên phòng</label>
                 <Input rounded_10 outLine value={nameRoom} onChange={(e) => setNameRoom(e.target.value)} />
             </div>
-
-            <Button rounded_10 blue w_fit className={styles.btnAdd} onClick={handleCreate}>
-                {isEdit ? 'Cập nhật' : 'Thêm mới'}
-            </Button>
+            <div className={clsx(styles.row, styles.btn)}>
+                {isEdit && (
+                    <Button rounded_10 red w_fit onClick={handelDeleteNews}>
+                        Xóa phòng
+                    </Button>
+                )}
+                <Button rounded_10 blue w_fit onClick={isEdit ? handleEdit : handleCreate}>
+                    {isEdit ? 'Cập nhật' : 'Thêm mới'}
+                </Button>
+            </div>
         </div>
     );
 
@@ -90,7 +142,7 @@ const RoomList = ({ branchId, typeRoomId }) => {
                         alt={room.name}
                         width={100}
                         height={120}
-                        onClick={() => handelDetail(room.image, room.name)}
+                        onClick={() => handelDetail(room)}
                     />
                     <p className={styles.roomName}>{`P - ${room.name}`}</p>
                 </div>
@@ -101,13 +153,25 @@ const RoomList = ({ branchId, typeRoomId }) => {
                 </div>
             </Tippy>
 
-            {isPopupCreate && <Popup handleClose={() => setIsPopupCreate(false)}>{renderRoomFormContent(false)}</Popup>}
+            {isPopupCreate && (
+                <Popup
+                    handleClose={() => {
+                        setIsPopupCreate(false);
+                        setImageUrl('');
+                        setNameRoom('');
+                        setEditFile(null); // Thêm dòng này
+                    }}
+                >
+                    {renderRoomFormContent(false)}
+                </Popup>
+            )}
             {isPopupEdit && (
                 <Popup
                     handleClose={() => {
                         setIsPopupEdit(false);
                         setImageUrl('');
                         setNameRoom('');
+                        setEditFile(null); // Thêm dòng này
                     }}
                 >
                     {renderRoomFormContent(true)}

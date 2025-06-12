@@ -8,7 +8,6 @@ import clsx from 'clsx';
 import SearchBar from '@/components/common/SearchBar';
 import loadingAnimation from '@public/animations/loadingItem.json';
 import Lottie from 'lottie-react';
-import Input from '@/components/common/Input/input';
 import {
     categoryFilms,
     useAllFilms,
@@ -19,109 +18,138 @@ import {
     useTop10Film,
 } from '@/services/films';
 import Pagination from '@/components/common/Pagonation';
-import Title from '@/components/common/Title';
-import Image from 'next/image';
-import LoadingItem from '@/components/common/LoadingItem/LoadingItem';
+import Button from '@/components/common/Button';
 
 const ListFilmPage = () => {
-    const [selectedFilm, setSelectedFilm] = useState(null);
+    // --- State cho việc chọn filter ---
+    const [selectedFilmId, setSelectedFilmId] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedYear, setSelectedYear] = useState('');
-    const [selectedTopFilm, setSelectedTopFilm] = useState(false);
-    const [activeFilter, setActiveFilter] = useState('');
+    const [activeFilter, setActiveFilter] = useState(''); // 'search', 'category', 'year', 'top10'
 
-    const { film: filmbyCategory, isLoading: loadingFilmByCategory } = useFilmsByCategory(selectedCategory);
-    const { film: filmbyYear, isLoading: loadingFilmByYear } = useFilmsByYear(selectedYear);
+    // --- Các hook fetch data gốc ---
+    const { film: filmById, isLoading: loadingFilmById } = useFilm(selectedFilmId);
+    const { film: filmByCategory, isLoading: loadingFilmByCategory } = useFilmsByCategory(selectedCategory);
+    const { film: filmByYear, isLoading: loadingFilmByYear } = useFilmsByYear(selectedYear);
     const { film: top10Film, isLoading: loadingTop10Film } = useTop10Film();
-    const { filmsCurrentyear, isLoadingFilmsByCurrentYear, isErrorFilmsByCurrentYear } = useFilmsByCurrentYear();
+    const { filmsCurrentyear, isLoadingFilmsByCurrentYear } = useFilmsByCurrentYear();
     const { films, isLoadingFilms, isErrorFilms } = useAllFilms();
-    const { film, isLoading: loadingFilm } = useFilm(selectedFilm);
+
+    // --- STATE CHUNG ĐỂ HIỂN THỊ (Đây là phần quan trọng nhất) ---
+    const [displayFilms, setDisplayFilms] = useState([]);
+    const [displayTitle, setDisplayTitle] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    // --- Logic phân trang cho danh sách mặc định ---
     const [currentPage, setCurrentPage] = useState(1);
     const [limit, setLimit] = useState(8);
     const totalItems = films?.length || 0;
     const totalPages = Math.ceil(totalItems / limit);
+    const paginatedFilms = films?.slice((currentPage - 1) * limit, currentPage * limit) || [];
     const FilmOptions = films?.map((film) => ({
         name: `${film.name} - ${film.nameEnglish}`,
         id: film._id,
         image: film.image,
     }));
-    const paginatedFilms = films?.slice((currentPage - 1) * limit, currentPage * limit) || [];
-    const allFimContainerRef = useRef(null);
 
-    const getLast15Years = () => {
-        const currentYear = new Date().getFullYear();
-        return Array.from({ length: 15 }, (_, i) => currentYear - 1 - i);
-    };
+    // --- useEffects để cập nhật STATE CHUNG dựa trên filter đang active ---
+
+    // 1. Lắng nghe filter THEO SEARCH
+    useEffect(() => {
+        if (activeFilter === 'search') {
+            setIsLoading(loadingFilmById);
+            if (!loadingFilmById && filmById) {
+                setDisplayFilms([filmById]); // filmById là 1 object, cần cho vào mảng
+                setDisplayTitle('Phim bạn tìm kiếm');
+            }
+        }
+    }, [activeFilter, filmById, loadingFilmById]);
+
+    // 2. Lắng nghe filter THEO THỂ LOẠI
+    useEffect(() => {
+        if (activeFilter === 'category') {
+            setIsLoading(loadingFilmByCategory);
+            if (!loadingFilmByCategory && filmByCategory) {
+                setDisplayFilms(filmByCategory);
+                setDisplayTitle(`Thể loại: ${selectedCategory}`);
+            }
+        }
+    }, [activeFilter, filmByCategory, loadingFilmByCategory, selectedCategory]);
+
+    // 3. Lắng nghe filter THEO NĂM
+    useEffect(() => {
+        if (activeFilter === 'year') {
+            setIsLoading(loadingFilmByYear);
+            if (!loadingFilmByYear && filmByYear) {
+                setDisplayFilms(filmByYear);
+                setDisplayTitle(`Phim phát hành năm ${selectedYear}`);
+            }
+        }
+    }, [activeFilter, filmByYear, loadingFilmByYear, selectedYear]);
+
+    // 4. Lắng nghe filter TOP 10
+    useEffect(() => {
+        if (activeFilter === 'top10') {
+            setIsLoading(loadingTop10Film);
+            if (!loadingTop10Film && top10Film) {
+                setDisplayFilms(top10Film);
+                setDisplayTitle('Top 10 phim được đặt nhiều nhất');
+            }
+        }
+    }, [activeFilter, top10Film, loadingTop10Film]);
+
+    const uniqueYears = films
+        ? [...new Set(films.map((film) => film.release_date))].sort((a, b) => b - a) // Sắp xếp giảm dần (năm mới nhất lên đầu)
+        : [];
 
     const clearAllFilters = () => {
-        setSelectedFilm(null);
+        setSelectedFilmId(null);
         setSelectedCategory('');
         setSelectedYear('');
-        setSelectedTopFilm(false);
         setActiveFilter('');
+        setDisplayFilms([]); // Xóa dữ liệu hiển thị filter
+        setDisplayTitle('');
     };
+
+    // Biến kiểm tra xem có đang filter hay không
+    const isFiltering = !!activeFilter;
 
     return (
         <>
             <Banner />
-
             <div className={clsx('container', style.container)}>
                 <div className={style.left}>
-                    {/* Bộ lọc phim theo Search */}
-                    {activeFilter === 'search' &&
-                        (loadingFilm ? (
-                            <Lottie animationData={loadingAnimation} loop autoplay className={style.loading} />
+                    {/* ---- KHỐI RENDER TẬP TRUNG ---- */}
+                    {isFiltering ? (
+                        isLoading ? (
+                            <div className={style.loadingContainer}>
+                                <Lottie animationData={loadingAnimation} loop autoplay className={style.loading} />
+                                <p>Đang tìm kiếm...</p>
+                            </div>
+                        ) : displayFilms.length > 0 ? (
+                            <Slider
+                                key={displayTitle} // Dùng key để Slider reset hoàn toàn khi đổi filter
+                                data={displayFilms}
+                                title={displayTitle}
+                                slidesPerView={4}
+                                renderItem={(film) => <FilmItem film={film} />}
+                            />
                         ) : (
-                            film && (
-                                <Slider
-                                    data={[film]}
-                                    title="Phim bạn tìm kiếm"
-                                    slidesPerView={4}
-                                    renderItem={(film) => <FilmItem film={film} />}
-                                />
-                            )
-                        ))}
-
-                    {/* Bộ lọc phim theo thể loại */}
-                    {activeFilter === 'category' && filmbyCategory?.length > 0 && (
-                        <Slider
-                            data={filmbyCategory}
-                            title={`Thể loại: ${selectedCategory}`}
-                            slidesPerView={4}
-                            renderItem={(film) => <FilmItem film={film} />}
-                        />
-                    )}
-
-                    {/* Bộ lọc phim theo năm */}
-                    {activeFilter === 'year' && filmbyYear?.length > 0 && (
-                        <Slider
-                            data={filmbyYear}
-                            title={`Phim phát hành năm ${selectedYear}`}
-                            slidesPerView={4}
-                            renderItem={(film) => <FilmItem film={film} />}
-                        />
-                    )}
-
-                    {/* Bộ lọc phim top10 */}
-                    {activeFilter === 'top10' && top10Film?.length > 0 && (
-                        <Slider
-                            data={top10Film}
-                            title="Top 10 được đặt nhiều nhất"
-                            slidesPerView={4}
-                            renderItem={(film) => <FilmItem film={film} />}
-                        />
-                    )}
-
-                    {/* Không chọn bộ lọc nào => hiển thị mặc định */}
-                    {
+                            <div className={style.noResult}>
+                                <p>Không tìm thấy phim phù hợp với lựa chọn của bạn.</p>
+                            </div>
+                        )
+                    ) : (
+                        // Giao diện mặc định khi không filter
                         <>
                             <Slider
                                 data={filmsCurrentyear}
+                                isLoading={isLoadingFilmsByCurrentYear}
                                 title="Phim mới ra mắt năm nay"
                                 slidesPerView={4}
                                 renderItem={(film) => <FilmItem film={film} />}
                             />
-                            <div className={style.allFimContainer} ref={allFimContainerRef}>
+                            <div className={style.allFimContainer}>
                                 <div className={style.title}>
                                     <h3>Tất cả các Phim tại PNM - BOX</h3>
                                 </div>
@@ -147,50 +175,41 @@ const ListFilmPage = () => {
                                 />
                             </div>
                         </>
-                    }
+                    )}
                 </div>
 
                 <div className={style.right}>
+                    {/* Phần filter không thay đổi nhiều, chỉ cần cập nhật tên state */}
                     <SearchBar
                         data={FilmOptions}
                         onSelect={(item) => {
-                            setSelectedFilm(item.id);
-                            setSelectedCategory('');
-                            setSelectedYear('');
-                            setSelectedTopFilm(false);
                             setActiveFilter('search');
+                            setSelectedFilmId(item.id);
                         }}
                         heightImage={70}
                         widthImage={50}
                     />
-
                     <ul className={clsx(style.options)}>
                         <li
-                            onClick={() => {
-                                setSelectedTopFilm(true);
-                                setSelectedFilm(null);
-                                setSelectedCategory('');
-                                setSelectedYear('');
-                                setActiveFilter('top10');
-                            }}
+                            className={clsx(activeFilter === 'top10' && style.active)}
+                            onClick={() => setActiveFilter('top10')}
                         >
                             <AiOutlineRight />
                             Hot và phổ biến
                         </li>
                     </ul>
-
                     <div className={style.category}>
                         <h5>Thể loại</h5>
                         <ul>
                             {categoryFilms.map((category, index) => (
                                 <li
                                     key={index}
+                                    className={clsx(
+                                        activeFilter === 'category' && selectedCategory === category && style.active
+                                    )}
                                     onClick={() => {
-                                        setSelectedCategory(category);
-                                        setSelectedFilm(null);
-                                        setSelectedYear('');
-                                        setSelectedTopFilm(false);
                                         setActiveFilter('category');
+                                        setSelectedCategory(category);
                                     }}
                                 >
                                     <AiOutlineRight />
@@ -199,20 +218,19 @@ const ListFilmPage = () => {
                             ))}
                         </ul>
                     </div>
-
                     <div className={style.year}>
                         <h5>Năm phát hành</h5>
                         <ul>
-                            {getLast15Years().map((year) => (
+                            {uniqueYears.map((year) => (
                                 <div
                                     key={year}
-                                    className={style.yearItem}
+                                    className={clsx(
+                                        style.yearItem, // Class gốc
+                                        activeFilter === 'year' && selectedYear === year && style.active
+                                    )}
                                     onClick={() => {
-                                        setSelectedYear(year.toString());
-                                        setSelectedFilm(null);
-                                        setSelectedCategory('');
-                                        setSelectedTopFilm(false);
                                         setActiveFilter('year');
+                                        setSelectedYear(year);
                                     }}
                                 >
                                     <p>{year}</p>
@@ -220,10 +238,17 @@ const ListFilmPage = () => {
                             ))}
                         </ul>
                     </div>
-
-                    <button className={style.clearButton} onClick={clearAllFilters}>
+                    <Button
+                        className={style.btnFilter}
+                        w_fit
+                        grey={!!activeFilter}
+                        disabled={!activeFilter}
+                        rounded_10
+                        h30
+                        onClick={clearAllFilters}
+                    >
                         Xoá bộ lọc
-                    </button>
+                    </Button>
                 </div>
             </div>
         </>

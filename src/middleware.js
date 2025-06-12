@@ -15,15 +15,16 @@ export async function middleware(req) {
     const publicPaths = [
         '/',
         '/bookRoom',
+        /^\/bookRoom\/[^/]+$/,
         '/listFilm',
         '/locations',
-        '/discount',
+        '/news',
+        /^\/news\/[^/]+$/,
+
         '/combo',
         '/auth/login',
         '/auth/register',
         '/auth/forgotPassword',
-        // ví dụ các trang chi tiết có param
-        /^\/products\/[^/]+$/,
     ];
 
     // Bỏ qua nếu là public hoặc asset

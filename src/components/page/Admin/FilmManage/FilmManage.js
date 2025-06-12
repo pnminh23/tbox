@@ -19,12 +19,6 @@ import Pagination from '@/components/common/Pagonation';
 const FilmManage = () => {
     const { films, isLoadingFilms, isErrorFilms, mutateFilms } = useAllFilms();
 
-    const FilmOptions = films?.map((film) => ({
-        name: `${film.name} - ${film.nameEnglish}`,
-        id: film._id,
-        image: film.image,
-    }));
-
     const [currentPage, setCurrentPage] = useState(1);
     const [limit, setLimit] = useState(5);
 

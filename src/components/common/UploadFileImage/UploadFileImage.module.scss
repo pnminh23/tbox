@@ -29,6 +29,11 @@
     width: 100px !important;
     height: 130px !important;
 }
+.newsImage {
+    object-fit: contain !important;
+    width: 150px !important;
+    height: 100px !important;
+}
 .modalOverlay {
     position: fixed;
     inset: 0;

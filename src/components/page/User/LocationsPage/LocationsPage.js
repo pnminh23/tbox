@@ -6,6 +6,7 @@ import { useAllBranches } from '@/services/branch';
 
 const LocationsPage = () => {
     const { branches, isLoadingAllBranches, isErrorAllBranches, mutateBranches } = useAllBranches();
+    console.log('branches', branches);
 
     return (
         <>
@@ -28,6 +29,9 @@ const LocationsPage = () => {
                 const roomImages = branch.rooms.map((room) => ({
                     image: room.image,
                     name: room.name,
+                    type: {
+                        name: room.type.name,
+                    },
                 }));
                 return (
                     <Slider
@@ -41,7 +45,7 @@ const LocationsPage = () => {
                         breakpoints={{
                             0: { slidesPerView: 2 },
                             480: { slidesPerView: 3 },
-                            980: { slidesPerView: 5 },
+                            980: { slidesPerView: 3 },
                         }}
                     >
                         {/* <div className={style.subContent}>

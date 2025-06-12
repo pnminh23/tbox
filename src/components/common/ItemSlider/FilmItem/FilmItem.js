@@ -3,6 +3,7 @@ import 'tippy.js/dist/tippy.css'; // Import CSS mặc định của Tippy
 import style from './FilmItem.module.scss';
 import Image from 'next/image';
 import Link from 'next/link';
+import noImage from '@public/static/img/avatar/no_image.jpg';
 import { PATH } from '@/constants/config';
 
 const FilmItem = ({ film }) => {
@@ -12,7 +13,7 @@ const FilmItem = ({ film }) => {
         <div className={style.item}>
             {film.index !== undefined && <div className={style.rankNumber}>{film.index + 1}</div>}
             <div className={style.image}>
-                <Image src={film.image} alt={film.name} fill objectFit="cover" />
+                <Image src={film?.image || noImage} alt={film.name} fill objectFit="cover" sizes="100vw" />
             </div>
             <div className={style.overlay}></div>
             <Link href={{ pathname: PATH.BookRoom, query: { f_Id: film._id } }} className={style.orderButton}>

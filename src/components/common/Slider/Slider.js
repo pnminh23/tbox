@@ -57,6 +57,7 @@ const Slider = ({
             swiperRef.current.swiper.params.navigation.nextEl = nextButtonRef.current;
             swiperRef.current.swiper.navigation.init();
             swiperRef.current.swiper.navigation.update();
+            swiperRef.current.swiper.update();
         }
     }, [data]); // Chỉ chạy khi items được tải xong
 
@@ -90,6 +91,8 @@ const Slider = ({
                     prevEl: prevButtonRef.current,
                     nextEl: nextButtonRef.current,
                 }}
+                observer={true} // Thêm dòng này
+                observeParents={true} // Thêm dòng này
                 autoplay={autoplay ? { delay: 7000, disableOnInteraction: false } : false}
                 breakpoints={breakpoints}
             >

@@ -1,65 +1,19 @@
+import { useAllBranches } from '@/services/branch';
 import Title from '../Title';
 import style from './Feedback.module.scss';
+import { useEffect, useState } from 'react';
+import { useFeedbackByBranch } from '@/services/feedback';
 
 const Feedback = () => {
-    const ListLocations = [
-        'PNM - BOX 175 Tây Sơn',
-        'PNM - BOX 139 Nguyễn Ngọc Vũ',
-        'PNM - BOX 7 Thiền Quang',
-        'PNM - BOX 19C Hoàng Diệu',
-    ];
+    const { branches, isLoadingAllBranches } = useAllBranches();
+    const [selectedBranch, setSelectedBranch] = useState('');
 
-    const Feedbacks = [
-        {
-            name: 'Phạm Nhật Minh',
-            rate: 4,
-            comment: 'Chất lượng dịch vụ tốt',
-            date: '2025-04-10T10:30:00.000Z',
-        },
-        {
-            name: 'Phạm Nhật Minh',
-            rate: 4,
-            comment: 'Chất lượng dịch vụ tốt, nhân viên nhiệt tình',
-            date: '2025-04-10T11:00:00.000Z',
-        },
-        {
-            name: 'Phạm Nhật Minh',
-            rate: 4,
-            comment: 'Chất lượng dịch vụ tốt, nhân viên nhiệt tình',
-            date: '2025-04-10T11:30:00.000Z',
-        },
-        {
-            name: 'Nguyễn Văn A',
-            rate: 5,
-            comment: 'Rất hài lòng với dịch vụ!',
-            date: '2025-04-09T14:20:00.000Z',
-        },
-        {
-            name: 'Trần Thị B',
-            rate: 3,
-            comment: 'Ổn, nhưng có thể cải thiện thêm',
-            date: '2025-04-08T09:00:00.000Z',
-        },
-        {
-            name: 'Lê Văn C',
-            rate: 4,
-            comment: 'Dịch vụ nhanh chóng và tiện lợi',
-            date: '2025-04-08T16:15:00.000Z',
-        },
-        {
-            name: 'Mai Thị D',
-            rate: 5,
-            comment: 'Tuyệt vời!',
-            date: '2025-04-07T08:00:00.000Z',
-        },
-        {
-            name: 'Hoàng Minh E',
-            rate: 2,
-            comment: 'Chưa tốt lắm, nên cải thiện',
-            date: '2025-04-06T17:45:00.000Z',
-        },
-    ];
-
+    const { feedbacks, isLoading: loadingFeedback } = useFeedbackByBranch(selectedBranch);
+    useEffect(() => {
+        if (branches?.length > 0 && !selectedBranch) {
+            setSelectedBranch(branches[0]._id);
+        }
+    }, [branches]);
     const renderStars = (count) => {
         return (
             <>
@@ -76,22 +30,26 @@ const Feedback = () => {
         <div className={style.container}>
             <div className={style.title}>
                 <Title>Đánh giá về cơ sở</Title>
-                <select className={style.select}>
-                    {ListLocations.map((opt) => (
-                        <option key={opt} value={opt}>
-                            {opt}
+                <select
+                    className={style.select}
+                    value={selectedBranch || ''}
+                    onChange={(e) => setSelectedBranch(e.target.value)}
+                >
+                    {branches?.map((branch) => (
+                        <option key={branch._id} value={branch._id}>
+                            {branch.name}
                         </option>
                     ))}
                 </select>
             </div>
             <div className={style.content}>
                 <div className={style.feedbackList}>
-                    {Feedbacks.map((item, index) => (
-                        <div key={index} className={style.feedbackCard}>
+                    {feedbacks?.map((feedback) => (
+                        <div key={feedback._id} className={style.feedbackCard}>
                             <div className={style.name}>
-                                {item.name}
+                                {feedback.name}
                                 <div className={style.date}>
-                                    {new Date(item.date).toLocaleString('vi-VN', {
+                                    {new Date(feedback.createdAt).toLocaleString('vi-VN', {
                                         day: '2-digit',
                                         month: '2-digit',
                                         year: 'numeric',
@@ -100,8 +58,8 @@ const Feedback = () => {
                                     })}
                                 </div>
                             </div>
-                            <div className={style.stars}>{renderStars(item.rate)}</div>
-                            <div className={style.comment}>{item.comment}</div>
+                            <div className={style.stars}>{renderStars(feedback.rating)}</div>
+                            <div className={style.comment}>{feedback.comment}</div>
                         </div>
                     ))}
                 </div>

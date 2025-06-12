@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './Table.module.scss';
 import clsx from 'clsx';
 import Image from 'next/image';
+import dayjs from 'dayjs';
 
 const Table = ({ columns, data, renderActions }) => {
     return (
@@ -14,7 +15,8 @@ const Table = ({ columns, data, renderActions }) => {
                                 {column.label}
                             </th>
                         ))}
-                        <th className={styles.colAction}>Thao tác</th>
+                        {/* Chỉ hiển thị cột Thao tác nếu có hàm renderActions */}
+                        {renderActions && <th className={styles.colAction}>Thao tác</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -22,25 +24,37 @@ const Table = ({ columns, data, renderActions }) => {
                         <tr key={`${item._id}-${index}`}>
                             {columns.map((column) => (
                                 <td key={column.key} className={styles[`col-${column.key}`]}>
-                                    {column.key === 'role' ? (
+                                    {/********** BẮT ĐẦU THAY ĐỔI **********/}
+                                    {column.key === 'status' ? (
+                                        (() => {
+                                            // Danh sách các trạng thái cần áp dụng style statusLock
+                                            const lockStatuses = ['Đã khóa', 'THẤT BẠI', 'ĐÃ HỦY'];
+                                            const currentStatus = item[column.key];
+
+                                            return (
+                                                <span
+                                                    className={clsx({
+                                                        [styles.statusLock]: lockStatuses.includes(currentStatus),
+                                                        [styles.status]: !lockStatuses.includes(currentStatus),
+                                                    })}
+                                                >
+                                                    {currentStatus}
+                                                </span>
+                                            );
+                                        })()
+                                    ) : /********** KẾT THÚC THAY ĐỔI **********/
+
+                                    column.key === 'role' ? (
                                         <span className={styles.role}>{item[column.key]}</span>
-                                    ) : column.key === 'status' ? (
-                                        <span
-                                            className={clsx(
-                                                item[column.key] === 'Đã khóa' ? styles.statusLock : styles.status
-                                            )}
-                                        >
-                                            {item[column.key]}
-                                        </span>
-                                    ) : column.key === 'createdAt' ? (
+                                    ) : column.key === 'createdAt' ? ( // Gộp chung điều kiện cho ngày tháng
                                         <span className={clsx(styles.createdAt)}>
-                                            {new Date(item[column.key]).toLocaleDateString()}
+                                            {dayjs(item[column.key]).format('DD/MM/YYYY')}
                                         </span>
                                     ) : column.key === 'image' ? (
                                         <Image
-                                            src={item[column.key]}
+                                            src={item[column.key] || '/default-image.png'} // Thêm ảnh dự phòng
                                             className={clsx(styles.image)}
-                                            alt={'iamge'}
+                                            alt={item.name || 'image'}
                                             width={40}
                                             height={60}
                                         />
@@ -51,9 +65,12 @@ const Table = ({ columns, data, renderActions }) => {
                                     )}
                                 </td>
                             ))}
-                            <td>
-                                <div className={styles.actions}>{renderActions(item)}</div>
-                            </td>
+                            {/* Chỉ render ô <td> cho actions nếu có hàm renderActions */}
+                            {renderActions && (
+                                <td>
+                                    <div className={styles.actions}>{renderActions(item)}</div>
+                                </td>
+                            )}
                         </tr>
                     ))}
                 </tbody>

@@ -15,8 +15,9 @@ import { useBookingsRealtime } from '@/hooks/useBookingRealTime';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/light-border.css';
-import { useBookingById, useCurrentActiveRoomsWithBookingId } from '@/services/booking';
+import { editBooking, useBookingById, useCurrentActiveRoomsWithBookingId } from '@/services/booking';
 import { formatMoney } from '@/function/formatMoney';
+import { toast } from 'react-toastify';
 const dateNow = new Date();
 const BookingManger = () => {
     const [selectedBranch, setSelectedBranch] = useState('');
@@ -36,6 +37,43 @@ const BookingManger = () => {
     useEffect(() => {
         console.log('selectedBooking (updated):', selectedBooking);
     }, [selectedBooking]);
+
+    const handleCompleteBooking = async () => {
+        if (!booking) return; // Đảm bảo đã có booking được chọn
+
+        try {
+            // Gọi service với status mới
+            const result = await editBooking(booking.id_booking, {
+                status: 'HOÀN THÀNH',
+            });
+            if (result.success) {
+                toast.success('Đã hoàn tất đơn đặt phòng!');
+            }
+        } catch (error) {
+            toast.error(error.message || 'Có lỗi xảy ra khi hoàn tất đơn.');
+            console.error(error);
+        }
+    };
+    const handleCancelBooking = async () => {
+        if (!booking) return; // Đảm bảo đã có booking được chọn
+
+        // Thêm một bước xác nhận trước khi hủy
+        if (!window.confirm(`Bạn có chắc muốn hủy đơn hàng "${booking._id}" không?`)) {
+            return;
+        }
+
+        try {
+            const result = await editBooking(booking._id, {
+                status: 'ĐÃ HỦY',
+            });
+            if (result.success) {
+                toast.success('Đã hủy đơn đặt phòng thành công!');
+            }
+        } catch (error) {
+            toast.error(error.message || 'Có lỗi xảy ra khi hủy đơn.');
+            console.error(error);
+        }
+    };
 
     return (
         <div className={style.container}>
@@ -144,12 +182,18 @@ const BookingManger = () => {
                                 </div>
 
                                 <div className={style.row}>
-                                    <Button rounded_10 redLinear w_fit>
-                                        Hoàn tất
+                                    <Button rounded_10 red w_fit onClick={handleCancelBooking}>
+                                        Hủy đơn
                                     </Button>
-                                    <Button rounded_10 yellowLinear w_fit>
-                                        Thanh toán
-                                    </Button>
+                                    {booking?.isPay === 'ĐÃ THANH TOÁN' ? (
+                                        <Button rounded_10 yellowLinear w_fit onClick={handleCompleteBooking}>
+                                            Hoàn tất
+                                        </Button>
+                                    ) : (
+                                        <Button rounded_10 yellowLinear w_fit>
+                                            Thanh toán
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         </div>

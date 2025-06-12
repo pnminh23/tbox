@@ -21,12 +21,27 @@ import menu3 from '@public/static/img/menuItem/menu3.jpg';
 import comboDat from '@public/static/img/menuItem/comboDating.jpg';
 // import backgroundContent3 from "@public/static/img/menuItem/background.jpg";
 import clsx from 'clsx';
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Feedback from '@/components/common/Feedback';
 import { useAllFilms, useFilmsByCurrentYear } from '@/services/films';
+import { PATH } from '@/constants/config';
+import { useAllBranches } from '@/services/branch';
+import { useRoomByBranch } from '@/services/room';
+import LoadingItem from '@/components/common/LoadingItem/LoadingItem';
 const Home = () => {
     // const { films, isLoadingAllFimls, isErrorAllFimls, mutateFilms } = useAllFilms();
+    const { branches, isLoadingAllBranches } = useAllBranches();
+
+    const [selectedBranch, setSelectedBranch] = useState('');
+    const { roomsByBranch, isLoading: loadingRoom } = useRoomByBranch(selectedBranch);
+    useEffect(() => {
+        if (branches?.length > 0 && !selectedBranch) {
+            setSelectedBranch(branches[0]._id);
+        }
+    }, [branches]);
+    console.log('selectedBranch: ', selectedBranch);
+    console.log('roomsByBranch: ', roomsByBranch);
     const { filmsCurrentyear, isLoadingFilmsByCurrentYear, isErrorFilmsByCurrentYear, mutateFilmsByCurrentYear } =
         useFilmsByCurrentYear();
 
@@ -55,14 +70,41 @@ const Home = () => {
                     }}
                 />
 
-                <Slider
-                    apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
-                    title="Hệ thống phòng"
-                    slidesPerView={3}
-                    renderItem={(box) => <BoxItem box={box} />}
-                    autoplay={true}
-                    slidesPerGroup={3}
-                />
+                <div className={style.roomByBranch}>
+                    <select
+                        className={style.select}
+                        value={selectedBranch || ''}
+                        onChange={(e) => setSelectedBranch(e.target.value)}
+                    >
+                        {branches?.map((branch) => (
+                            <option key={branch._id} value={branch._id}>
+                                {branch.name}
+                            </option>
+                        ))}
+                    </select>
+                    {loadingRoom ? (
+                        // Hiển thị một placeholder/skeleton loading rõ ràng
+                        <div className={style.loadingPlaceholder}>
+                            <LoadingItem />
+                        </div>
+                    ) : (
+                        // Chỉ render Slider khi đã có dữ liệu cuối cùng
+                        <Slider
+                            key={selectedBranch}
+                            data={roomsByBranch || []} // Truyền mảng rỗng nếu roomsByBranch là null/undefined
+                            title="Hệ thống phòng"
+                            slidesPerView={3}
+                            renderItem={(box) => <BoxItem box={box} />}
+                            autoplay={true}
+                            slidesPerGroup={3}
+                            breakpoints={{
+                                0: { slidesPerView: 1 },
+                                480: { slidesPerView: 2 },
+                                980: { slidesPerView: 3 },
+                            }}
+                        />
+                    )}
+                </div>
             </div>
             <div className={style.content1}>
                 <h3> lí do chọn PNM - BOX</h3>
@@ -72,16 +114,21 @@ const Home = () => {
                         <div className={style.paragraph}>
                             <h5>Cafe phim phòng riêng đầu tiên</h5>
                             <p>
-                                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
-                                has been the industrys standard dummy text ever since the 1500s, when an unknown printer
-                                took a galley of type and scrambled it to make a type specimen book. It has survived not
-                                only five centuries, but also the leap into electronic typesetting, remaining
-                                essentially unchanged.
+                                Tự hào là một trong những thương hiệu tiên phong cho mô hình cafe phim tại Việt Nam, PNM
+                                - BOX mang đến một không gian giải trí riêng tư và độc đáo. Nơi đây nhanh chóng trở
+                                thành điểm hẹn lý tưởng cho các cặp đôi và nhóm bạn muốn tận hưởng những giây phút thư
+                                giãn.
                                 <br />
                                 <br />
-                                It was popularised in the 1960s with the release of Letraset sheets containing Lorem
-                                Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker
-                                including versions of Lorem Ipsum.
+                                Tại PNM - BOX, mỗi "box" là một phòng chiếu phim mini được trang bị màn hình lớn sắc nét
+                                và hệ thống âm thanh sống động. Điểm nhấn đặc biệt là bạn có thể vừa theo dõi các bộ
+                                phim yêu thích, vừa thoải mái thưởng thức đồ uống và món ăn nhẹ được phục vụ ngay tại
+                                phòng.
+                                <br />
+                                <br />
+                                Với không gian ấm cúng, lãng mạn cùng chất lượng dịch vụ chu đáo, PNM - BOX đã tạo nên
+                                một lựa chọn giải trí hấp dẫn, kết hợp hoàn hảo trải nghiệm xem phim chuyên nghiệp và sự
+                                thoải mái của một quán cà phê.
                             </p>
                         </div>
                         <Image src={imgContent1} alt="image Box" />
@@ -115,7 +162,7 @@ const Home = () => {
                                     <AiOutlineCheck />
                                 </li>
                             </ul>
-                            <Button uppercase p_10_24 w_fit rounded_10 redLinear bold>
+                            <Button uppercase p_10_24 w_fit rounded_10 redLinear bold href={PATH.BookRoom}>
                                 Đặt phòng
                             </Button>
                         </div>
@@ -123,59 +170,6 @@ const Home = () => {
                 </div>
             </div>
 
-            <div className={style.content2}>
-                <div className={style.title}>
-                    <h5>Tổ chức sự kiện</h5>
-                    <p>
-                        {`Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...`}
-                        <br />
-                        {`There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain...`}
-                    </p>
-                </div>
-                {/* Nút prev/next đặt ngoài Swiper */}
-                <div ref={prevRef} className={style.prevButton}>
-                    <AiOutlineLeft />
-                </div>
-                <div ref={nextRef} className={style.nextButton}>
-                    <AiOutlineRight />
-                </div>
-
-                <Swiper
-                    className={style.swiperContent2}
-                    modules={[Navigation, Autoplay]}
-                    speed={700}
-                    slidesPerView={3}
-                    loop={true}
-                    navigation={{
-                        prevEl: prevRef.current,
-                        nextEl: nextRef.current,
-                    }}
-                    onInit={(swiper) => {
-                        swiper.params.navigation.prevEl = prevRef.current;
-                        swiper.params.navigation.nextEl = nextRef.current;
-                        swiper.navigation.init();
-                        swiper.navigation.update();
-                    }}
-                    breakpoints={{
-                        0: { slidesPerView: 1, spaceBetween: 10 },
-                        480: { slidesPerView: 2, spaceBetween: 15 },
-                        980: { slidesPerView: 3, spaceBetween: 30 },
-                    }}
-                >
-                    <SwiperSlide className={style.item}>
-                        <Image src={decorImg1} alt="decor Image" />
-                    </SwiperSlide>
-                    <SwiperSlide className={style.item}>
-                        <Image src={decorImg2} alt="decor Image" />
-                    </SwiperSlide>
-                    <SwiperSlide className={style.item}>
-                        <Image src={decorImg3} alt="decor Image" />
-                    </SwiperSlide>
-                    <SwiperSlide className={style.item}>
-                        <Image src={decorImg4} alt="decor Image" />
-                    </SwiperSlide>
-                </Swiper>
-            </div>
             <div className={style.content3}>
                 <h5>Thực đơn đa dạng</h5>
                 <div className={style.containerContent3}>

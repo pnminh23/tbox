@@ -34,7 +34,7 @@ const MenuTab = ({ user, dark, collapsed }) => {
         { path: PATH.BannerManagement, label: 'Quản lý Banner', icon: <AiOutlinePicture /> },
         { path: PATH.FilmManagement, label: 'Quản lý phim', icon: <AiOutlineVideoCamera /> },
         { path: PATH.LocationsManagement, label: 'Quản lý cơ sở', icon: <AiOutlineHome /> },
-        { path: PATH.DiscountManagement, label: 'Quản lý khuyến mãi', icon: <AiOutlineGift /> },
+        { path: PATH.NewsManagement, label: 'Quản lý tin tức', icon: <AiOutlineGift /> },
         { path: PATH.ComboManagement, label: 'Quản lý combo', icon: <AiOutlineShopping /> },
         { path: PATH.InvoiceManagement, label: 'Quản lý đơn đặt', icon: <AiOutlineProfile /> },
 
