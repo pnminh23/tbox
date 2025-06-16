@@ -40,8 +40,7 @@ const Home = () => {
             setSelectedBranch(branches[0]._id);
         }
     }, [branches]);
-    console.log('selectedBranch: ', selectedBranch);
-    console.log('roomsByBranch: ', roomsByBranch);
+
     const { filmsCurrentyear, isLoadingFilmsByCurrentYear, isErrorFilmsByCurrentYear, mutateFilmsByCurrentYear } =
         useFilmsByCurrentYear();
 

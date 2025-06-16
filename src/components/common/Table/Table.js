@@ -24,27 +24,7 @@ const Table = ({ columns, data, renderActions }) => {
                         <tr key={`${item._id}-${index}`}>
                             {columns.map((column) => (
                                 <td key={column.key} className={styles[`col-${column.key}`]}>
-                                    {/********** BẮT ĐẦU THAY ĐỔI **********/}
-                                    {column.key === 'status' ? (
-                                        (() => {
-                                            // Danh sách các trạng thái cần áp dụng style statusLock
-                                            const lockStatuses = ['Đã khóa', 'THẤT BẠI', 'ĐÃ HỦY'];
-                                            const currentStatus = item[column.key];
-
-                                            return (
-                                                <span
-                                                    className={clsx({
-                                                        [styles.statusLock]: lockStatuses.includes(currentStatus),
-                                                        [styles.status]: !lockStatuses.includes(currentStatus),
-                                                    })}
-                                                >
-                                                    {currentStatus}
-                                                </span>
-                                            );
-                                        })()
-                                    ) : /********** KẾT THÚC THAY ĐỔI **********/
-
-                                    column.key === 'role' ? (
+                                    {column.key === 'role' ? (
                                         <span className={styles.role}>{item[column.key]}</span>
                                     ) : column.key === 'createdAt' ? ( // Gộp chung điều kiện cho ngày tháng
                                         <span className={clsx(styles.createdAt)}>

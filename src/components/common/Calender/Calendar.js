@@ -6,12 +6,20 @@ import style from './Calendar.module.scss';
 import { useStyleClass } from '@/hooks/useStyleClass';
 import clsx from 'clsx';
 
-const Calendar = ({ selectedDate, onChange, currentDay = false, type = 'day', disabled = false, ...props }) => {
+// BƯỚC 1: Thêm prop `disablePastDates`
+const Calendar = ({
+    selectedDate,
+    onChange,
+    currentDay = false,
+    type = 'day',
+    disabled = false,
+    disablePastDates = false, // Prop mới, mặc định là false
+    ...props
+}) => {
     const [open, setOpen] = useState(false);
     const wrapperRef = useRef(null);
     const styleClass = useStyleClass(props, style);
 
-    // Nếu currentDay === true và selectedDate chưa có → tự set ngày hôm nay
     useEffect(() => {
         if (currentDay && !selectedDate) {
             const today = new Date();
@@ -40,7 +48,7 @@ const Calendar = ({ selectedDate, onChange, currentDay = false, type = 'day', di
     const formattedDate = selectedDate
         ? type === 'month'
             ? `${selectedDate.getMonth() + 1}/${selectedDate.getFullYear()}`
-            : selectedDate.toLocaleDateString()
+            : selectedDate.toLocaleDateString('vi-VN') // Dùng định dạng Việt Nam
         : type === 'month'
         ? 'Chọn tháng'
         : 'Chọn ngày';
@@ -50,7 +58,6 @@ const Calendar = ({ selectedDate, onChange, currentDay = false, type = 'day', di
             <div
                 className={clsx(style.calendarButton, disabled && style.disable, styleClass)}
                 onClick={() => !disabled && setOpen(!open)}
-                disabled={disabled}
             >
                 {formattedDate}
                 <CalendarIcon className={style.calendarIcon} />
@@ -68,6 +75,8 @@ const Calendar = ({ selectedDate, onChange, currentDay = false, type = 'day', di
                         showMonthYearPicker={type === 'month'}
                         dateFormat={type === 'month' ? 'MM/yyyy' : 'dd/MM/yyyy'}
                         className={style.customDatepicker}
+                        // BƯỚC 2: Thêm prop minDate vào đây
+                        minDate={disablePastDates ? new Date() : null}
                     />
                 </div>
             )}

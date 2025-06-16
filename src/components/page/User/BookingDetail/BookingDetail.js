@@ -19,15 +19,25 @@ const BookingDetail = ({ booking }) => {
     const { status } = router.query;
     const [isPopupPaymentVisible, setIsPopupPaymentVisible] = useState(false);
 
-    // useEffect để theo dõi `status` và bật popup
+    // State mới để lưu kết quả thanh toán một cách đáng tin cậy
+    const [paymentResultStatus, setPaymentResultStatus] = useState(null);
+
+    // useEffect để theo dõi `status` từ URL và bật popup
     useEffect(() => {
+        // Chỉ thực thi khi có query `status` trong URL
         if (status) {
+            // 1. Lưu kết quả vào state của component
+            setPaymentResultStatus(status);
+
+            // 2. Bật popup
             setIsPopupPaymentVisible(true);
-            // Loại bỏ query param khỏi URL
+
+            // 3. Dọn dẹp URL (xóa query param).
+            // Việc này giờ đây an toàn vì chúng ta đã lưu kết quả vào `paymentResultStatus`.
             const cleanUrl = `/bookRoom/${booking?._id}`;
             router.replace(cleanUrl, undefined, { shallow: true });
         }
-    }, [status, booking?._id]);
+    }, [status, booking?._id, router]); // Thêm `router` vào dependency array
 
     const handlePayment = async () => {
         console.log('id_booking: ', booking?.id_booking);
@@ -43,17 +53,17 @@ const BookingDetail = ({ booking }) => {
         console.log('newPayment: ', newPayment);
         try {
             const result = await createPayment(newPayment); // gọi đến backend
-            // console.log('result: ', result);
             if (result?.checkoutUrl) {
                 window.location.href = result.checkoutUrl; // chuyển tới trang thanh toán
             } else {
-                alert('Không lấy được link thanh toán!');
+                toast.error('Không lấy được link thanh toán!');
             }
         } catch (error) {
             console.error('Lỗi khi tạo đơn hàng:', error);
-            alert('Có lỗi xảy ra khi khởi tạo thanh toán!');
+            toast.error('Có lỗi xảy ra khi khởi tạo thanh toán!');
         }
     };
+
     const handleCancelBooking = async () => {
         if (!booking) return; // Đảm bảo đã có booking được chọn
 
@@ -64,7 +74,7 @@ const BookingDetail = ({ booking }) => {
 
         try {
             const result = await editBooking(booking._id, {
-                status: 'HỦY',
+                status: 'ĐÃ HỦY',
             });
             if (result.success) {
                 toast.success('Đã hủy đơn đặt phòng thành công!');
@@ -74,12 +84,14 @@ const BookingDetail = ({ booking }) => {
             console.error(error);
         }
     };
+
     return (
         <div className="container">
             {isPopupPaymentVisible && (
                 <Popup handleClose={() => setIsPopupPaymentVisible(false)}>
                     <div className={styles.popupPayment}>
-                        {status === 'PAID' ? (
+                        {/* SỬ DỤNG STATE `paymentResultStatus` ĐỂ KIỂM TRA */}
+                        {paymentResultStatus === 'PAID' ? (
                             <>
                                 <AiOutlineCheckCircle className={styles.success} />
                                 <p>Thanh toán thành công!</p>
@@ -164,7 +176,7 @@ const BookingDetail = ({ booking }) => {
                 <div className={styles.row}>
                     <div className={styles.groupItem}>
                         <p className={styles.label}>Mã khuyến mãi:</p>
-                        <Input dark rounded_10 disabled value={booking?.promotion?.name || 'Không có'} />
+                        <Input dark rounded_10 disabled value={booking?.promotion || 'Không có'} />
                     </div>
                     <div className={styles.groupItem}>
                         <p className={styles.label}>Combo:</p>

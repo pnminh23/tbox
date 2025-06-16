@@ -49,7 +49,7 @@ export const useBookingByOrderCode = (orderCode) => {
 export const useBookingById = (_id) => {
     const shouldFetch = _id != null && _id !== '';
     const endpoint = shouldFetch ? `${API_URL}/get-booking-by-id/${_id}` : null;
-    const { data, error, isLoading } = useSWR(endpoint, fetcher, {
+    const { data, error, isLoading, mutate } = useSWR(endpoint, fetcher, {
         shouldRetryOnError: true,
         revalidateOnFocus: true,
     });
@@ -58,6 +58,7 @@ export const useBookingById = (_id) => {
         booking: data?.data,
         isLoading,
         isError: error,
+        mutate,
     };
 };
 

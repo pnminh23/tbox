@@ -46,13 +46,20 @@ export const toggleLock = async (email) => {
     }
 };
 
-export const getAccountByEmail = async (email) => {
-    try {
-        const res = await axios.post(`${API_URL}/account-by-email`, { email }, { withCredentials: true });
-        return res.data; // trả về data để frontend xử lý nếu cần
-    } catch (err) {
-        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi toggle lock' };
-    }
+export const useAccountByEmail = (_Email) => {
+    const endpoint = `${API_URL}/account-by-email/${_Email}`;
+    const { data, error, isLoading } = useSWR(endpoint, fetcher, {
+        shouldRetryOnError: true,
+        revalidateOnFocus: true,
+    });
+
+    const mutate = () => mutate(endpoint);
+    return {
+        account: data?.data,
+        isLoading,
+        error,
+        mutate,
+    };
 };
 
 export const editAccountByEmail = async (email, formData) => {
@@ -66,5 +73,16 @@ export const editAccountByEmail = async (email, formData) => {
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
         throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi chỉnh sửa account' };
+    }
+};
+
+export const deleteAccountByEmail = async (email) => {
+    try {
+        const res = await axios.delete(`${API_URL}/delete/${email}`, {
+            withCredentials: true,
+        });
+        return res.data; // trả về data để frontend xử lý nếu cần
+    } catch (err) {
+        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa account' };
     }
 };

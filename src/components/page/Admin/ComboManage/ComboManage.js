@@ -38,6 +38,7 @@ const ComboManage = () => {
         name: '',
         description: '',
         types: [],
+        duration: 0, // Thêm duration vào state
     });
 
     useEffect(() => {
@@ -46,6 +47,7 @@ const ComboManage = () => {
                 name: combo.name || '',
                 description: combo.description || '',
                 types: combo.types || [],
+                duration: combo.duration || 0, // Cập nhật duration khi có dữ liệu combo
             });
         }
     }, [combo]);
@@ -59,6 +61,7 @@ const ComboManage = () => {
             name: editCombo.name,
             description: editCombo.description,
             types: editCombo.types,
+            duration: editCombo.duration, // Thêm duration vào object tạo mới
         };
 
         const result = await createCombo(newCombo);
@@ -74,6 +77,7 @@ const ComboManage = () => {
             name: editCombo.name,
             description: editCombo.description,
             types: editCombo.types,
+            duration: editCombo.duration, // Thêm duration vào object chỉnh sửa
         };
         const result = await editComboById(selectedComboId, newCombo);
 
@@ -83,6 +87,7 @@ const ComboManage = () => {
                 name: combo.name || '',
                 description: combo.description || '',
                 types: combo.types || [],
+                duration: combo.duration || 0, // Cập nhật lại state
             });
             setSelectedComboId(null);
         } else {
@@ -113,6 +118,16 @@ const ComboManage = () => {
                     outLine
                     value={editCombo.name}
                     onChange={(e) => setEditCombo((prev) => ({ ...prev, name: e.target.value }))}
+                />
+            </div>
+            {/* Thêm trường nhập liệu cho duration */}
+            <div className={styles.groupItem}>
+                <label>Thời lượng (phút)</label>
+                <Input
+                    rounded_10
+                    outLine
+                    value={editCombo.duration}
+                    onChange={(e) => setEditCombo((prev) => ({ ...prev, duration: Number(e.target.value) }))}
                 />
             </div>
             <div className={clsx(styles.groupItem, styles.typeRoomContainer)}>
@@ -181,8 +196,6 @@ const ComboManage = () => {
                 />
             </div>
 
-            <div className={styles.row}></div>
-
             <Button
                 rounded_10
                 blue
@@ -205,6 +218,7 @@ const ComboManage = () => {
                             name: '',
                             description: '',
                             types: [],
+                            duration: 0, // Reset duration
                         });
                         setSelectedComboId(null);
                     }}
@@ -220,6 +234,7 @@ const ComboManage = () => {
                             name: '',
                             description: '',
                             types: [],
+                            duration: 0, // Reset duration
                         });
                         setSelectedComboId(null);
                     }}

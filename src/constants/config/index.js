@@ -12,6 +12,7 @@ export const PATH = {
     FilmManagement: '/admin/film',
     BookRoom: '/bookRoom',
     BookRoomManagement: '/admin/booking',
+    PromotionManagement: '/admin/promotion',
     News: '/news',
     NewsManagement: '/admin/news',
     Combo: '/combo',

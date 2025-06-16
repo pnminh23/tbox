@@ -268,7 +268,6 @@ const BookRoomPage = () => {
 
     const handlePayment = async () => {
         console.log('id_booking: ', booking?.id_booking);
-
         const newPayment = {
             id_booking: booking?.id_booking,
             email: selectedEmail || user.email,
@@ -462,7 +461,7 @@ const BookRoomPage = () => {
                 <div className={style.formBookRoom}>
                     <div className={style.form}>
                         <div className={style.groupItems}>
-                            <p>Tìm kiếm phim</p>
+                            <p>Chọn phim</p>
                             <SearchBar
                                 data={FilmOptions}
                                 onSelect={(item) => {
@@ -535,7 +534,12 @@ const BookRoomPage = () => {
                                 <div className={style.date}>
                                     <p>Ngày đặt phòng</p>
 
-                                    <Calendar selectedDate={selectedDate} onChange={setSelectedDate} currentDay />
+                                    <Calendar
+                                        selectedDate={selectedDate}
+                                        onChange={setSelectedDate}
+                                        currentDay
+                                        disablePastDates
+                                    />
                                 </div>
 
                                 <div className={style.room}>
@@ -559,6 +563,8 @@ const BookRoomPage = () => {
                                             key={room._id}
                                             onClick={() => handleSelectedRoom(room._id)}
                                         >
+                                            <Image src={room?.image} alt={room.name} width={100} height={120} />
+
                                             {room.name}
                                         </div>
                                     ))}

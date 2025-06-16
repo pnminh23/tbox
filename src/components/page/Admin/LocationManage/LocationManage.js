@@ -1,103 +1,154 @@
-import Selection from '@/components/common/Selection';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './LocationManage.module.scss';
-import Button from '@/components/common/Button';
-import { AiOutlineDelete, AiOutlineEye, AiOutlinePlus } from 'react-icons/ai';
-import Table from '@/components/common/Table';
-import { createBranch, deleteBranchById, useAllBranches, useBranch } from '@/services/branch';
-import { useEffect, useState } from 'react';
-import Tippy from '@tippyjs/react';
-import Pagination from '@/components/common/Pagonation';
-import { useRoomByBranch, useRoomByBranchAndType, useTypeRoom } from '@/services/room';
-import Popup from '@/components/common/Popup/Popup';
-import Input from '@/components/common/Input';
-import clsx from 'clsx';
-import Tabs from '@/components/common/Tabs/Tabs';
-import Image from 'next/image';
-import RoomList from '@/components/page/Admin/RoomList/RoomList';
 import { toast } from 'react-toastify';
 
+// Services & Hooks
+import { createBranch, deleteBranchById, editBranchById, useAllBranches, useBranch } from '@/services/branch';
+import { useTypeRoom } from '@/services/room';
+
+// Components
+import Table from '@/components/common/Table';
+import Pagination from '@/components/common/Pagonation';
+import Button from '@/components/common/Button';
+import Input from '@/components/common/Input';
+import Popup from '@/components/common/Popup/Popup';
+import Tippy from '@tippyjs/react';
+import { AiOutlineDelete, AiOutlineEye, AiOutlinePlus, AiOutlineSearch } from 'react-icons/ai';
+import RoomList from '@/components/page/Admin/RoomList/RoomList';
+import Tabs from '@/components/common/Tabs/Tabs';
+import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
+import RoomTypeManager from '../RoomTypeManager/RoomTypeManager';
+
 const LocationManage = () => {
-    const { branches, isLoadingAllBranches, isErrorAllBranches, mutateBranches } = useAllBranches();
+    // === State Management ===
+    const [searchInput, setSearchInput] = useState('');
+    const [activeSearchQuery, setActiveSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState(5);
     const [selectedBranchId, setSelectedBranchId] = useState(null);
-    const { typeRooms } = useTypeRoom();
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [isRoomTypePopupVisible, setIsRoomTypePopupVisible] = useState(false);
 
-    const { branch: selectedBranch, isLoadingBranch, isErrorBranch, mutateBranch } = useBranch(selectedBranchId);
-
-    const [currentPage, setCurrentPage] = useState(1); // bắt đầu từ 1
-    const [limit, setLimit] = useState(5); // mặc định 8 phim/trang
-    const totalItems = branches?.length || 0;
-    const totalPages = Math.ceil(totalItems / limit);
-    const paginatedBranches = branches?.slice((currentPage - 1) * limit, currentPage * limit) || [];
+    // State cho các popup
     const [isPopupEdit, setIsPopupEdit] = useState(false);
     const [isPopupCreate, setIsPopupCreate] = useState(false);
     const [isPopupDelete, setIsPopupDelete] = useState(false);
-    const tableData =
-        paginatedBranches?.map((branch, index) => ({
-            _id: branch._id, // để làm key cho row
-            index: index + 1,
-            name: branch.name,
-            address: branch.address,
-            phone: branch.phone,
-            typeRoom: branch.typeRoom,
-            createdAt: branch.createdAt,
-        })) || [];
 
-    const [editBranch, setEditBranch] = useState({
-        name: '',
-        address: '',
-        phone: '',
-    });
+    // State cho form
+    const initialEditBranch = { name: '', address: '', phone: '' };
+    const [editBranch, setEditBranch] = useState(initialEditBranch);
+
+    // === Data Fetching ===
+    const { branches, isLoading, isError, mutateBranches } = useAllBranches();
+    const { branch: selectedBranch } = useBranch(selectedBranchId);
+    const { typeRooms } = useTypeRoom();
+
+    // === Derived Data & Filtering ===
+    const filteredBranches = useMemo(() => {
+        if (!branches) return [];
+        if (!activeSearchQuery) {
+            return branches;
+        }
+        const query = activeSearchQuery.toLowerCase();
+        return branches.filter(
+            (branch) =>
+                branch.name?.toLowerCase().includes(query) ||
+                branch.address?.toLowerCase().includes(query) ||
+                branch.phone?.toLowerCase().includes(query)
+        );
+    }, [branches, activeSearchQuery]);
+
+    const totalItems = filteredBranches.length;
+    const totalPages = Math.ceil(totalItems / limit) || 1;
+    const paginatedBranches = useMemo(() => {
+        return filteredBranches.slice((currentPage - 1) * limit, currentPage * limit);
+    }, [filteredBranches, currentPage, limit]);
+
+    const tableData = paginatedBranches.map((branch, index) => ({
+        ...branch,
+        index: index + 1,
+    }));
+
+    // === Event Handlers & Effects ===
+    const resetForm = () => setEditBranch(initialEditBranch);
+
     useEffect(() => {
         if (selectedBranch) {
             setEditBranch({
                 name: selectedBranch.name || '',
                 address: selectedBranch.address || '',
-                typeRoom: selectedBranch.typeRoom || [],
                 phone: selectedBranch.phone || '',
             });
         }
     }, [selectedBranch]);
 
-    const handleGetBranch = async (_id) => {
-        setSelectedBranchId(_id);
+    const handlePerformSearch = () => {
+        setActiveSearchQuery(searchInput);
+        setCurrentPage(1);
+    };
+
+    const handleGetBranch = (id) => {
+        setSelectedBranchId(id);
         setIsPopupEdit(true);
     };
 
+    const handleOpenCreatePopup = () => {
+        resetForm();
+        setIsPopupCreate(true);
+    };
+
+    const handleOpenDeletePopup = (id) => {
+        setSelectedBranchId(id);
+        setIsPopupDelete(true);
+    };
+
     const handleCreateBranch = async () => {
-        const newBranch = {
-            name: editBranch.name,
-            address: editBranch.address,
-            phone: editBranch.phone,
-        };
-
-        const result = await createBranch(newBranch);
-
+        setIsProcessing(true);
+        const result = await createBranch(editBranch);
         if (result.success) {
-            toast.success(result.message);
-            setSelectedBranchId(result.data.data._id);
-            console.log('newbranchID: ', result.data.data._id);
+            toast.success('Thêm cơ sở mới thành công!');
+            mutateBranches();
+            setIsPopupCreate(false);
+            resetForm();
         } else {
-            toast.error(result.message);
+            toast.error(result.message || 'Thêm mới thất bại.');
         }
+        setIsProcessing(false);
+    };
+
+    const handleEditBranch = async () => {
+        if (!selectedBranchId) return;
+        setIsProcessing(true);
+        const result = await editBranchById(selectedBranchId, editBranch);
+        if (result.success) {
+            toast.success('Cập nhật cơ sở thành công!');
+            mutateBranches();
+            setIsPopupEdit(false);
+        } else {
+            toast.error(result.message || 'Cập nhật thất bại.');
+        }
+        setIsProcessing(false);
     };
 
     const handleDeleteBranch = async () => {
+        if (!selectedBranchId) return;
+        setIsProcessing(true);
         const result = await deleteBranchById(selectedBranchId);
-
         if (result.success) {
             toast.success(result.message);
-            setSelectedBranchId(null);
-            setIsPopupDelete(false);
             mutateBranches();
         } else {
             toast.error(result.message);
         }
+        setIsProcessing(false);
+        setIsPopupDelete(false);
+        setSelectedBranchId(null);
     };
 
-    const renderRoomFormContent = (isEdit = false) => (
+    // Hàm render form chung cho Cả Create và Edit
+    const renderBranchForm = (isEdit = false) => (
         <div className={styles.formPopup}>
-            <p className={styles.title}>{isEdit ? 'Chi tiết cơ sở' : 'Thêm cơ sở mới'}</p>
-
+            <p className={styles.title}>{isEdit ? 'Chi tiết & Chỉnh sửa cơ sở' : 'Thêm cơ sở mới'}</p>
             <div className={styles.row}>
                 <div className={styles.groupItem}>
                     <label>Tên cơ sở</label>
@@ -109,7 +160,7 @@ const LocationManage = () => {
                     />
                 </div>
                 <div className={styles.groupItem}>
-                    <label>Số điện thoại của cơ sở:</label>
+                    <label>Số điện thoại:</label>
                     <Input
                         rounded_10
                         outLine
@@ -127,9 +178,10 @@ const LocationManage = () => {
                     onChange={(e) => setEditBranch((prev) => ({ ...prev, address: e.target.value }))}
                 />
             </div>
-            {selectedBranchId && (
+
+            {isEdit && selectedBranchId && (
                 <div className={styles.groupItem}>
-                    <label>{isEdit ? 'Loại phòng' : 'Thêm phòng cho cơ sở'}</label>
+                    <label>Danh sách phòng</label>
                     <Tabs
                         tabs={typeRooms?.map((item) => ({
                             label: item.name,
@@ -139,145 +191,109 @@ const LocationManage = () => {
                 </div>
             )}
 
-            <div className={styles.row}></div>
-            {selectedBranchId ? (
-                <Button rounded_10 blue w_fit className={styles.btnAdd}>
-                    {isEdit ? 'Cập nhật' : 'Thêm mới'}
-                </Button>
-            ) : (
-                <Button rounded_10 blue w_fit className={styles.btnAdd} onClick={handleCreateBranch}>
-                    Tiếp tục
-                </Button>
-            )}
+            <Button
+                rounded_10
+                blue
+                w_fit
+                className={styles.btnAdd}
+                onClick={isEdit ? handleEditBranch : handleCreateBranch}
+            >
+                {isEdit ? 'Cập nhật' : 'Thêm mới'}
+            </Button>
         </div>
     );
+
+    if (isLoading) return <LoadingFullPage />;
+    if (isError) return <div>Lỗi khi tải dữ liệu cơ sở.</div>;
+
     return (
         <div className={styles.container}>
+            {isProcessing && <LoadingFullPage />}
+
             {isPopupEdit && (
-                <Popup
-                    key={selectedBranchId || 'create'}
-                    handleClose={() => {
-                        setIsPopupEdit(false);
-                        setEditBranch({
-                            name: '',
-                            address: '',
-                            phone: '',
-                        });
-                        setSelectedBranchId(null);
-                    }}
-                >
-                    {renderRoomFormContent(true)}
+                <Popup big handleClose={() => setIsPopupEdit(false)}>
+                    {renderBranchForm(true)}
                 </Popup>
             )}
-            {isPopupCreate && (
-                <Popup
-                    handleClose={() => {
-                        setIsPopupCreate(false);
-                        setEditBranch({
-                            name: '',
-                            address: '',
-                            phone: '',
-                        });
-                        setSelectedBranchId(null);
-                    }}
-                >
-                    {renderRoomFormContent(false)}
-                </Popup>
-            )}
+            {isPopupCreate && <Popup handleClose={() => setIsPopupCreate(false)}>{renderBranchForm(false)}</Popup>}
             {isPopupDelete && (
-                <Popup
-                    handleClose={() => {
-                        setIsPopupDelete(false);
-                    }}
-                >
+                <Popup handleClose={() => setIsPopupDelete(false)}>
                     <div className={styles.formPopup}>
                         <p className={styles.title}>Xác nhận xóa</p>
-                        <div className={styles.row}>
-                            <p>
-                                Bạn muốn xóa cơ sở
-                                <b style={{ marginLeft: 6 }}>{selectedBranch?.name}</b>
-                            </p>
-                        </div>
-                        <div className={styles.row}>
-                            <Button rounded_10 outline light onClick={() => setIsPopupDelete(false)}>
+                        <p>
+                            Bạn có chắc muốn xóa cơ sở <strong>{selectedBranch?.name}</strong>? Toàn bộ phòng và đơn đặt
+                            thuộc cơ sở này cũng sẽ bị ảnh hưởng.
+                        </p>
+                        <div className={styles.confirmActions}>
+                            <Button outline light onClick={() => setIsPopupDelete(false)}>
                                 Hủy
                             </Button>
-                            <Button rounded_10 red onClick={handleDeleteBranch}>
+                            <Button red onClick={handleDeleteBranch}>
                                 Xác nhận
                             </Button>
                         </div>
                     </div>
                 </Popup>
             )}
+            {isRoomTypePopupVisible && (
+                <Popup handleClose={() => setIsRoomTypePopupVisible(false)}>
+                    <RoomTypeManager />
+                </Popup>
+            )}
+
             <div className={styles.header}>
-                <Button
-                    rounded_10
-                    w_fit
-                    blue
-                    icon={<AiOutlinePlus />}
-                    className={styles.btnAdd}
-                    onClick={() => setIsPopupCreate(true)}
-                >
+                <div className={styles.search}>
+                    <Input
+                        rounded_10
+                        outLine
+                        placeholder="Tìm kiếm theo tên, địa chỉ, SĐT..."
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handlePerformSearch()}
+                    />
+                    <Button w_fit rounded_10 yellowLinear icon={<AiOutlineSearch />} onClick={handlePerformSearch}>
+                        Tìm kiếm
+                    </Button>
+                    <Button rounded_10 blue onClick={() => setIsRoomTypePopupVisible((prev) => !prev)}>
+                        Tùy chỉnh loại phòng
+                    </Button>
+                </div>
+                <Button w_fit rounded_10 blue icon={<AiOutlinePlus />} onClick={handleOpenCreatePopup}>
                     Thêm mới cơ sở
                 </Button>
             </div>
+
             <div className={styles.content}>
                 <Table
                     data={tableData}
                     columns={[
                         { key: 'index', label: 'STT' },
-                        {
-                            key: 'name',
-                            label: 'Tên cơ sở',
-                            render: (item) => (
-                                <div className={styles.nameBranchContainer}>
-                                    <p>{item.name}</p>
-                                </div>
-                            ),
-                        },
+                        { key: 'name', label: 'Tên cơ sở' },
                         { key: 'address', label: 'Địa chỉ' },
-                        {
-                            key: 'typeRoom',
-                            label: 'Loại phòng',
-                            render: (item) => (
-                                <div className={styles.typeRoomContainer}>
-                                    {(Array.isArray(item.typeRoom) ? item.typeRoom : []).map((room) => (
-                                        <p key={room._id} className={styles.typeRoomItem}>
-                                            {room.name}
-                                        </p>
-                                    ))}
-                                </div>
-                            ),
-                        },
+                        { key: 'phone', label: 'Hotline' },
                     ]}
                     renderActions={(item) => (
                         <>
-                            <Tippy content="Chi tiết" placement="bottom">
+                            <Tippy content="Chi tiết & Chỉnh sửa" placement="bottom">
                                 <div>
                                     <Button
-                                        w_fit
                                         rounded_10
-                                        p_10_14
+                                        w_fit
                                         blueIcon
                                         icon={<AiOutlineEye />}
                                         onClick={() => handleGetBranch(item._id)}
-                                    ></Button>
+                                    />
                                 </div>
                             </Tippy>
-
                             <Tippy content="Xóa" placement="bottom">
                                 <div>
                                     <Button
-                                        w_fit
                                         rounded_10
-                                        p_10_14
+                                        w_fit
                                         redIcon
                                         icon={<AiOutlineDelete />}
-                                        onClick={() => {
-                                            setIsPopupDelete(true);
-                                            setSelectedBranchId(item._id);
-                                        }}
-                                    ></Button>
+                                        onClick={() => handleOpenDeletePopup(item._id)}
+                                    />
                                 </div>
                             </Tippy>
                         </>
@@ -289,10 +305,10 @@ const LocationManage = () => {
                     totalPages={totalPages}
                     totalItems={totalItems}
                     limit={limit}
-                    onPageChange={(page) => setCurrentPage(page)}
+                    onPageChange={setCurrentPage}
                     onLimitChange={(newLimit) => {
                         setLimit(newLimit);
-                        setCurrentPage(1); // reset về trang đầu
+                        setCurrentPage(1);
                     }}
                 />
             </div>

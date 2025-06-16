@@ -1,90 +1,101 @@
-import { useEffect, useState } from 'react';
-import clsx from 'clsx'; // Giả sử bạn dùng clsx cho class names điều kiện
+import { useEffect, useMemo, useState } from 'react';
 import style from './AllBooking.module.scss';
-import Input from '@/components/common/Input';
-import Button from '@/components/common/Button';
-import Calender from '@/components/common/Calender'; // Sửa lại thành Calender theo import của bạn
-import ListInvoice from '@/components/common/ListInvoice';
-import { useAllBookingByEmail, useAllBookingByEmailAndMonth, useAllBookingByEmailCurrent } from '@/services/booking';
-import LoadingItem from '@/components/common/LoadingItem/LoadingItem';
+import { toast } from 'react-toastify';
+import dayjs from 'dayjs';
 
-// const listFilter = ['Đơn hiện tại', 'Theo tháng', 'Tất cả các đơn']; // Không cần thiết nữa nếu dùng button riêng
+// Services & Hooks
+import { useAllBookingByEmail, useAllBookingByEmailAndMonth, useAllBookingByEmailCurrent } from '@/services/booking';
+
+// Components
+import Button from '@/components/common/Button';
+import Input from '@/components/common/Input';
+import Calendar from '@/components/common/Calender';
+import ListInvoice from '@/components/common/ListInvoice';
+import LoadingItem from '@/components/common/LoadingItem/LoadingItem';
+import { AiOutlineSearch } from 'react-icons/ai';
 
 const InvoiceDetailPage = () => {
-    const [activeFilter, setActiveFilter] = useState('Tất cả các đơn'); // Mặc định là "Tất cả các đơn"
-    const [selectedDateMonth, setSelectedDateMonth] = useState(null); // Date object cho tháng được chọn
-    const [apiMonth, setApiMonth] = useState(null); // Tháng (số) để gọi API
-    const [apiYear, setApiYear] = useState(null); // Năm (số) để gọi API
+    // === State Management ===
+    const [activeFilter, setActiveFilter] = useState('Tất cả các đơn');
+    const [selectedDateMonth, setSelectedDateMonth] = useState(null);
+    const [apiMonth, setApiMonth] = useState(null);
+    const [apiYear, setApiYear] = useState(null);
+    // State mới cho tìm kiếm
+    const [searchInput, setSearchInput] = useState('');
+    const [activeSearchQuery, setActiveSearchQuery] = useState('');
 
-    // Lấy dữ liệu
+    // === Data Fetching ===
     const { booking: allBookingCurrent, isLoading: loadingBookingCurrent } = useAllBookingByEmailCurrent();
     const { booking: allBooking, isLoading: loadingBooking } = useAllBookingByEmail();
-    console.log('allbooking: ', allBooking);
     const { booking: allBookingByMonth, isLoading: loadingBookingByMonth } = useAllBookingByEmailAndMonth(
         apiMonth,
         apiYear
     );
 
+    // === Event Handlers & Effects ===
     useEffect(() => {
         if (selectedDateMonth) {
-            const monthForApi = selectedDateMonth.getMonth() + 1; // JS month is 0-indexed
+            const monthForApi = selectedDateMonth.getMonth() + 1;
             const yearForApi = selectedDateMonth.getFullYear();
             setApiMonth(monthForApi);
             setApiYear(yearForApi);
-            // console.log(`useEffect: Selected Date changed. API Month: ${monthForApi}, API Year: ${yearForApi}`);
         } else {
-            // Nếu selectedDateMonth bị xóa (ví dụ: có nút clear trong Calendar), reset apiMonth/Year
             setApiMonth(null);
             setApiYear(null);
         }
     }, [selectedDateMonth]);
 
-    console.log('apiMonth: ', apiMonth);
-    console.log('apiYear: ', apiYear);
-
     const handleFilterButtonClick = (filterType) => {
         setActiveFilter(filterType);
-        // Nếu người dùng chuyển sang filter khác không phải "Theo tháng"
-        // bạn có thể cân nhắc việc reset selectedDateMonth tại đây nếu muốn
-        // if (filterType !== 'Theo tháng') {
-        // setSelectedDateMonth(null);
-        // }
     };
 
-    const renderInvoices = () => {
+    const handlePerformSearch = () => {
+        setActiveSearchQuery(searchInput);
+    };
+
+    // === Derived Data (Lọc và chọn dữ liệu để hiển thị) ===
+    const displayBookings = useMemo(() => {
+        let sourceData = [];
+
+        // 1. Chọn nguồn dữ liệu dựa trên filter đang active
         switch (activeFilter) {
             case 'Đơn hiện tại':
-                if (loadingBookingCurrent)
-                    return (
-                        <div className={style.loadingItem}>
-                            <LoadingItem />
-                        </div>
-                    );
-                if (!allBookingCurrent || allBookingCurrent.length === 0) return <p>Không có đơn hiện tại.</p>;
-                return allBookingCurrent.map((booking) => <ListInvoice key={booking._id} booking={booking} />);
-            case 'Tất cả các đơn':
-                if (loadingBooking)
-                    return (
-                        <div className={style.loadingItem}>
-                            <LoadingItem />
-                        </div>
-                    );
-                if (!allBooking || allBooking.length === 0) return <p>Không có đơn nào.</p>;
-                return allBooking?.map((booking) => <ListInvoice key={booking._id} booking={booking} />);
+                sourceData = allBookingCurrent || [];
+                break;
             case 'Theo tháng':
-                if (!selectedDateMonth) return <p>Vui lòng chọn tháng để xem hóa đơn.</p>;
-                if (loadingBookingByMonth)
-                    return (
-                        <div className={style.loadingItem}>
-                            <LoadingItem />
-                        </div>
-                    );
-                if (!allBookingByMonth || allBookingByMonth.length === 0)
-                    return <p>Không có đơn nào cho tháng đã chọn.</p>;
-                return allBookingByMonth.map((booking) => <ListInvoice key={booking._id} booking={booking} />);
+                sourceData = allBookingByMonth || [];
+                break;
+            case 'Tất cả các đơn':
             default:
-                return null;
+                sourceData = allBooking || [];
+                break;
         }
+
+        // 2. Nếu có truy vấn tìm kiếm, lọc tiếp trên nguồn dữ liệu đã chọn
+        if (!activeSearchQuery) {
+            return sourceData;
+        }
+
+        const query = activeSearchQuery.toLowerCase();
+        return sourceData.filter((booking) => booking.id_booking?.toString().toLowerCase().includes(query));
+    }, [activeFilter, allBooking, allBookingCurrent, allBookingByMonth, activeSearchQuery]);
+
+    const renderInvoices = () => {
+        const isLoading = loadingBookingCurrent || loadingBooking || loadingBookingByMonth;
+        if (isLoading && displayBookings.length === 0) {
+            return (
+                <div className={style.loadingItem}>
+                    <LoadingItem />
+                </div>
+            );
+        }
+        if (activeFilter === 'Theo tháng' && !selectedDateMonth) {
+            return <p className={style.message}>Vui lòng chọn tháng để xem hóa đơn.</p>;
+        }
+        if (displayBookings.length === 0) {
+            return <p className={style.message}>Không có đơn hàng nào phù hợp.</p>;
+        }
+        return displayBookings.map((booking) => <ListInvoice key={booking._id} booking={booking} />);
     };
 
     return (
@@ -93,26 +104,19 @@ const InvoiceDetailPage = () => {
                 <div className={style.flexRow}>
                     <p>Lọc: </p>
                     <div className={style.filterButtonsContainer}>
-                        {/* --- SỬA CÁC NÚT BẤM Ở ĐÂY --- */}
-
-                        {/* Nút "Đơn hiện tại" */}
                         <Button
                             h30
                             rounded_6
-                            // Áp dụng prop màu có điều kiện
                             yellowLinear={activeFilter === 'Đơn hiện tại'}
                             light={activeFilter !== 'Đơn hiện tại'}
                             onClick={() => handleFilterButtonClick('Đơn hiện tại')}
-                            className={style.filterButton} // Giữ lại class chung cho các nút
+                            className={style.filterButton}
                         >
                             Đơn hiện tại
                         </Button>
-
-                        {/* Nút "Tất cả các đơn" */}
                         <Button
                             h30
                             rounded_6
-                            // Áp dụng prop màu có điều kiện
                             yellowLinear={activeFilter === 'Tất cả các đơn'}
                             light={activeFilter !== 'Tất cả các đơn'}
                             onClick={() => handleFilterButtonClick('Tất cả các đơn')}
@@ -120,12 +124,9 @@ const InvoiceDetailPage = () => {
                         >
                             Tất cả các đơn
                         </Button>
-
-                        {/* Nút "Theo tháng" */}
                         <Button
                             h30
                             rounded_6
-                            // Áp dụng prop màu có điều kiện
                             yellowLinear={activeFilter === 'Theo tháng'}
                             light={activeFilter !== 'Theo tháng'}
                             onClick={() => handleFilterButtonClick('Theo tháng')}
@@ -136,7 +137,7 @@ const InvoiceDetailPage = () => {
                     </div>
                     {activeFilter === 'Theo tháng' && (
                         <div className={style.calendar}>
-                            <Calender
+                            <Calendar
                                 type="month"
                                 selectedDate={selectedDateMonth}
                                 onChange={(date) => setSelectedDateMonth(date)}
@@ -146,8 +147,15 @@ const InvoiceDetailPage = () => {
                 </div>
                 <div className={style.flexRow}>
                     <p>Tìm kiếm: </p>
-                    <Input placeholder="Nhập mã hóa đơn" rounded_10 className={style.input} />
-                    <Button rounded_10 yellowLinear className={style.search}>
+                    <Input
+                        placeholder="Nhập mã hóa đơn"
+                        rounded_10
+                        className={style.input}
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handlePerformSearch()}
+                    />
+                    <Button rounded_10 yellowLinear className={style.search} onClick={handlePerformSearch}>
                         Tìm kiếm
                     </Button>
                 </div>
@@ -156,4 +164,5 @@ const InvoiceDetailPage = () => {
         </div>
     );
 };
+
 export default InvoiceDetailPage;

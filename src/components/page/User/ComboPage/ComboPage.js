@@ -11,16 +11,28 @@ import decorImg4 from '@public/static/img/decor/4.webp';
 import { Navigation, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import Slider from '@/components/common/Slider';
 import BoxItem from '@/components/common/ItemSlider/BoxItem';
 import Feedback from '@/components/common/Feedback';
 import { useAllCombo } from '@/services/combo';
+import { formatMoney } from '@/function/formatMoney';
+import { useRoomByBranch } from '@/services/room';
+import { useAllBranches } from '@/services/branch';
+import LoadingItem from '@/components/common/LoadingItem/LoadingItem';
 
 const ComboPage = () => {
     const { allCombo, isLoading: loadingAllCombo, error: erroAllCombo } = useAllCombo();
+    const { branches, isLoadingAllBranches } = useAllBranches();
 
+    const [selectedBranch, setSelectedBranch] = useState('');
+    const { roomsByBranch, isLoading: loadingRoom } = useRoomByBranch(selectedBranch);
+    useEffect(() => {
+        if (branches?.length > 0 && !selectedBranch) {
+            setSelectedBranch(branches[0]._id);
+        }
+    }, [branches]);
     const prevRef = useRef(null);
     const nextRef = useRef(null);
     return (
@@ -44,18 +56,12 @@ const ComboPage = () => {
                                     ))}
                                 </div>
                                 <div className={style.price}>
-                                    <div className={style.item}>
-                                        <p className={style.nameCombo}>BoxJ</p>
-                                        <p>199K</p>
-                                    </div>
-                                    <div className={style.item}>
-                                        <p className={style.nameCombo}>BoxQ</p>
-                                        <p>259K</p>
-                                    </div>
-                                    <div className={style.item}>
-                                        <p className={style.nameCombo}>BoxJ</p>
-                                        <p>299K</p>
-                                    </div>
+                                    {combo.types.map((type) => (
+                                        <div className={style.item} key={type.typeRoom._id}>
+                                            <p className={style.nameCombo}>{`Box ${type.typeRoom.name}`}</p>
+                                            <p>{formatMoney(type.price)}</p>
+                                        </div>
+                                    ))}
                                 </div>
                                 <Button yellowLinear rounded_10 href={PATH.BookRoom}>
                                     Đặt phòng ngay
@@ -120,14 +126,41 @@ const ComboPage = () => {
                         Liên hệ với PNM - BOX
                     </Button>
                 </div>
-                <Slider
-                    apiUrl="https://phimapi.com/v1/api/danh-sach/phim-le"
-                    title="Hệ thống phòng"
-                    slidesPerView={3}
-                    renderItem={(box) => <BoxItem box={box} />}
-                    autoplay={true}
-                    slidesPerGroup={3}
-                />
+                <div className={style.roomByBranch}>
+                    <select
+                        className={style.select}
+                        value={selectedBranch || ''}
+                        onChange={(e) => setSelectedBranch(e.target.value)}
+                    >
+                        {branches?.map((branch) => (
+                            <option key={branch._id} value={branch._id}>
+                                {branch.name}
+                            </option>
+                        ))}
+                    </select>
+                    {loadingRoom ? (
+                        // Hiển thị một placeholder/skeleton loading rõ ràng
+                        <div className={style.loadingPlaceholder}>
+                            <LoadingItem />
+                        </div>
+                    ) : (
+                        // Chỉ render Slider khi đã có dữ liệu cuối cùng
+                        <Slider
+                            key={selectedBranch}
+                            data={roomsByBranch || []} // Truyền mảng rỗng nếu roomsByBranch là null/undefined
+                            title="Hệ thống phòng"
+                            slidesPerView={3}
+                            renderItem={(box) => <BoxItem box={box} />}
+                            autoplay={true}
+                            slidesPerGroup={3}
+                            breakpoints={{
+                                0: { slidesPerView: 1 },
+                                480: { slidesPerView: 2 },
+                                980: { slidesPerView: 3 },
+                            }}
+                        />
+                    )}
+                </div>
                 <Feedback />
             </div>
         </>

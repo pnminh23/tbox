@@ -21,6 +21,7 @@ import { createFeedback } from '@/services/feedback';
 import { formatMoney } from '@/function/formatMoney';
 import { createPayment } from '@/services/payment';
 import { useRouter } from 'next/router';
+import { editBooking } from '@/services/booking';
 
 const ListInvoice = ({ booking }) => {
     const [loading, setLoading] = useState(false);
@@ -114,7 +115,7 @@ const ListInvoice = ({ booking }) => {
     const handlePayment = async () => {
         const description = `${booking?.id_booking} đặt phòng`;
         console.log('id_booking: ', booking?.id_booking);
-
+        const expiredAt = dayjs().add(5, 'minute').unix();
         const newPayment = {
             id_booking: booking?.id_booking,
             email,
@@ -122,6 +123,7 @@ const ListInvoice = ({ booking }) => {
             description: description,
             returnUrl: `http://localhost:3000/bookRoom/${booking?._id}`,
             cancelUrl: `http://localhost:3000/bookRoom/${booking?._id}`,
+            expiredAt,
         };
         console.log('newPayment: ', newPayment);
         try {
@@ -135,6 +137,26 @@ const ListInvoice = ({ booking }) => {
         } catch (error) {
             console.error('Lỗi khi tạo đơn hàng:', error);
             alert('Có lỗi xảy ra khi khởi tạo thanh toán!');
+        }
+    };
+    const handleCancelBooking = async () => {
+        if (!booking) return; // Đảm bảo đã có booking được chọn
+
+        // Thêm một bước xác nhận trước khi hủy
+        if (!window.confirm(`Bạn có chắc muốn hủy đơn hàng "${booking._id}" không?`)) {
+            return;
+        }
+
+        try {
+            const result = await editBooking(booking._id, {
+                status: 'ĐÃ HỦY',
+            });
+            if (result.success) {
+                toast.success('Đã hủy đơn đặt phòng thành công!');
+            }
+        } catch (error) {
+            toast.error(error.message || 'Có lỗi xảy ra khi hủy đơn.');
+            console.error(error);
         }
     };
 
@@ -279,6 +301,9 @@ const ListInvoice = ({ booking }) => {
                 </div>
                 <div className={clsx(style.column, style.colIspay)}>
                     <p>{formatMoney(booking?.total_money)}</p>
+                    <div className={style.item}>
+                        Mã giảm giá: <p>{booking?.promotion || 'Không'}</p>
+                    </div>
                     <p>{booking?.isPay || 'Chưa rõ'}</p>
                 </div>
                 <div className={clsx(style.column, style.colStatus)}>
@@ -313,7 +338,7 @@ const ListInvoice = ({ booking }) => {
                     ) : (
                         booking?.status !== 'ĐÃ HỦY' &&
                         booking?.status !== 'THẤT BẠI' && (
-                            <Button rounded_10 red icon={<AiOutlineDelete />}>
+                            <Button rounded_10 red icon={<AiOutlineDelete />} onClick={handleCancelBooking}>
                                 Hủy đơn
                             </Button>
                         )

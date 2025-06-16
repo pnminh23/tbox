@@ -7,18 +7,15 @@
 
 .header {
     display: flex;
-    justify-content: space-between;
-
-    .search {
-        width: 50%;
-        display: flex;
-        gap: 10px;
-    }
     .btnAdd {
         margin-left: auto;
     }
+    .search {
+        width: 700px;
+        display: flex;
+        gap: 10px;
+    }
 }
-
 .formPopup {
     width: 700px;
     display: flex;
@@ -49,25 +46,35 @@
     .date {
         width: 50%;
     }
-
+    .country {
+        width: 50%;
+    }
     .btnAdd {
         margin-top: 10px;
         margin-left: auto;
     }
 }
-
+.nameComboContainer {
+    text-align: center;
+    font-weight: 500;
+}
 .typeRoomContainer {
     display: flex;
-    gap: 5px;
-    justify-content: center;
-    .typeRoomItem {
-        padding: 4px 8px;
-        font-size: 14px;
+    gap: 10px;
+    flex-direction: column;
+    .typeRoom {
+        width: 100px;
         background: var(--gradient-yellow);
-        border-radius: 5px;
+        line-height: 40px;
+        padding: 0 10px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .inputPrice {
+        width: 100%;
     }
 }
-
-.nameBranchContainer {
-    font-weight: 500;
+.textareaDescription {
+    padding: 8px 10px;
+    border-radius: 10px;
 }

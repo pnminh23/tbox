@@ -56,3 +56,23 @@
     width: 50%;
     margin-bottom: 20px;
 }
+.badge {
+    padding: 10px;
+    border-radius: 10px;
+}
+.successful {
+    background: var(--blue-bg);
+    color: var(--blue);
+}
+.completed {
+    background: var(--green-bg);
+    color: var(--green);
+}
+.failed {
+    background: var(--yellow-bg);
+    color: var(--yellow);
+}
+.cancelled {
+    background: var(--red-bg);
+    color: var(--red);
+}

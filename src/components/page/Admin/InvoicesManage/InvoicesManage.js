@@ -31,7 +31,7 @@ const InvoicesManage = () => {
     const [isPopupEdit, setIsPopupEdit] = useState(false);
 
     const { bookings } = useAllBookings();
-    const { booking } = useBookingById(selectedBookingId);
+    const { booking, mutate: mutateBookingbyId } = useBookingById(selectedBookingId);
     const { bookings: bookingsByDate } = useAllBookingsByDate(selectedDate);
     console.log('selectedMonth: ', selectedMonth);
     const { bookings: bookingsByMonth } = useAllBookingsByMonth(selectedMonth);
@@ -89,7 +89,10 @@ const InvoicesManage = () => {
 
         try {
             const result = await editBooking(booking._id, { status: 'HỦY' });
-            if (result.success) toast.success('Đã hủy đơn đặt phòng thành công!');
+            if (result.success) {
+                toast.success('Đã hủy đơn đặt phòng thành công!');
+                mutateBookingbyId();
+            }
         } catch (error) {
             toast.error(error.message || 'Có lỗi xảy ra khi hủy đơn.');
             console.error(error);
@@ -100,8 +103,11 @@ const InvoicesManage = () => {
         if (!booking) return;
 
         try {
-            const result = await editBooking(booking.id_booking, { status: 'HOÀN THÀNH' });
-            if (result.success) toast.success('Đã hoàn tất đơn đặt phòng!');
+            const result = await editBooking(booking._id, { status: 'HOÀN THÀNH', isPay: 'ĐÃ THANH TOÁN' });
+            if (result.success) {
+                toast.success('Đã hoàn tất đơn đặt phòng!');
+                mutateBookingbyId();
+            }
         } catch (error) {
             toast.error(error.message || 'Có lỗi xảy ra khi hoàn tất đơn.');
             console.error(error);
@@ -188,7 +194,7 @@ const InvoicesManage = () => {
                         <div className={styles.row}>
                             <div className={styles.groupItem}>
                                 <p className={styles.label}>Mã khuyến mãi:</p>
-                                <Input rounded_10 disabled value={booking?.promotion?.name || 'Không có'} />
+                                <Input rounded_10 disabled value={booking?.promotion || 'Không có'} />
                             </div>
                             <div className={styles.groupItem}>
                                 <p className={styles.label}>Combo:</p>
@@ -208,11 +214,10 @@ const InvoicesManage = () => {
                                         Hủy đơn
                                     </Button>
                                 )}
-                                {booking?.status !== 'HOÀN THÀNH' && booking?.isPay === 'ĐÃ THANH TOÁN' && (
-                                    <Button rounded_10 yellowLinear w_fit onClick={handleCompleteBooking}>
-                                        Hoàn tất đơn đặt
-                                    </Button>
-                                )}
+
+                                <Button rounded_10 yellowLinear w_fit onClick={handleCompleteBooking}>
+                                    Hoàn tất đơn đặt
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -280,8 +285,62 @@ const InvoicesManage = () => {
                         { key: '_id', label: 'Mã đơn hàng' },
                         { key: 'name_client', label: 'Tên khách hàng' },
                         { key: 'phone', label: 'Số điện thoại' },
-                        { key: 'status', label: 'Trạng thái đơn hàng' },
-                        { key: 'isPay', label: 'Tình trạng thanh toán' },
+                        {
+                            key: 'status',
+                            label: 'Trạng thái đơn hàng',
+                            render: (item) => {
+                                let statusClassName;
+                                switch (item.status) {
+                                    case 'HOÀN THÀNH':
+                                        statusClassName = styles.completed;
+                                        break;
+                                    case 'THÀNH CÔNG':
+                                        statusClassName = styles.successful;
+                                        break;
+                                    case 'ĐÃ HỦY':
+                                        statusClassName = styles.cancelled;
+                                        break;
+                                    case 'THẤT BẠI':
+                                        statusClassName = styles.failed;
+                                        break;
+                                    default:
+                                        // Một lớp mặc định cho các trạng thái khác (nếu có)
+                                        statusClassName = styles.statusDefault;
+                                        break;
+                                }
+
+                                // Luôn trả về (return) một phần tử JSX để hiển thị
+                                // Kết hợp className chung và className riêng của từng trạng thái
+                                return <span className={`${styles.badge} ${statusClassName}`}>{item.status}</span>;
+                            },
+                        },
+                        {
+                            key: 'isPay',
+                            label: 'Tình trạng thanh toán',
+                            render: (item) => {
+                                let isPayClassName;
+                                switch (item.isPay) {
+                                    case 'ĐÃ THANH TOÁN':
+                                        isPayClassName = styles.completed;
+                                        break;
+                                    case 'ĐÃ THANH TOÁN 50%':
+                                        isPayClassName = styles.successful;
+                                        break;
+                                    case 'CHƯA THANH TOÁN':
+                                        isPayClassName = styles.failed;
+                                        break;
+
+                                    default:
+                                        // Một lớp mặc định cho các trạng thái khác (nếu có)
+                                        isPayClassName = styles.default;
+                                        break;
+                                }
+
+                                // Luôn trả về (return) một phần tử JSX để hiển thị
+                                // Kết hợp className chung và className riêng của từng trạng thái
+                                return <span className={`${styles.badge} ${isPayClassName}`}>{item.isPay}</span>;
+                            },
+                        },
                         { key: 'date', label: 'Ngày đặt' },
                         { key: 'total_money', label: 'Tổng tiền' },
                     ]}

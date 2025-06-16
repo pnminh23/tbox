@@ -1,19 +1,23 @@
-import Button from '@/components/common/Button';
+import { useEffect, useState } from 'react';
 import style from './AccountPage.module.scss';
-import { AiOutlineEye, AiOutlineUpload } from 'react-icons/ai';
-import { useEffect, useRef, useState } from 'react';
-import Input from '@/components/common/Input';
-import Calendar from '@/components/common/Calender';
-import clsx from 'clsx';
-import UploadFileImage from '@/components/common/UploadFileImage/UploadFileImage';
 import { toast } from 'react-toastify';
-import { editAccountByEmail, getAccountByEmail } from '@/services/account';
+
+// Services & Hooks
+import { editAccountByEmail, useAccountByEmail } from '@/services/account';
+
+// Components
+import Button from '@/components/common/Button';
+import Input from '@/components/common/Input';
+import UploadFileImage from '@/components/common/UploadFileImage/UploadFileImage';
 import Link from 'next/link';
 import { PATH } from '@/constants/config';
+import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
 
 const AccountPage = () => {
-    const [email, setEmail] = useState('');
+    // === State Management ===
+    const [email, setEmail] = useState(null); // Bắt đầu với null
     const [editFile, setEditFile] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [editAccount, setEditAccount] = useState({
         name: '',
         phone: '',
@@ -21,76 +25,80 @@ const AccountPage = () => {
         image: '',
     });
 
+    // 1. LẤY EMAIL TỪ LOCALSTORAGE KHI COMPONENT MOUNT
     useEffect(() => {
         const storedEmail = localStorage.getItem('email');
-
-        const fetchAccount = async () => {
-            try {
-                console.log('email:', storedEmail);
-
-                const response = await getAccountByEmail(storedEmail);
-
-                if (response.success) {
-                    toast.success(response.message);
-                    setEditAccount({
-                        name: response.data.name || '',
-                        phone: response.data.phone || '',
-                        email: response.data.email || '',
-                        image: response.data.image || '',
-                    });
-                } else {
-                    toast.error(response.message);
-                }
-                console.log('defaultImage:', editAccount.image);
-            } catch (err) {
-                toast.error(err.message || 'Có lỗi xảy ra');
-            }
-        };
-
-        fetchAccount();
+        if (storedEmail) {
+            setEmail(storedEmail);
+        }
     }, []);
 
-    const handleEdit = async () => {
+    // 2. GỌI HOOK SWR ĐỂ LẤY DỮ LIỆU TÀI KHOẢN
+    // Hook sẽ tự động chạy khi `email` có giá trị
+    const { account, isLoading, isError } = useAccountByEmail(email);
+
+    // 3. useEffect NÀY SẼ TỰ ĐỘNG ĐIỀN FORM KHI CÓ DỮ LIỆU TỪ HOOK
+    useEffect(() => {
+        if (account) {
+            setEditAccount({
+                name: account.name || '',
+                phone: account.phone || '',
+                email: account.email || '',
+                image: account.image || '',
+            });
+        }
+    }, [account]);
+
+    // 4. HÀM XỬ LÝ CẬP NHẬT
+    const handleEdit = async (e) => {
+        e.preventDefault();
+        if (!email) return;
+
+        setIsSubmitting(true);
         try {
             const formData = new FormData();
-            formData.append('email', editAccount.email); // bắt buộc
+            formData.append('name', editAccount.name);
+            formData.append('phone', editAccount.phone);
+            if (editFile) {
+                formData.append('image', editFile);
+            }
 
-            if (editAccount.name) formData.append('name', editAccount.name);
-            if (editAccount.phone) formData.append('phone', editAccount.phone);
-
-            if (editFile) formData.append('image', editFile); // nếu có file mới
-
-            const response = await editAccountByEmail(formData);
+            const response = await editAccountByEmail(email, formData);
 
             if (response.success) {
                 toast.success('Cập nhật tài khoản thành công!');
+                setEditFile(null); // Reset file đã chọn
             } else {
-                toast.error(response.message);
+                toast.error(response.message || 'Cập nhật thất bại.');
             }
         } catch (err) {
             console.error(err);
             toast.error('Đã xảy ra lỗi khi cập nhật!');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
+    // 5. XỬ LÝ TRẠNG THÁI LOADING VÀ ERROR
+    if (isLoading) {
+        return <LoadingFullPage />;
+    }
+    if (isError) {
+        return <div>Lỗi khi tải thông tin tài khoản. Vui lòng thử lại.</div>;
+    }
+
     return (
-        <form className={style.container}>
+        <form className={style.container} onSubmit={handleEdit}>
             <div className={style.groupItem}>
                 <p className={style.label}>Thông tin tài khoản</p>
-                <UploadFileImage
-                    avatar
-                    defaultImage={editAccount.image}
-                    onFileSelected={(file) => {
-                        setEditFile(file);
-                        // Xử lý thêm nếu cần
-                    }}
-                />
+                <UploadFileImage avatar defaultImage={editAccount.image} onFileSelected={(file) => setEditFile(file)} />
                 <div className={style.groupItem}>
                     <p className={style.label}>Họ và tên</p>
                     <Input
                         rounded_10
                         value={editAccount.name}
                         onChange={(e) => setEditAccount((prev) => ({ ...prev, name: e.target.value }))}
+                        required
                     />
                 </div>
                 <div className={style.row}>
@@ -104,6 +112,7 @@ const AccountPage = () => {
                             rounded_10
                             value={editAccount.phone}
                             onChange={(e) => setEditAccount((prev) => ({ ...prev, phone: e.target.value }))}
+                            required
                         />
                     </div>
                 </div>
@@ -111,13 +120,15 @@ const AccountPage = () => {
                 <Link href={PATH.ForgotPassword} className={style.changePassword}>
                     Thay đổi mật khẩu
                 </Link>
+
                 <div className={style.groupItem}>
-                    <Button yellowLinear type={'button'} rounded_10 w_fit onClick={handleEdit}>
-                        Cập nhật thông tin cá nhân
+                    <Button yellowLinear type="submit" rounded_10 w_fit disabled={isSubmitting}>
+                        {isSubmitting ? 'Đang cập nhật...' : 'Cập nhật thông tin'}
                     </Button>
                 </div>
             </div>
         </form>
     );
 };
+
 export default AccountPage;

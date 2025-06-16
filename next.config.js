@@ -9,6 +9,10 @@ const nextConfig = {
                 port: '2911',
                 pathname: '/uploads/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com', // Tên miền của Cloudinary
+            },
         ],
     },
     env: {

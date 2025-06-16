@@ -57,34 +57,25 @@ export const useBookingsRealtime = (roomID, dateISO) => {
 
         // Khi booking bị chỉnh sửa
         socket.on('editBooking', (bk) => {
-            console.log('🛠️ editBooking received:', bk);
+            console.log('🛠️ editBooking received, checking for reload:', bk);
 
             const bkDate = new Date(bk.date).toISOString().slice(0, 10);
             const cmpDate = new Date(dateISO).toISOString().slice(0, 10);
-            if (bkDate !== cmpDate) return console.log('date không giống nhau');
 
-            if (bk.room.toString() !== roomID.toString()) return console.log('room không giống nhau');
+            // 1. Kiểm tra xem booking vừa được sửa có thuộc đúng ngày đang xem không
+            if (bkDate !== cmpDate) {
+                return; // Không liên quan, không làm gì cả
+            }
 
-            const editedBookingId = bk._id || bk.id;
-            const newSlots = bk.time_slots;
+            // 2. Kiểm tra xem booking có thuộc đúng phòng đang xem không (dùng ?. an toàn)
+            if (bk.room?._id.toString() !== roomID.toString()) {
+                return; // Không liên quan, không làm gì cả
+            }
 
-            setRoomData((prev) => {
-                if (!prev) return prev;
-
-                // Loại bỏ các timeSlot có cùng bookingId, sau đó thêm các timeSlot mới
-                const updatedSlots = [
-                    ...prev.bookedTimeSlots.filter((ts) => ts.bookingId !== editedBookingId),
-                    ...newSlots.map((slot) => ({
-                        ...slot,
-                        bookingId: editedBookingId,
-                    })),
-                ];
-
-                return {
-                    ...prev,
-                    bookedTimeSlots: updatedSlots,
-                };
-            });
+            // 3. Nếu sự kiện này liên quan đến phòng và ngày hiện tại,
+            //    thì gọi lại hàm loadData() để tải dữ liệu mới nhất.
+            console.log('🔄 Relevant booking edited. Reloading data...');
+            loadData();
         });
 
         // Khi booking bị xoá
