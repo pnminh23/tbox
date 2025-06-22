@@ -293,7 +293,7 @@ const ComboManage = () => {
                                 </div>
                             ),
                         },
-                        { key: 'description', label: 'Các tiện ích' },
+                        { key: 'description', label: 'Mô tả' },
                     ]}
                     renderActions={(item) => (
                         <>

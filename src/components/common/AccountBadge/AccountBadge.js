@@ -57,7 +57,7 @@ const AccountBadge = ({ user }) => {
                         {user?.role === 'admin' && (
                             <div className={styles.menuItem}>
                                 <AiOutlineAppstore />
-                                <Link href={PATH.BookRoomManagement}>Trang admin</Link>
+                                <Link href={PATH.BookRoomManagement}>Trang quản trị</Link>
                             </div>
                         )}
                         <div className={styles.menuItem}>

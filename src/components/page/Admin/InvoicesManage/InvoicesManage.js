@@ -67,7 +67,7 @@ const InvoicesManage = () => {
     }, [filteredBookings, currentPage, limit]);
 
     const tableData = paginatedBookings.map((b, i) => ({
-        _id: b._id,
+        _id: b.id_booking,
         index: i + 1,
         name_client: b.name_client,
         email: b.email,

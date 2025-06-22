@@ -18,6 +18,7 @@ import 'tippy.js/themes/light-border.css';
 import { editBooking, useBookingById, useCurrentActiveRoomsWithBookingId } from '@/services/booking';
 import { formatMoney } from '@/function/formatMoney';
 import { toast } from 'react-toastify';
+import { createPayment } from '@/services/payment';
 const dateNow = new Date();
 const BookingManger = () => {
     const [selectedBranch, setSelectedBranch] = useState('');
@@ -72,6 +73,28 @@ const BookingManger = () => {
         } catch (error) {
             toast.error(error.message || 'Có lỗi xảy ra khi hủy đơn.');
             console.error(error);
+        }
+    };
+
+    const handlePayment = async () => {
+        const newPayment = {
+            id_booking: booking?.id_booking,
+            email: booking?.email,
+            amount: booking?.payment_amount || 0,
+            description: `${booking?._id}`,
+            returnUrl: `http://localhost:3000/bookRoom/${booking._id}`,
+            cancelUrl: `http://localhost:3000/bookRoom/${booking._id}`,
+        };
+        try {
+            const result = await createPayment(newPayment); // gọi đến backend
+            if (result?.checkoutUrl) {
+                window.location.href = result.checkoutUrl; // chuyển tới trang thanh toán
+            } else {
+                alert('Không lấy được link thanh toán!');
+            }
+        } catch (error) {
+            console.error('Lỗi khi tạo đơn hàng:', error);
+            alert('Có lỗi xảy ra khi khởi tạo thanh toán!');
         }
     };
 
@@ -190,7 +213,7 @@ const BookingManger = () => {
                                             Hoàn tất
                                         </Button>
                                     ) : (
-                                        <Button rounded_10 yellowLinear w_fit>
+                                        <Button rounded_10 yellowLinear w_fit onClick={handlePayment}>
                                             Thanh toán
                                         </Button>
                                     )}

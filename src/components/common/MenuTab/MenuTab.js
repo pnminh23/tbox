@@ -31,8 +31,7 @@ const MenuTab = ({ user, dark, collapsed }) => {
     ];
     const menuItemPathAdmin = [
         { path: PATH.BookRoomManagement, label: 'Quản lý đặt phòng', icon: <AiOutlineCalendar /> },
-        { path: PATH.AccountManagement, label: 'Quản lý người dùng', icon: <AiOutlineUser /> },
-        { path: PATH.BannerManagement, label: 'Quản lý Banner', icon: <AiOutlinePicture /> },
+        { path: PATH.AccountManagement, label: 'Quản lý tài khoản', icon: <AiOutlineUser /> },
         { path: PATH.FilmManagement, label: 'Quản lý phim', icon: <AiOutlineVideoCamera /> },
         { path: PATH.LocationsManagement, label: 'Quản lý cơ sở', icon: <AiOutlineHome /> },
         { path: PATH.NewsManagement, label: 'Quản lý tin tức', icon: <AiOutlineForm /> },

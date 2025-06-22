@@ -14,6 +14,7 @@ import clsx from 'clsx';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
 import Pagination from '@/components/common/Pagonation';
+import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
 // import SearchBar from '@/components/common/SearchBar'; // SearchBar hiện tại của bạn (nếu vẫn dùng)
 
 const FilmManage = () => {
@@ -32,6 +33,7 @@ const FilmManage = () => {
     const [isPopupEdit, setIsPopupEdit] = useState(false);
     const [isPopupCreate, setIsPopupCreate] = useState(false);
     const [isPopupDelete, setIsPopupDelete] = useState(false);
+    const [isLoadingAction, setIsLoadingAction] = useState(false);
 
     const initialEditFilm = {
         name: '',
@@ -136,6 +138,7 @@ const FilmManage = () => {
     };
 
     const handleCreate = async () => {
+        setIsLoadingAction(true);
         try {
             const formData = new FormData();
             if (editFilm.name) formData.append('name', editFilm.name);
@@ -166,10 +169,13 @@ const FilmManage = () => {
         } catch (err) {
             console.error(err);
             toast.error('Đã xảy ra lỗi khi thêm mới!');
+        } finally {
+            setIsLoadingAction(false); // <-- TẮT LOADING
         }
     };
 
     const handleEdit = async () => {
+        setIsLoadingAction(true);
         try {
             const formData = new FormData();
             if (editFilm.name) formData.append('name', editFilm.name);
@@ -204,6 +210,8 @@ const FilmManage = () => {
         } catch (err) {
             console.error(err);
             toast.error('Đã xảy ra lỗi khi cập nhật!');
+        } finally {
+            setIsLoadingAction(false); // <-- TẮT LOADING
         }
     };
 
@@ -214,7 +222,7 @@ const FilmManage = () => {
 
     return (
         <div className={styles.container}>
-            {/* Popup Sửa Phim */}
+            {isLoadingAction && <LoadingFullPage />}
             {isPopupEdit && (
                 <Popup
                     handleClose={() => {
