@@ -20,7 +20,6 @@ export async function middleware(req) {
         '/locations',
         '/news',
         /^\/news\/[^/]+$/,
-
         '/combo',
         '/auth/login',
         '/auth/register',
