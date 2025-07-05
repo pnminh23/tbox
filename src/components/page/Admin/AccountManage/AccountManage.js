@@ -23,7 +23,6 @@ import Selection from '@/components/common/Selection';
 import Calendar from '@/components/common/Calender';
 import UploadFileImage from '@/components/common/UploadFileImage/UploadFileImage';
 import {
-    AiOutlineDelete,
     AiOutlineEdit,
     AiOutlineInteraction,
     AiOutlineLock,
@@ -198,8 +197,98 @@ const AccountManage = () => {
 
             {/* Popup Chỉnh sửa */}
             {isPopupEdit && (
-                <Popup big handleClose={() => setIsPopupEdit(false)}>
-                    {/* ... Form Edit tương tự như lần trước ... */}
+                <Popup  handleClose={() => setIsPopupEdit(false)}>
+                    <form className={styles.formEdit}>
+                        <p className={styles.title}>Chỉnh sửa tài khoản</p>
+                        <div className={styles.groupItem}>
+                            <label>Ảnh đại diện</label>
+                            <UploadFileImage
+                                avatar
+                                defaultImage={editAccount.image}
+                                onFileSelected={(file) => {
+                                    setEditFile(file);
+                                    // Xử lý thêm nếu cần
+                                }}
+                            />
+                        </div>
+                        <div className={styles.row}>
+                            <div className={styles.groupItem}>
+                                <label>Họ và tên:</label>
+                                <Input
+                                    rounded_10
+                                    outLine
+                                    value={editAccount.name}
+                                    onChange={(e) => setEditAccount((prev) => ({ ...prev, name: e.target.value }))}
+                                />
+                            </div>
+                            <div className={styles.groupItem}>
+                                <label>Số điện thoại:</label>
+                                <Input
+                                    rounded_10
+                                    outLine
+                                    value={editAccount.phone}
+                                    onChange={(e) => setEditAccount((prev) => ({ ...prev, phone: e.target.value }))}
+                                />
+                            </div>
+                        </div>
+                        <div className={styles.row}>
+                            <div className={clsx(styles.groupItem, styles.inputEmail)}>
+                                <label>Email:</label>
+                                <Input rounded_10 value={editAccount.email} disabled></Input>
+                            </div>
+                        </div>
+                        <div className={styles.row}>
+                            <div className={clsx(styles.groupItem, styles.role)}>
+                                <label>Quyền:</label>
+                                <Selection
+                                    options={['user', 'admin']}
+                                    defaultValue={editAccount.role}
+                                    rounded_10
+                                    onChange={(value) =>
+                                        setEditAccount((prev) => ({
+                                            ...prev,
+                                            role: value,
+                                        }))
+                                    }
+                                />
+                            </div>
+                            <div className={clsx(styles.groupItem, styles.status)}>
+                                <label>Trạng thái:</label>
+                                <Selection
+                                    options={['Hoạt Động', 'Đã khóa']}
+                                    defaultValue={editAccount.isLock ? 'Đã khóa' : 'Hoạt Động'}
+                                    onChange={(value) =>
+                                        setEditAccount((prev) => ({
+                                            ...prev,
+                                            isLock: value === 'Đã khóa',
+                                        }))
+                                    }
+                                    rounded_10
+                                />
+                            </div>
+                            <div className={clsx(styles.groupItem, styles.date)}>
+                                <label>Ngày tạo:</label>
+                                <Calendar selectedDate={new Date(editAccount.createdAt)} disabled={true} rounded_10 />
+                            </div>
+                        </div>
+                        <div className={styles.groupItem}>
+                            <label>Thay đổi mật khẩu mới:</label>
+                            <Input
+                                rounded_10
+                                outLine
+                                placeholder={'Nhập mật khẩu mới'}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                            />
+                        </div>
+                        <div className={clsx(styles.row, styles.buttons)}>
+                            <Button rounded_10 w_fit blue onClick={handleEdit}>
+                                Cập nhật tài khoản
+                            </Button>
+                            <Button rounded_10 w_fit red>
+                                Xóa tài khoản
+                            </Button>
+                        </div>
+                    </form>
                 </Popup>
             )}
 
@@ -258,6 +347,7 @@ const AccountManage = () => {
                             <Tippy content="Chỉnh sửa" placement="bottom">
                                 <div>
                                     <Button
+                                        rounded_10
                                         blueIcon
                                         icon={<AiOutlineEdit />}
                                         onClick={() => handleGetAccount(item.email)}
@@ -267,6 +357,7 @@ const AccountManage = () => {
                             <Tippy content={item.status === 'Đã khóa' ? 'Mở khóa' : 'Khóa'} placement="bottom">
                                 <div>
                                     <Button
+                                        rounded_10
                                         redIcon
                                         icon={item.status === 'Đã khóa' ? <AiOutlineUnlock /> : <AiOutlineLock />}
                                         onClick={() => handleToggleLock(item.email)}
@@ -276,6 +367,7 @@ const AccountManage = () => {
                             <Tippy content="Thay đổi quyền" placement="bottom">
                                 <div>
                                     <Button
+                                        rounded_10
                                         greenIcon
                                         icon={<AiOutlineInteraction />}
                                         onClick={() => handleChangeRole(item.email, item.role)}

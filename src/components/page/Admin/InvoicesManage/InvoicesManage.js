@@ -81,6 +81,7 @@ const InvoicesManage = () => {
     const handleGetBooking = (_id) => {
         setSelectedBookingId(_id);
         setIsPopupEdit(true);
+        console.log('booking by id: ',booking)
     };
 
     const handleCancelBooking = async () => {
