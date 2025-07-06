@@ -3,12 +3,13 @@ import Title from '../Title';
 import style from './Feedback.module.scss';
 import { useEffect, useState } from 'react';
 import { useFeedbackByBranch } from '@/services/feedback';
+import Button from '../Button';
 
 const Feedback = () => {
-    const { branches, isLoadingAllBranches } = useAllBranches();
+    const { branches } = useAllBranches();
     const [selectedBranch, setSelectedBranch] = useState('');
 
-    const { feedbacks, isLoading: loadingFeedback } = useFeedbackByBranch(selectedBranch);
+    const { feedbacks } = useFeedbackByBranch(selectedBranch);
     useEffect(() => {
         if (branches?.length > 0 && !selectedBranch) {
             setSelectedBranch(branches[0]._id);
@@ -62,10 +63,6 @@ const Feedback = () => {
                             <div className={style.comment}>{feedback.comment}</div>
                         </div>
                     ))}
-                </div>
-                <div className={style.buttons}>
-                    <button className={style.viewMore}>Xem thêm đánh giá</button>
-                    <button className={style.giveFeedback}>Đánh giá</button>
                 </div>
             </div>
         </div>

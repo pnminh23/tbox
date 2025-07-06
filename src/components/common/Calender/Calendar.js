@@ -6,14 +6,13 @@ import style from './Calendar.module.scss';
 import { useStyleClass } from '@/hooks/useStyleClass';
 import clsx from 'clsx';
 
-// BƯỚC 1: Thêm prop `disablePastDates`
 const Calendar = ({
     selectedDate,
     onChange,
     currentDay = false,
     type = 'day',
     disabled = false,
-    disablePastDates = false, // Prop mới, mặc định là false
+    disablePastDates = false,
     ...props
 }) => {
     const [open, setOpen] = useState(false);
@@ -75,7 +74,6 @@ const Calendar = ({
                         showMonthYearPicker={type === 'month'}
                         dateFormat={type === 'month' ? 'MM/yyyy' : 'dd/MM/yyyy'}
                         className={style.customDatepicker}
-                        // BƯỚC 2: Thêm prop minDate vào đây
                         minDate={disablePastDates ? new Date() : null}
                     />
                 </div>

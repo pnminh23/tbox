@@ -3,17 +3,7 @@ import clsx from 'clsx';
 import styles from './Button.module.scss';
 import { useStyleClass } from '@/hooks/useStyleClass';
 
-const Button = ({
-    children,
-    onClick,
-    icon,
-    href,
-    className,
-    target,
-    disabled,
-    type, // Nhận type từ props
-    ...props
-}) => {
+const Button = ({ children, onClick, icon, href, className, target, disabled, type, ...props }) => {
     const styleClass = useStyleClass(props, styles);
 
     let Wrapper = 'button';
@@ -21,7 +11,7 @@ const Button = ({
 
     const handleClick = (e) => {
         if (disabled) {
-            e.preventDefault(); // Ngăn không cho bấm
+            e.preventDefault();
             return;
         }
         if (onClick) onClick(e);
@@ -42,7 +32,7 @@ const Button = ({
             )}
             {...(Wrapper === Link ? { href } : { type: type || 'submit' })}
             onClick={handleClick}
-            disabled={disabled && Wrapper === 'button'} // Áp dụng disabled cho button thật
+            disabled={disabled && Wrapper === 'button'}
         >
             <div className={clsx(styleClass, styles.btn)}>
                 {icon && <div className={styles.icon}>{icon}</div>}

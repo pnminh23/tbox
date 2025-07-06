@@ -1,5 +1,3 @@
-import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css'; // Import CSS mặc định của Tippy
 import style from './FilmItem.module.scss';
 import Image from 'next/image';
 import Link from 'next/link';

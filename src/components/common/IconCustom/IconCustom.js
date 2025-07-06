@@ -1,8 +1,7 @@
 import React from 'react';
 import Tippy from '@tippyjs/react';
 import styles from './IconCustom.module.scss';
-import 'tippy.js/dist/tippy.css'; // Import CSS cơ bản của Tippy
-
+import 'tippy.js/dist/tippy.css';
 function IconCustom({
     icon: IconComponent,
     size = 24,
@@ -11,7 +10,7 @@ function IconCustom({
     href = '',
     onClick = null,
     tooltip = '',
-    placement = 'top', // thêm placement (vị trí tooltip)
+    placement = 'top',
 }) {
     const icon = (
         <IconComponent

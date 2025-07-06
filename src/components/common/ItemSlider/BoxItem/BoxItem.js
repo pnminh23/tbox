@@ -1,10 +1,9 @@
 import style from './BoxItem.module.scss';
 import Image from 'next/image';
 import noImage from '@public/static/img/avatar/no_image.jpg';
-import { formatMoney } from '@/function/formatMoney';
 
 const BoxItem = ({ box }) => {
-    console.log('box: ',box)
+    console.log('box: ', box);
     return (
         <div className={style.item}>
             <div className={style.image}>

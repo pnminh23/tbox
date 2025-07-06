@@ -7,8 +7,6 @@ import { useState } from 'react';
 const Input = ({ type = 'text', placeholder, value, onChange, icon, className, disabled, readOnly, ...props }) => {
     const styleClass = useStyleClass(props, styles);
     const [showPassword, setShowPassword] = useState(false);
-
-    // Nếu là password và có icon mắt thì inputType sẽ thay đổi tùy trạng thái
     const isPasswordType = type === 'password';
     const inputType = isPasswordType ? (showPassword ? 'text' : 'password') : type;
 
@@ -31,7 +29,6 @@ const Input = ({ type = 'text', placeholder, value, onChange, icon, className, d
                 {...props}
             />
 
-            {/* Hiển thị icon con mắt nếu là password */}
             {isPasswordType && !disabled && (
                 <div className={styles.toggleIcon} onClick={toggleShowPassword} role="button" tabIndex={0}>
                     {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}

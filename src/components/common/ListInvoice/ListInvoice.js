@@ -12,9 +12,7 @@ import RoomDisplay from '../RoomDisplay/RoomDisplay';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import Popup from '../Popup/Popup';
-// import RichText from '../RichText'; // RichText không được sử dụng, có thể bỏ
 import Input from '../Input';
-// import { Comme } from 'next/font/google'; // Comme không được sử dụng, có thể bỏ
 import { toast } from 'react-toastify';
 import LoadingFullPage from '../LoadingFullPage/loadingFullPage';
 import { createFeedback } from '@/services/feedback';
