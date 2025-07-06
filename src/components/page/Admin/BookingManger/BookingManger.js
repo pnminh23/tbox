@@ -41,7 +41,7 @@ const BookingManger = () => {
 
         try {
             // Gọi service với status mới
-            const result = await editBooking(booking.id_booking, {
+            const result = await editBooking(booking._id, {
                 status: 'HOÀN THÀNH',
             });
             if (result.success) {
@@ -74,13 +74,16 @@ const BookingManger = () => {
     };
 
     const handlePayment = async () => {
+        const expiredAt = dayjs().add(5, 'minute').unix();
         const newPayment = {
             id_booking: booking?.id_booking,
             email: booking?.email,
             amount: booking?.payment_amount || 0,
             description: `${booking?._id}`,
-            returnUrl: `http://localhost:3000/bookRoom/${booking._id}`,
-            cancelUrl: `http://localhost:3000/bookRoom/${booking._id}`,
+            returnUrl: `http://localhost:3000/bookRoom/${booking.id_booking}`,
+            cancelUrl: `http://localhost:3000/bookRoom/${booking.id_booking}`,
+            expiredAt,
+
         };
         try {
             const result = await createPayment(newPayment); // gọi đến backend
@@ -202,14 +205,26 @@ const BookingManger = () => {
                                 </div>
 
                                 <div className={style.row}>
-                                    <Button rounded_10 red w_fit onClick={handleCancelBooking}>
-                                        Hủy đơn
-                                    </Button>
-                                    {booking?.isPay === 'ĐÃ THANH TOÁN' ? (
-                                        <Button rounded_10 yellowLinear w_fit onClick={handleCompleteBooking}>
-                                            Hoàn tất
+                                    {/* Ẩn nút Hủy nếu đã hoàn tất */}
+                                    {booking?.status !== 'HOÀN THÀNH' && (
+                                        <Button rounded_10 red w_fit onClick={handleCancelBooking}>
+                                            Hủy đơn
                                         </Button>
+                                    )}
+
+                                    {/* Nếu đã thanh toán */}
+                                    {booking?.isPay === 'ĐÃ THANH TOÁN' ? (
+                                        booking?.status === 'HOÀN THÀNH' ? (
+                                            <Button rounded_10 w_fit disabled yellowLinear>
+                                                Đã hoàn tất
+                                            </Button>
+                                        ) : (
+                                            <Button rounded_10 yellowLinear w_fit onClick={handleCompleteBooking}>
+                                                Hoàn tất
+                                            </Button>
+                                        )
                                     ) : (
+                                        // Nếu chưa thanh toán
                                         <Button rounded_10 yellowLinear w_fit onClick={handlePayment}>
                                             Thanh toán
                                         </Button>

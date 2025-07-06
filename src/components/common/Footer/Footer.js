@@ -7,7 +7,9 @@ import {
 } from "react-icons/ai";
 import Image from "next/image";
 import Link from "next/link";
+import { useAllBranches } from "@/services/branch";
 function Footer() {
+    const {branches} = useAllBranches();
     return (
         <div className={style.container}>
             <div className="container">
@@ -16,20 +18,13 @@ function Footer() {
                         <Image src={logo} alt="logo" />
                     </div>
                     <div className={style.listBranch}>
-                        <h3>Hệ thống TBOX tại Hà Nội</h3>
+                        <h3>Hệ thống cơ sở chi nhánh của TBOX </h3>
                         <div className={style.listBranchctn}>
-                            <ul>
-                                <li>175 Tây Sơn</li>
-                                <li>175 Tây Sơn</li>
-                                <li>175 Tây Sơn</li>
-                                <li>175 Tây Sơn</li>
-                            </ul>
-                            <ul>
-                                <li>175 Tây Sơn</li>
-                                <li>175 Tây Sơn</li>
-                                <li>175 Tây Sơn</li>
-                                <li>175 Tây Sơn</li>
-                            </ul>
+                        <ul>
+                            {branches?.map((branch) => (
+                                <li>{branch.name}</li>
+                            ))}
+                        </ul>
                         </div>
                     </div>
                     <div className={style.contact}>

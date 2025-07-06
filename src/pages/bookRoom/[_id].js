@@ -1,28 +1,25 @@
-// pages/bookRoom/[_id].js
-
 import Head from 'next/head';
 import LayoutUser from '@/layout/LayoutUser/LayoutUser';
 import { useRouter } from 'next/router';
 import { useBookingById } from '@/services/booking';
 import BookingDetail from '@/components/page/User/BookingDetail/BookingDetail';
-import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage'; // Thêm component loading
-
+import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage'; 
 export default function Booking() {
     const router = useRouter();
     const { _id } = router.query;
-    // Giả sử hook của bạn trả về cả isLoading
+
     const { booking, isLoading, isError } = useBookingById(_id);
 
-    // Xử lý các trạng thái
+    
     if (isLoading) {
-        return <LoadingFullPage />; // Hiển thị loading trong khi chờ
+        return <LoadingFullPage />; 
     }
 
     if (isError || !booking) {
-        return <div>Không tìm thấy đơn đặt phòng hoặc đã có lỗi xảy ra.</div>; // Hiển thị lỗi
+        return <div>Không tìm thấy đơn đặt phòng hoặc đã có lỗi xảy ra.</div>; 
     }
 
-    // Chỉ render khi đã có dữ liệu booking
+    
     return (
         <>
             <Head>

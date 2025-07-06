@@ -261,16 +261,17 @@ const BookRoomPage = () => {
     };
 
     const handlePayment = async () => {
-        console.log('id_booking: ', booking?.id_booking);
+        const expiredAt = dayjs().add(5, 'minute').unix();
         const newPayment = {
             id_booking: booking?.id_booking,
             email: selectedEmail || user.email,
             amount: booking?.payment_amount || 0,
-            description: `${booking?._id}`,
-            returnUrl: `http://localhost:3000/bookRoom/${booking._id}`,
-            cancelUrl: `http://localhost:3000/bookRoom/${booking._id}`,
+            description: `${booking?.id_booking}`,
+            returnUrl: `http://localhost:3000/bookRoom/${booking.id_booking}`,
+            cancelUrl: `http://localhost:3000/bookRoom/${booking.id_booking}`,
+            expiredAt,
         };
-        console.log('newPayment: ', newPayment);
+        
         try {
             const result = await createPayment(newPayment); // gọi đến backend
             // console.log('result: ', result);
@@ -285,13 +286,15 @@ const BookRoomPage = () => {
         }
     };
     const handleHalfPayment = async () => {
+        const expiredAt = dayjs().add(5, 'minute').unix();
         const description = `${booking?._id}`;
         const newPayment = {
             id_booking: booking?.id_booking,
             amount: halfPay || 0,
             description: description,
-            returnUrl: `http://localhost:3000/bookRoom/${booking._id}`,
-            cancelUrl: `http://localhost:3000/bookRoom/${booking._id}`,
+            returnUrl: `http://localhost:3000/bookRoom/${booking.id_booking}`,
+            cancelUrl: `http://localhost:3000/bookRoom/${booking.id_booking}`,
+            expiredAt,
         };
         // console.log('newPayment: ', newPayment);
         try {

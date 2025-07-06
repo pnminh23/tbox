@@ -12,49 +12,48 @@ import { useEffect, useState } from 'react';
 import Popup from '@/components/common/Popup/Popup';
 import { toast } from 'react-toastify';
 import { editBooking } from '@/services/booking';
-// import { handlePayment } from '@/services/handlePayment';
 
 const BookingDetail = ({ booking }) => {
     const router = useRouter();
     const { status } = router.query;
     const [isPopupPaymentVisible, setIsPopupPaymentVisible] = useState(false);
 
-    // State mới để lưu kết quả thanh toán một cách đáng tin cậy
+    
     const [paymentResultStatus, setPaymentResultStatus] = useState(null);
 
-    // useEffect để theo dõi `status` từ URL và bật popup
+    
     useEffect(() => {
-        // Chỉ thực thi khi có query `status` trong URL
+        
         if (status) {
-            // 1. Lưu kết quả vào state của component
+            
             setPaymentResultStatus(status);
 
-            // 2. Bật popup
+            
             setIsPopupPaymentVisible(true);
 
-            // 3. Dọn dẹp URL (xóa query param).
-            // Việc này giờ đây an toàn vì chúng ta đã lưu kết quả vào `paymentResultStatus`.
-            const cleanUrl = `/bookRoom/${booking?._id}`;
+            // Dọn dẹp URL (xóa query param).
+            const cleanUrl = `/bookRoom/${booking?.id_booking}`;
             router.replace(cleanUrl, undefined, { shallow: true });
         }
-    }, [status, booking?._id, router]); // Thêm `router` vào dependency array
+    }, [status, booking?.id_booking, router]); 
 
     const handlePayment = async () => {
-        console.log('id_booking: ', booking?.id_booking);
+        const expiredAt = dayjs().add(5, 'minute').unix();
 
         const newPayment = {
             id_booking: booking?.id_booking,
             email: booking?.email,
             amount: booking?.payment_amount || 0,
-            description: `${booking?._id}`,
-            returnUrl: `http://localhost:3000/bookRoom/${booking?._id}`,
-            cancelUrl: `http://localhost:3000/bookRoom/${booking?._id}`,
+            description: `${booking?.id_booking}`,
+            returnUrl: `http://localhost:3000/bookRoom/${booking?.id_booking}`,
+            cancelUrl: `http://localhost:3000/bookRoom/${booking?.id_booking}`,
+            expiredAt,
         };
         console.log('newPayment: ', newPayment);
         try {
-            const result = await createPayment(newPayment); // gọi đến backend
+            const result = await createPayment(newPayment); 
             if (result?.checkoutUrl) {
-                window.location.href = result.checkoutUrl; // chuyển tới trang thanh toán
+                window.location.href = result.checkoutUrl; 
             } else {
                 toast.error('Không lấy được link thanh toán!');
             }
@@ -65,10 +64,10 @@ const BookingDetail = ({ booking }) => {
     };
 
     const handleCancelBooking = async () => {
-        if (!booking) return; // Đảm bảo đã có booking được chọn
+        if (!booking) return; 
 
         // Thêm một bước xác nhận trước khi hủy
-        if (!window.confirm(`Bạn có chắc muốn hủy đơn hàng "${booking._id}" không?`)) {
+        if (!window.confirm(`Bạn có chắc muốn hủy đơn hàng "${booking.id_booking}" không?`)) {
             return;
         }
 
@@ -90,7 +89,6 @@ const BookingDetail = ({ booking }) => {
             {isPopupPaymentVisible && (
                 <Popup handleClose={() => setIsPopupPaymentVisible(false)}>
                     <div className={styles.popupPayment}>
-                        {/* SỬ DỤNG STATE `paymentResultStatus` ĐỂ KIỂM TRA */}
                         {paymentResultStatus === 'PAID' ? (
                             <>
                                 <AiOutlineCheckCircle className={styles.success} />

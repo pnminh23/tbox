@@ -16,7 +16,7 @@ import {
     Redo,
     Minus,
 } from 'lucide-react';
-import React, { useEffect } from 'react'; // Quan trọng: Thêm useEffect
+import React, { useEffect } from 'react';
 import styles from './RichText.module.scss';
 
 const MenuBar = ({ editor }) => {
