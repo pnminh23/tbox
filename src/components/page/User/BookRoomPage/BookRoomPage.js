@@ -4,13 +4,12 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/light-border.css';
 import { PATH } from '@/constants/config';
-import img1 from '@public/static/img/background/background_formInfor.jpg';
 import { AiOutlineCheckCircle, AiOutlineCloseCircle, AiOutlineWarning } from 'react-icons/ai';
 import Link from 'next/link';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
 import Selection from '@/components/common/Selection';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Calendar from '@/components/common/Calender';
 import clsx from 'clsx';
 import Image from 'next/image';
@@ -59,14 +58,9 @@ const BookRoomPage = () => {
     const router = useRouter();
     const { f_Id } = router.query;
 
-    // console.log('status:', status);
-    // console.log('orderCode:', orderCode);
-    // const { booking: bookingByID } = useBookingByOrderCode(orderCode);
-    // console.log('bookingByID:', bookingByID);
-
     const [initialFilmId, setInitialFilmId] = useState(null);
 
-    // Lấy f_Id từ URL **chỉ một lần**
+
     useEffect(() => {
         if (f_Id && !initialFilmId) {
             setInitialFilmId(f_Id);
@@ -249,7 +243,7 @@ const BookRoomPage = () => {
                     setHalfPay(result.data.money);
                 } else {
                     toast.success(result.message);
-                    router.push(`/bookRoom/${newBookingData._id}`);
+                    router.push(`/bookRoom/${newBookingData.id_booking}`);
                     setSelectedTimeSlots([]);
 
                     // console.log('result data:', booking);

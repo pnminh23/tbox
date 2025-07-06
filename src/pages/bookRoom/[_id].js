@@ -10,7 +10,6 @@ import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage
 export default function Booking() {
     const router = useRouter();
     const { _id } = router.query;
-
     // Giả sử hook của bạn trả về cả isLoading
     const { booking, isLoading, isError } = useBookingById(_id);
 

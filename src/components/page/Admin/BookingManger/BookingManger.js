@@ -24,16 +24,13 @@ const BookingManger = () => {
     const [selectedBranch, setSelectedBranch] = useState('');
     const [selectedRoom, setSelectedRoom] = useState('');
     const [selectedBooking, setSelectedBooking] = useState(null);
-    const { roomBooking, isLoading: loadingRoomBooking } = useCurrentActiveRoomsWithBookingId();
-    const { booking, isLoading: loadingBooking } = useBookingById(selectedBooking);
-    console.log('booking rom:', roomBooking);
-    console.log('booking:', booking);
-    const { roomsByBranch, isLoading: loadingRoomByBranch } = useRoomByBranch(selectedBranch);
+    const { roomBooking } = useCurrentActiveRoomsWithBookingId();
+    const { booking } = useBookingById(selectedBooking);
+    const { roomsByBranch } = useRoomByBranch(selectedBranch);
     const { branches } = useAllBranches();
-    const { timeSlots } = useAllTimeSlots();
     const BranchOptions = branches?.map((branch) => ({
         name: branch.name,
-        id: branch._id, // hoặc room.id nếu backend trả id thường
+        id: branch._id, 
     }));
     useEffect(() => {
         console.log('selectedBooking (updated):', selectedBooking);

@@ -3,7 +3,6 @@ import style from './LocationsPage.module.scss';
 import Slider from '@/components/common/Slider';
 import BoxItem from '@/components/common/ItemSlider/BoxItem';
 import { useAllBranches } from '@/services/branch';
-import { formatMoney } from '@/function/formatMoney';
 
 const LocationsPage = () => {
     const { branches, isLoadingAllBranches } = useAllBranches();
@@ -13,12 +12,14 @@ const LocationsPage = () => {
         <>
             <Banner />
             <div className="container">
+                
                 {branches?.map((branch) => {
                     const roomImages = branch.rooms.map((room) => ({
                         image: room.image,
                         name: room.name,
                         type: {
                             name: room.type.name,
+                            price: room.type.base_price_per_minute,
                         },
                     }));
                     return (
@@ -35,7 +36,16 @@ const LocationsPage = () => {
                                 480: { slidesPerView: 3 },
                                 980: { slidesPerView: 3 },
                             }}
-                        ></Slider>
+                        >
+                            <div className={style.priceContainer}>
+                                {branch?.type?.map((type)=>(
+                                    <div className={style.price}>
+                                        {type.base_price_per_minute}
+                                    </div>
+                                ))}
+                            
+                            </div>
+                        </Slider>
                     );
                 })}
             </div>
