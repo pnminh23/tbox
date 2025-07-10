@@ -41,21 +41,15 @@ export const useCombo = (_id) => {
 
 export const createCombo = async (ComboData) => {
     try {
-        await axios.post(`${API_URL}/create`, ComboData, {
+        const res = await axios.post(`${API_URL}/create`, ComboData, {
             withCredentials: true,
         });
 
         await mutate(`${API_URL}/get-all`);
 
-        return {
-            success: true,
-            message: 'Thêm combo mới thành công',
-        };
+        return res.data;
     } catch (error) {
-        return {
-            success: false,
-            error: error?.response?.data?.message || 'Something went wrong',
-        };
+        throw error.response?.data || { success: false, message: 'Đã xảy ra lỗi khi thêm combo' };
     }
 };
 export const editComboById = async (_id, updatedData) => {

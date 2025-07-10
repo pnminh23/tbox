@@ -20,14 +20,12 @@ export const useBookingsRealtime = (roomID, dateISO) => {
     useEffect(() => {
         loadData();
 
-        // ✅ Log khi socket kết nối thành công
         socket.on('connect', () => {
-            console.log('✅ Socket connected:', socket.id);
+            console.log('Socket connected:', socket.id);
         });
 
-        // ✅ Log mọi sự kiện để kiểm tra có nhận gì không
         socket.onAny((event, ...args) => {
-            console.log('📦 Socket event received:', event, args);
+            console.log('Socket event received:', event, args);
         });
 
         // Khi có booking mới
@@ -57,7 +55,7 @@ export const useBookingsRealtime = (roomID, dateISO) => {
 
         // Khi booking bị chỉnh sửa
         socket.on('editBooking', (bk) => {
-            console.log('🛠️ editBooking received, checking for reload:', bk);
+            console.log('editBooking received, checking for reload:', bk);
 
             const bkDate = new Date(bk.date).toISOString().slice(0, 10);
             const cmpDate = new Date(dateISO).toISOString().slice(0, 10);
@@ -74,7 +72,7 @@ export const useBookingsRealtime = (roomID, dateISO) => {
 
             // 3. Nếu sự kiện này liên quan đến phòng và ngày hiện tại,
             //    thì gọi lại hàm loadData() để tải dữ liệu mới nhất.
-            console.log('🔄 Relevant booking edited. Reloading data...');
+            console.log('Relevant booking edited. Reloading data...');
             loadData();
         });
 

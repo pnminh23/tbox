@@ -9,12 +9,12 @@ import Table from '@/components/common/Table';
 import Popup from '@/components/common/Popup/Popup';
 import Input from '@/components/common/Input';
 import clsx from 'clsx';
-import RichTextEditor from '@/components/common/ReactQuill/ReactQuill';
 import { toast } from 'react-toastify';
 import { useTypeRoom } from '@/services/room';
+import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
 
 const ComboManage = () => {
-    const { allCombo, isLoading: loadingAllCombo, error: erroAllCombo } = useAllCombo();
+    const { allCombo } = useAllCombo();
     const [selectedComboId, setSelectedComboId] = useState(null);
     const { combo } = useCombo(selectedComboId);
     const [currentPage, setCurrentPage] = useState(1); // bắt đầu từ 1
@@ -23,6 +23,7 @@ const ComboManage = () => {
     const totalItems = allCombo?.length || 0;
     const totalPages = Math.ceil(totalItems / limit);
     const paginatedBranches = allCombo?.slice((currentPage - 1) * limit, currentPage * limit) || [];
+    const [isLoading, setIsLoading] = useState();
     const [isPopupEdit, setIsPopupEdit] = useState(false);
     const [isPopupCreate, setIsPopupCreate] = useState(false);
     const [isPopupDelete, setIsPopupDelete] = useState(false);
@@ -57,53 +58,68 @@ const ComboManage = () => {
         setIsPopupEdit(true);
     };
     const handleCreateCombo = async () => {
-        const newCombo = {
-            name: editCombo.name,
-            description: editCombo.description,
-            types: editCombo.types,
-            duration: editCombo.duration, // Thêm duration vào object tạo mới
-        };
+        try {
+            setIsLoading(true);
+            const newCombo = {
+                name: editCombo.name,
+                description: editCombo.description,
+                types: editCombo.types,
+                duration: editCombo.duration, // Thêm duration vào object tạo mới
+            };
 
-        const result = await createCombo(newCombo);
-
-        if (result.success) {
-            toast.success(result.message);
-        } else {
-            toast.error(result.message);
+            const result = await createCombo(newCombo);
+            if (result.success) {
+                toast.success(result.message);
+                setIsPopupCreate(false);
+            }
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setIsLoading(false);
         }
     };
     const handleEditCombo = async () => {
-        const newCombo = {
-            name: editCombo.name,
-            description: editCombo.description,
-            types: editCombo.types,
-            duration: editCombo.duration, // Thêm duration vào object chỉnh sửa
-        };
-        const result = await editComboById(selectedComboId, newCombo);
+        try {
+            setIsLoading(true);
+            const newCombo = {
+                name: editCombo.name,
+                description: editCombo.description,
+                types: editCombo.types,
+                duration: editCombo.duration, // Thêm duration vào object chỉnh sửa
+            };
+            const result = await editComboById(selectedComboId, newCombo);
 
-        if (result.success) {
-            toast.success(result.message);
-            setEditCombo({
-                name: combo.name || '',
-                description: combo.description || '',
-                types: combo.types || [],
-                duration: combo.duration || 0, // Cập nhật lại state
-            });
-            setSelectedComboId(null);
-        } else {
-            toast.error(result.message);
+            if (result.success) {
+                toast.success(result.message);
+                setEditCombo({
+                    name: combo.name || '',
+                    description: combo.description || '',
+                    types: combo.types || [],
+                    duration: combo.duration || 0, // Cập nhật lại state
+                });
+                setSelectedComboId(null);
+            }
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleDeleteCombo = async () => {
-        const result = await deleteComboById(selectedComboId);
+        try {
+            setIsLoading(true);
+            const result = await deleteComboById(selectedComboId);
 
-        if (result.success) {
-            toast.success(result.message);
-            setSelectedComboId(null);
-            setIsPopupDelete(false);
-        } else {
-            toast.error(result.message);
+            if (result.success) {
+                toast.success(result.message);
+                setSelectedComboId(null);
+                setIsPopupDelete(false);
+            }
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -117,10 +133,10 @@ const ComboManage = () => {
                     rounded_10
                     outLine
                     value={editCombo.name}
+                    placeholder={'Nhập tên combo'}
                     onChange={(e) => setEditCombo((prev) => ({ ...prev, name: e.target.value }))}
                 />
             </div>
-            {/* Thêm trường nhập liệu cho duration */}
             <div className={styles.groupItem}>
                 <label>Thời lượng (phút)</label>
                 <Input
@@ -187,6 +203,7 @@ const ComboManage = () => {
                     rows={5}
                     className={styles.textareaDescription}
                     value={editCombo.description || ''}
+                    placeholder="Nhập mô tả"
                     onChange={(e) =>
                         setEditCombo((prev) => ({
                             ...prev,
@@ -209,6 +226,7 @@ const ComboManage = () => {
     );
     return (
         <div className={styles.container}>
+            {isLoading && <LoadingFullPage />}
             {isPopupEdit && (
                 <Popup
                     key={selectedComboId || 'create'}

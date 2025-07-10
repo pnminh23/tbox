@@ -13,12 +13,14 @@ import Input from '../../../common/Input';
 import Button from '../../../common/Button';
 import { toast } from 'react-toastify';
 import clsx from 'clsx';
+import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
 
 const RoomList = ({ branchId, typeRoomId }) => {
     const { RoomsByBranchAndType, isLoadingAllRooms, isErrorAllRooms, mutateRoom } = useRoomByBranchAndType(
         branchId,
         typeRoomId
     );
+    const [isLoading, setIsLoading] = useState();
     const [isPopupCreate, setIsPopupCreate] = useState(false);
     const [isPopupEdit, setIsPopupEdit] = useState(false);
     const [nameRoom, setNameRoom] = useState('');
@@ -38,6 +40,7 @@ const RoomList = ({ branchId, typeRoomId }) => {
 
     const handleCreate = async () => {
         try {
+            setIsLoading(true);
             const formData = new FormData();
             // KHÔNG cần append email vào formData nữa (vì truyền qua params)
             // formData.append('email', editAccount.email); ❌ bỏ dòng này
@@ -48,7 +51,7 @@ const RoomList = ({ branchId, typeRoomId }) => {
             const response = await createRoom(formData);
 
             if (response.success) {
-                toast.success('Thêm phòng mới thành công!');
+                toast.success(response.message);
                 setIsPopupCreate(false); // đóng popup
                 setNameRoom('');
                 mutateRoom();
@@ -56,13 +59,15 @@ const RoomList = ({ branchId, typeRoomId }) => {
                 toast.error(response.message);
             }
         } catch (err) {
-            console.error(err);
-            toast.error('Đã xảy ra lỗi khi thêm mới!');
+            toast.error(err.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleEdit = async () => {
         try {
+            setIsLoading(true);
             const formData = new FormData();
             if (nameRoom) formData.append('name', nameRoom);
             if (editFile) formData.append('image', editFile);
@@ -70,7 +75,7 @@ const RoomList = ({ branchId, typeRoomId }) => {
             const response = await editRoomById(selectedRoomId, formData);
 
             if (response.success) {
-                toast.success('Cập nhật tin tức thành công!');
+                toast.success(response.message);
                 setIsPopupEdit(false);
                 setSelectedRoomId(null);
                 mutateRoom();
@@ -80,14 +85,17 @@ const RoomList = ({ branchId, typeRoomId }) => {
         } catch (err) {
             console.error(err);
             toast.error('Đã xảy ra lỗi khi cập nhật!');
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const handelDeleteNews = async () => {
+    const handelDelete = async () => {
         try {
+            setIsLoading(true);
             const response = await deleteRoomById(selectedRoomId);
             if (response.success) {
-                toast.success('Xóa phòng thành công!');
+                toast.success(response.message);
                 setSelectedRoomId(null);
                 setIsPopupEdit(false);
                 mutateRoom();
@@ -97,6 +105,8 @@ const RoomList = ({ branchId, typeRoomId }) => {
         } catch (err) {
             console.error(err);
             toast.error('Đã xảy ra lỗi khi xóa!');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -119,7 +129,7 @@ const RoomList = ({ branchId, typeRoomId }) => {
             </div>
             <div className={clsx(styles.row, styles.btn)}>
                 {isEdit && (
-                    <Button rounded_10 red w_fit onClick={handelDeleteNews}>
+                    <Button rounded_10 red w_fit onClick={handelDelete}>
                         Xóa phòng
                     </Button>
                 )}
@@ -132,6 +142,7 @@ const RoomList = ({ branchId, typeRoomId }) => {
 
     return (
         <div className={styles.roomsContainer}>
+            {isLoading && <LoadingFullPage />}
             {isLoadingAllRooms && (
                 <Lottie animationData={loadingAnimation} loop={true} autoplay={true} className={styles.loading} />
             )}

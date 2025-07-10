@@ -41,15 +41,11 @@ export const createNews = async (data) => {
 
         await mutate(`${API_URL}/get-all`);
 
-        return {
-            success: true,
-            message: response.message,
-            data: response.data,
-        };
+        return response.data;
     } catch (error) {
         return {
             success: false,
-            error: error?.response?.data?.message || 'Something went wrong',
+            message: error?.response?.data?.message || 'Something went wrong',
         };
     }
 };

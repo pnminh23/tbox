@@ -94,7 +94,7 @@ const ListInvoice = ({ booking }) => {
         const newPayment = {
             id_booking: booking?.id_booking,
             email,
-            amount: booking?.total_money || 0,
+            amount: booking?.payment_amount || 0,
             description,
             returnUrl: `http://localhost:3000/bookRoom/${booking?.id_booking}`,
             cancelUrl: `http://localhost:3000/bookRoom/${booking?.id_booking}`,
@@ -130,9 +130,7 @@ const ListInvoice = ({ booking }) => {
     return (
         <>
             {isPopupPaymentStatus && (
-                <Popup
-                    handleClose={() => setIsPopupPaymentStatus(false)}
-                >
+                <Popup handleClose={() => setIsPopupPaymentStatus(false)}>
                     <div className={style.popupPayment}>
                         {status === 'PAID' ? (
                             <>
@@ -239,41 +237,64 @@ const ListInvoice = ({ booking }) => {
                     <RoomDisplay roomName={booking?.room?.name} roomType={booking?.room?.type?.name} />
                 </div>
                 <div className={clsx(style.column, style.colInfor)}>
-                    <div className={style.item}>Mã đơn: <p>{booking?.id_booking || 'N/A'}</p></div>
-                    <div className={style.item}>Số điện thoại: <p>{booking?.phone || 'N/A'}</p></div>
-                    <div className={style.item}>Ngày: <p>{booking?.date ? dayjs(booking.date).format('DD/MM/YYYY') : 'N/A'}</p></div>
+                    <div className={style.item}>
+                        Mã đơn: <p>{booking?.id_booking || 'N/A'}</p>
+                    </div>
+                    <div className={style.item}>
+                        Số điện thoại: <p>{booking?.phone || 'N/A'}</p>
+                    </div>
+                    <div className={style.item}>
+                        Ngày: <p>{booking?.date ? dayjs(booking.date).format('DD/MM/YYYY') : 'N/A'}</p>
+                    </div>
                 </div>
                 <div className={clsx(style.column, style.colInfor)}>
-                    <div className={style.item}>Cơ sở: <p>{booking?.room?.branch?.name || 'Không xác định'}</p></div>
-                    <div className={style.item}>Từ: <p>{booking?.time_slots?.[0]?.start_time || 'N/A'}</p> đến: <p>{booking?.time_slots?.at(-1)?.end_time || 'N/A'}</p></div>
-                    <div className={style.item}>Combo: <p>{booking?.combo?.name || 'Không có'}</p></div>
+                    <div className={style.item}>
+                        Cơ sở: <p>{booking?.room?.branch?.name || 'Không xác định'}</p>
+                    </div>
+                    <div className={style.item}>
+                        Từ: <p>{booking?.time_slots?.[0]?.start_time || 'N/A'}</p> đến:{' '}
+                        <p>{booking?.time_slots?.at(-1)?.end_time || 'N/A'}</p>
+                    </div>
+                    <div className={style.item}>
+                        Combo: <p>{booking?.combo?.name || 'Không có'}</p>
+                    </div>
                 </div>
                 <div className={clsx(style.column, style.colIspay)}>
                     <p>{formatMoney(booking?.total_money)}</p>
-                    <div className={style.item}>Mã giảm giá: <p>{booking?.promotion || 'Không'}</p></div>
+                    <div className={style.item}>
+                        Mã giảm giá: <p>{booking?.promotion || 'Không'}</p>
+                    </div>
                     <p>{booking?.isPay || 'Chưa rõ'}</p>
                 </div>
                 <div className={clsx(style.column, style.colStatus)}>
                     Trạng thái <p>{booking?.status || 'Chưa rõ'}</p>
                 </div>
                 <div className={clsx(style.colAction, style.column)}>
-                    {booking?.isPay !== 'ĐÃ THANH TOÁN' && booking?.status !== 'THẤT BẠI' && booking?.status !== 'ĐÃ HỦY' && (
-                        <Button rounded_10 blue icon={<AiOutlinePayCircle />} onClick={handlePayment}>
-                            Thanh toán
-                        </Button>
-                    )}
+                    {booking?.isPay !== 'ĐÃ THANH TOÁN' &&
+                        booking?.status !== 'THẤT BẠI' &&
+                        booking?.status !== 'ĐÃ HỦY' && (
+                            <Button rounded_10 blue icon={<AiOutlinePayCircle />} onClick={handlePayment}>
+                                Thanh toán
+                            </Button>
+                        )}
                     {booking?.status === 'HOÀN THÀNH' ? (
                         booking?.isReviewed ? (
                             <Button rounded_10 yellowLinear icon={<AiOutlineCheckCircle />} disabled>
                                 Bạn đã đánh giá
                             </Button>
                         ) : (
-                            <Button rounded_10 yellowLinear icon={<AiOutlineEdit />} onClick={() => setIsPopUpFeedback(true)}>
+                            <Button
+                                rounded_10
+                                yellowLinear
+                                icon={<AiOutlineEdit />}
+                                onClick={() => setIsPopUpFeedback(true)}
+                            >
                                 Đánh giá
                             </Button>
                         )
                     ) : (
-                        booking?.status !== 'ĐÃ HỦY' && booking?.status !== 'THẤT BẠI' && (
+                        booking?.status !== 'ĐÃ HỦY' &&
+                        booking?.status !== 'THẤT BẠI' && (
                             <Button rounded_10 red icon={<AiOutlineDelete />} onClick={handleCancelBooking}>
                                 Hủy đơn
                             </Button>

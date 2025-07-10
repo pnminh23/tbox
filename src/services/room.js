@@ -87,10 +87,7 @@ export const deleteRoomById = async (_id) => {
         const res = await axios.delete(`${API_URL}/delete-room/${_id}`, {
             withCredentials: true,
         });
-        return {
-            success: true,
-            message: res.message,
-        };
+        return res.data;
     } catch (err) {
         throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa combo' };
     }
@@ -103,7 +100,6 @@ export const createRoomType = async (roomTypeData) => {
         });
         return res.data;
     } catch (err) {
-        console.error('Error creating room type:', err);
         throw (
             err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi tạo loại phòng mới. Vui lòng thử lại.' }
         );
@@ -123,23 +119,13 @@ export const useAllTypeRooms = () => {
     };
 };
 
-/**
- * Chỉnh sửa thông tin loại phòng bằng ID.
- * @param {string} _id - ID của loại phòng cần chỉnh sửa.
- * @param {object} roomTypeData - Dữ liệu loại phòng đã cập nhật.
- * @returns {Promise<object>} Đối tượng success và message.
- */
 export const editRoomTypeById = async (_id, roomTypeData) => {
     try {
         const res = await axios.put(`${API_URL}/edit-type-room/${_id}`, roomTypeData, {
             withCredentials: true,
         });
         const messageFromServer = res.data?.message || 'Cập nhật loại phòng thành công.';
-        return {
-            success: true,
-            message: messageFromServer,
-            data: res.data?.data,
-        };
+        return res.data;
     } catch (err) {
         console.error(`Error editing room type with ID ${_id}:`, err);
         throw (
@@ -151,11 +137,6 @@ export const editRoomTypeById = async (_id, roomTypeData) => {
     }
 };
 
-/**
- * Xóa loại phòng bằng ID.
- * @param {string} _id - ID của loại phòng cần xóa.
- * @returns {Promise<object>} Đối tượng success và message.
- */
 export const deleteRoomTypeById = async (_id) => {
     try {
         const res = await axios.delete(`${API_URL}/delete-roomType/${_id}`, {

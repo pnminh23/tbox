@@ -22,13 +22,7 @@ import Tippy from '@tippyjs/react';
 import Selection from '@/components/common/Selection';
 import Calendar from '@/components/common/Calender';
 import UploadFileImage from '@/components/common/UploadFileImage/UploadFileImage';
-import {
-    AiOutlineEdit,
-    AiOutlineInteraction,
-    AiOutlineLock,
-    AiOutlineSearch,
-    AiOutlineUnlock,
-} from 'react-icons/ai';
+import { AiOutlineEdit, AiOutlineInteraction, AiOutlineLock, AiOutlineSearch, AiOutlineUnlock } from 'react-icons/ai';
 import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
 
 const AccountManage = () => {
@@ -167,9 +161,9 @@ const AccountManage = () => {
             setIsProcessing(false);
         }
     };
+    console.log('selectedEmail: ', selectedEmail);
 
     const handleDelete = async () => {
-        if (!selectedEmail) return;
         setIsProcessing(true);
         try {
             const response = await deleteAccountByEmail(selectedEmail);
@@ -197,8 +191,8 @@ const AccountManage = () => {
 
             {/* Popup Chỉnh sửa */}
             {isPopupEdit && (
-                <Popup  handleClose={() => setIsPopupEdit(false)}>
-                    <form className={styles.formEdit}>
+                <Popup handleClose={() => setIsPopupEdit(false)}>
+                    <div className={styles.formEdit}>
                         <p className={styles.title}>Chỉnh sửa tài khoản</p>
                         <div className={styles.groupItem}>
                             <label>Ảnh đại diện</label>
@@ -284,28 +278,28 @@ const AccountManage = () => {
                             <Button rounded_10 w_fit blue onClick={handleEdit}>
                                 Cập nhật tài khoản
                             </Button>
-                            <Button rounded_10 w_fit red>
+                            <Button rounded_10 w_fit red onClick={() => setIsPopupDelete(true)}>
                                 Xóa tài khoản
                             </Button>
                         </div>
-                    </form>
+                    </div>
                 </Popup>
             )}
 
             {/* Popup Xác nhận Xóa */}
             {isPopupDelete && (
                 <Popup handleClose={() => setIsPopupDelete(false)}>
-                    <div className={styles.formPopup}>
+                    <div className={styles.formEdit}>
                         <p className={styles.title}>Xác nhận xóa</p>
                         <p>
                             Bạn có chắc muốn xóa tài khoản <strong>{selectedEmail}</strong>? Hành động này không thể
                             hoàn tác.
                         </p>
-                        <div className={styles.row}>
-                            <Button outline onClick={() => setIsPopupDelete(false)}>
+                        <div className={clsx(styles.row, styles.buttons)}>
+                            <Button w_fit outline rounded_10 light onClick={() => setIsPopupDelete(false)}>
                                 Hủy
                             </Button>
-                            <Button red onClick={handleDelete}>
+                            <Button w_fit red rounded_10 onClick={handleDelete}>
                                 Xác nhận
                             </Button>
                         </div>

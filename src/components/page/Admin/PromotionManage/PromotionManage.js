@@ -13,7 +13,6 @@ import {
 } from '@/services/promotion';
 import { useEffect, useMemo, useState } from 'react';
 import Popup from '@/components/common/Popup/Popup';
-import UploadFileImage from '@/components/common/UploadFileImage/UploadFileImage';
 import Input from '@/components/common/Input';
 import { toast } from 'react-toastify';
 
@@ -27,7 +26,7 @@ const PromotionManage = () => {
     const [isPopupEdit, setIsPopupEdit] = useState(false);
     const [isPopupCreate, setIsPopupCreate] = useState(false);
     const [isPopupDelete, setIsPopupDelete] = useState(false);
-    const initialEditPromotion = { name: '', discountPercent: '', quanlity: '' };
+    const initialEditPromotion = { name: '', discountPercent: '', quantity: '' };
     const [editPromotion, setEditPromotion] = useState(initialEditPromotion);
 
     // === Data Fetching ===
@@ -46,11 +45,10 @@ const PromotionManage = () => {
             (promo) =>
                 promo.name?.toLowerCase().includes(query) ||
                 promo.discountPercent?.toString().includes(query) ||
-                promo.quanlity?.toString().includes(query)
+                promo.quantity?.toString().includes(query)
         );
     }, [allPromotion, activeSearchQuery]);
 
-    // Sửa lỗi: Tính toán phân trang dựa trên danh sách đã lọc
     const totalItems = filteredPromotions.length;
     const totalPages = Math.ceil(totalItems / limit) || 1;
     const paginatedPromotions = useMemo(() => {
@@ -62,7 +60,7 @@ const PromotionManage = () => {
         index: (currentPage - 1) * limit + index + 1,
         name: promo.name,
         discountPercent: promo.discountPercent,
-        quanlity: promo.quanlity,
+        quantity: promo.quantity,
         createdAt: promo.createdAt,
     }));
 
@@ -74,7 +72,7 @@ const PromotionManage = () => {
             setEditPromotion({
                 name: selectedPromotion.name || '',
                 discountPercent: selectedPromotion.discountPercent || '',
-                quanlity: selectedPromotion.quanlity || '',
+                quantity: selectedPromotion.quantity || '',
             });
         }
     }, [selectedPromotion, selectedId]);
@@ -174,8 +172,8 @@ const PromotionManage = () => {
                                 rounded_10
                                 outLine
                                 type="number"
-                                value={editPromotion.quanlity}
-                                onChange={(e) => setEditPromotion((prev) => ({ ...prev, quanlity: e.target.value }))}
+                                value={editPromotion.quantity}
+                                onChange={(e) => setEditPromotion((prev) => ({ ...prev, quantity: e.target.value }))}
                             />
                         </div>
                         <Button rounded_10 w_fit blue onClick={handleEdit} className={styles.btnAdd}>
@@ -222,8 +220,8 @@ const PromotionManage = () => {
                                 rounded_10
                                 outLine
                                 type="number"
-                                value={editPromotion.quanlity}
-                                onChange={(e) => setEditPromotion((prev) => ({ ...prev, quanlity: e.target.value }))}
+                                value={editPromotion.quantity}
+                                onChange={(e) => setEditPromotion((prev) => ({ ...prev, quantity: e.target.value }))}
                             />
                         </div>
                         <Button rounded_10 w_fit blue onClick={handleCreate} className={styles.btnAdd}>
@@ -299,7 +297,7 @@ const PromotionManage = () => {
                             label: 'Giảm giá',
                             render: (item) => <p>{`${item.discountPercent}%`}</p>,
                         },
-                        { key: 'quanlity', label: 'Số lượng' },
+                        { key: 'quantity', label: 'Số lượng' },
                         { key: 'createdAt', label: 'Ngày tạo' },
                     ]}
                     renderActions={(item) => (

@@ -47,11 +47,7 @@ export const createBranch = async (branchData) => {
         // Sau khi tạo xong, cập nhật danh sách branch
         await mutate(`${API_URL}/get-all`);
 
-        return {
-            success: true,
-            message: 'Thêm cơ sở thành công',
-            data: response.data,
-        };
+        return response.data;
     } catch (error) {
         console.error('Error creating branch:', error);
         return {
@@ -60,6 +56,26 @@ export const createBranch = async (branchData) => {
         };
     }
 };
+
+export const editBranchById = async (_id, updatedData) => {
+    try {
+        const response = await axios.put(`${API_URL}/edit/${_id}`, updatedData, {
+            withCredentials: true,
+        });
+
+        // Cập nhật lại danh sách sau khi chỉnh sửa
+        await mutate(`${API_URL}/get-all`);
+        await mutate(`${API_URL}/get/${_id}`);
+
+        return response.data;
+    } catch (error) {
+        return {
+            success: false,
+            message: error?.response?.data?.message || 'Đã xảy ra lỗi khi cập nhật cơ sở',
+        };
+    }
+};
+
 export const deleteBranchById = async (_id) => {
     try {
         const res = await axios.delete(`${API_URL}/delete/${_id}`, {

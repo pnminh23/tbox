@@ -30,7 +30,7 @@ const BookingManger = () => {
     const { branches } = useAllBranches();
     const BranchOptions = branches?.map((branch) => ({
         name: branch.name,
-        id: branch._id, 
+        id: branch._id,
     }));
     useEffect(() => {
         console.log('selectedBooking (updated):', selectedBooking);
@@ -83,12 +83,11 @@ const BookingManger = () => {
             returnUrl: `http://localhost:3000/bookRoom/${booking.id_booking}`,
             cancelUrl: `http://localhost:3000/bookRoom/${booking.id_booking}`,
             expiredAt,
-
         };
         try {
             const result = await createPayment(newPayment); // gọi đến backend
             if (result?.checkoutUrl) {
-                window.location.href = result.checkoutUrl; // chuyển tới trang thanh toán
+                window.open(result.checkoutUrl, '_blank'); // chuyển tới trang thanh toán
             } else {
                 alert('Không lấy được link thanh toán!');
             }
