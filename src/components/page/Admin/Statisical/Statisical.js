@@ -6,16 +6,12 @@ import { useAllBookings } from '@/services/booking';
 import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
 import { formatMoney } from '@/function/formatMoney';
 import { FaArrowTrendUp, FaArrowTrendDown } from 'react-icons/fa6';
-
-// Import các plugin cần thiết cho dayjs
 import isBetween from 'dayjs/plugin/isBetween';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import isoWeek from 'dayjs/plugin/isoWeek';
 dayjs.extend(isBetween);
 dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);
-
-// Import component TimeFilter
 import TimeFilter from '@/components/common/TimeFilter/TimeFilter';
 
 // Helper function để tính phần trăm thay đổi
@@ -27,7 +23,7 @@ const calculatePercentageChange = (current, previous) => {
     return Math.round(change);
 };
 
-// Helper object để lấy tên bộ lọc
+// lấy tên bộ lọc
 const filterDisplayNames = {
     today: 'hôm nay',
     yesterday: 'hôm qua',
@@ -48,7 +44,7 @@ const Statisical = () => {
         return bookings.filter((b) => b.isPay === 'ĐÃ THANH TOÁN');
     }, [bookings]);
 
-    // Hook tính toán doanh thu
+    // tính toán doanh thu
     const revenueStats = useMemo(() => {
         if (!paidBookings) return null;
 

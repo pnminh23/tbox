@@ -60,7 +60,6 @@ const BookRoomPage = () => {
 
     const [initialFilmId, setInitialFilmId] = useState(null);
 
-
     useEffect(() => {
         if (f_Id && !initialFilmId) {
             setInitialFilmId(f_Id);
@@ -271,7 +270,7 @@ const BookRoomPage = () => {
             cancelUrl: `http://localhost:3000/bookRoom/${booking.id_booking}`,
             expiredAt,
         };
-        
+
         try {
             const result = await createPayment(newPayment); // gọi đến backend
             // console.log('result: ', result);
@@ -644,8 +643,7 @@ const BookRoomPage = () => {
                                 <h5>Lưu ý</h5>
                             </div>
                             <p>
-                                - Các đơn đặt phòng từ 300.000 VNĐ trở lên và đơn đặt phòng trước 2 ngày vui lòng thanh
-                                toán trước 50% giá trị hóa đơn
+                                - Các đơn đặt phòng từ 150.000 VNĐ trở lên vui lòng thanh toán trước 50% giá trị hóa đơn
                             </p>
                             <p>
                                 - Những tài khoản đặt phòng nhưng không đến và không báo lại cho PNM - BOX, chúng tôi
