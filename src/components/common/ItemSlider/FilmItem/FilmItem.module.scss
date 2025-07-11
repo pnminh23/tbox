@@ -20,7 +20,7 @@
         height: 300px;
 
         img {
-            border-top-left-radius: 10px;
+            border-top-left-radius: 10px;   
             border-top-right-radius: 10px;
         }
     }
@@ -74,7 +74,6 @@
     background-color: #151515;
     padding: 10px;
 
-    height: 150px;
     .name {
         white-space: nowrap; /* Ngăn chữ xuống dòng */
         overflow: hidden; /* Ẩn phần nội dung bị tràn */
@@ -89,6 +88,9 @@
         text-overflow: ellipsis;
         color: var(--grey);
         margin-bottom: 5px;
+    }
+    .categories{
+        height: 60px;
     }
     .categoryItem {
         display: inline;

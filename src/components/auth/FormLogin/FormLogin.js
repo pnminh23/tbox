@@ -85,7 +85,10 @@ const FormLogin = () => {
                 <form className={style.login} onSubmit={handleLogin}>
                     <div className={style.headerRow}>
                         <h3>Đăng nhập</h3>
-                        <AiOutlineLeft className={style.back} onClick={() => router.back()} />
+                        <p className={style.back}>
+                            <AiOutlineLeft  onClick={() => router.back()} />
+                                Trang chủ
+                            </p>
                     </div>
                     <div className={clsx(style.groupItem, style.relative)}>
                         <Tippy content={errors.email} visible={!!errors.email} placement="right">

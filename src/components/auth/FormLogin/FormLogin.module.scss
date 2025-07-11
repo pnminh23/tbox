@@ -19,6 +19,8 @@
     display: flex;
     justify-content: center;
     .back {
+        display: flex;
+        align-items: center;
         font-size: 25px;
         color: #343434;
         outline: none;

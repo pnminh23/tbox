@@ -124,7 +124,8 @@
 }
 
 .feedbackList {
-    max-height: 360px; // đủ chứa 3 feedback
+    max-height: 360px; 
+    min-height: 120px; 
     overflow-y: auto;
     background-color: #343434;
     border-radius: 10px;
