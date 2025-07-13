@@ -1,20 +1,12 @@
 import Input from '@/components/common/Input';
 import style from './BookingManger.module.scss';
 import Button from '@/components/common/Button';
-import Table from '@/components/common/Table';
-import { AiOutlineCloseCircle, AiOutlineSearch } from 'react-icons/ai';
 import React, { useEffect, useState } from 'react';
-import IconCustom from '@/components/common/IconCustom';
 import { useAllBranches } from '@/services/branch';
 import Selection from '@/components/common/Selection';
 import { useRoomByBranch } from '@/services/room';
 import clsx from 'clsx';
-import { useAllTimeSlots } from '@/services/timeSlots';
 import dayjs from 'dayjs';
-import { useBookingsRealtime } from '@/hooks/useBookingRealTime';
-import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css';
-import 'tippy.js/themes/light-border.css';
 import { editBooking, useBookingById, useCurrentActiveRoomsWithBookingId } from '@/services/booking';
 import { formatMoney } from '@/function/formatMoney';
 import { toast } from 'react-toastify';
@@ -32,9 +24,6 @@ const BookingManger = () => {
         name: branch.name,
         id: branch._id,
     }));
-    useEffect(() => {
-        console.log('selectedBooking (updated):', selectedBooking);
-    }, [selectedBooking]);
 
     const handleCompleteBooking = async () => {
         if (!booking) return; // Đảm bảo đã có booking được chọn

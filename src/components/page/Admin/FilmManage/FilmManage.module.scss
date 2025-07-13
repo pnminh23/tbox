@@ -46,3 +46,20 @@
         margin-left: auto;
     }
 }
+.category {
+    width: 200px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px; // Adjust spacing between <p> tags
+    .categoryItem {
+        width: fit-content;
+        margin: 0;
+        padding: 4px 8px;
+        background-color: var(--grey-primary); // Example background color
+        border-radius: 4px; // Rounded corners
+        font-size: 14px; // Adjust font size
+        color: #333; // Text color
+        // Add any other styles as needed
+    }
+}

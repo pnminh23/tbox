@@ -125,7 +125,17 @@ const RoomList = ({ branchId, typeRoomId }) => {
             </div>
             <div className={styles.groupItem}>
                 <label>Tên phòng</label>
-                <Input rounded_10 outLine value={nameRoom} onChange={(e) => setNameRoom(e.target.value)} />
+                <Input
+                    rounded_10
+                    outLine
+                    value={nameRoom}
+                    onChange={(e) => setNameRoom(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            isEdit ? handleEdit() : handleCreate();
+                        }
+                    }}
+                />
             </div>
             <div className={clsx(styles.row, styles.btn)}>
                 {isEdit && (

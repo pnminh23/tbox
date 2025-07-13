@@ -25,10 +25,10 @@
         }
         tr {
             border-bottom: 1px solid var(--grey); // màu viền có thể tuỳ chỉnh
-            height: 60px;
-            &:nth-child(even) {
-                background-color: #f2f2f2; // màu nền cho dòng chẵn
-            }
+            height: 70px;
+            // &:nth-child(even) {
+            //     background-color: #f2f2f2; // màu nền cho dòng chẵn
+            // }
         }
     }
     th::selection,

@@ -54,7 +54,6 @@ const BookRoomPage = () => {
     const { allCombo } = useAllCombo();
     const { timeSlots } = useAllTimeSlots();
     const { user } = useUserData();
-    console.log('email: ', user?.email);
     const router = useRouter();
     const { f_Id } = router.query;
 
@@ -65,16 +64,6 @@ const BookRoomPage = () => {
             setInitialFilmId(f_Id);
         }
     }, [f_Id, initialFilmId]);
-
-    // useEffect(() => {
-    //     if (bookingByID) {
-    //         setBooking(bookingByID);
-    //         console.log('bookingByID: ', bookingByID);
-    //         if (status) {
-    //             setIsPopupPaymentStatus(true);
-    //         }
-    //     }
-    // }, [bookingByID, status]);
 
     // Ưu tiên selectedFilm, nếu không có thì lấy initialFilmId
     const { film, isLoading: loadingFilm } = useFilm(selectedFilm || initialFilmId);
@@ -89,7 +78,6 @@ const BookRoomPage = () => {
     const [isPopupDeposit, setIsPopupDeposit] = useState(false);
     const [messageDeposit, setMessageDeposit] = useState('');
     const [halfPay, setHalfPay] = useState(0);
-    const [isPopupPaymentStatus, setIsPopupPaymentStatus] = useState(false);
     const [contentConfirm, setContentConfirm] = useState('');
     const [confirmedOverDuration, setConfirmedOverDuration] = useState(false);
     const disabledTimeSlots = bookedRoom?.bookedTimeSlots || [];
@@ -123,61 +111,88 @@ const BookRoomPage = () => {
     };
 
     const handleTimeSlotClick = (timeSlotId) => {
-        // Tìm vị trí của timeSlot trong mảng gốc để kiểm tra tính liền kề
         const clickedIndex = timeSlots.findIndex((slot) => slot._id === timeSlotId);
-
         if (clickedIndex === -1) return;
 
-        const isSelected = selectedTimeSlots.includes(timeSlotId);
+        // Nếu danh sách rỗng, chọn khung giờ đầu tiên và tự động chọn các khung tiếp theo
+        if (selectedTimeSlots.length === 0 && film?.duration) {
+            let totalDuration = 0;
+            let newSelectedTimeSlots = [timeSlotId];
+            const clickedSlot = timeSlots[clickedIndex];
+            totalDuration += clickedSlot.slot_duration || 0;
 
-        // Nếu đang được chọn => loại khỏi danh sách
-        if (isSelected) {
-            const newSelected = selectedTimeSlots.filter((id) => id !== timeSlotId);
+            // Tự động chọn các khung giờ tiếp theo cho đến khi đủ thời lượng phim
+            for (let i = clickedIndex + 1; i < timeSlots.length; i++) {
+                const nextSlot = timeSlots[i];
+                const isDisabled = disabledTimeSlots.includes(nextSlot._id);
 
-            if (newSelected.length <= 1) {
-                // 0 hoặc 1 slot thì mặc định liên tục
-                setSelectedTimeSlots(newSelected);
-                return;
-            }
+                // Kiểm tra nếu khung giờ đã qua
+                const now = dayjs().subtract(10, 'minute');
+                const isToday = dayjs(selectedDate).isSame(now, 'day');
+                const slotStart = dayjs(selectedDate)
+                    .hour(Number(nextSlot.start_time.split(':')[0]))
+                    .minute(Number(nextSlot.start_time.split(':')[1]));
+                const isPast = isToday && slotStart.isBefore(now);
 
-            const selectedIndexes = newSelected
-                .map((id) => timeSlots.findIndex((slot) => slot._id === id))
-                .sort((a, b) => a - b);
+                if (isDisabled || isPast) {
+                    toast.error('Không thể chọn khung giờ này vì đã được đặt hoặc đã qua.');
+                    setSelectedTimeSlots([]);
+                    return;
+                }
 
-            let isStillContinuous = true;
-            for (let i = 0; i < selectedIndexes.length - 1; i++) {
-                if (selectedIndexes[i + 1] !== selectedIndexes[i] + 1) {
-                    isStillContinuous = false;
+                if (totalDuration < film.duration) {
+                    newSelectedTimeSlots.push(nextSlot._id);
+                    totalDuration += nextSlot.slot_duration || 0;
+                } else {
                     break;
                 }
             }
 
-            if (!isStillContinuous) {
-                toast.error('Bạn chỉ được chọn các khung giờ liền nhau');
+            // Kiểm tra nếu tổng thời lượng không đủ
+            if (totalDuration < film.duration) {
+                toast.error(
+                    `Không đủ khung giờ liên tiếp để đáp ứng thời lượng phim (${film.duration} phút). Vui lòng chọn khung giờ khác.`
+                );
+                setSelectedTimeSlots([]);
                 return;
             }
 
-            setSelectedTimeSlots(newSelected);
-            return;
-        }
+            setSelectedTimeSlots(newSelectedTimeSlots);
+        } else if (selectedTimeSlots.length > 0) {
+            // Nếu đã có khung giờ được chọn, chọn tất cả từ khung đầu tiên đến khung được click
+            const firstSelectedIndex = timeSlots.findIndex((slot) => slot._id === selectedTimeSlots[0]);
+            const startIndex = Math.min(firstSelectedIndex, clickedIndex);
+            const endIndex = Math.max(firstSelectedIndex, clickedIndex);
 
-        // Nếu danh sách rỗng => chọn luôn timeSlot
-        if (selectedTimeSlots.length === 0) {
-            setSelectedTimeSlots([timeSlotId]);
-            return;
-        }
+            let newSelectedTimeSlots = [];
+            let isValid = true;
 
-        // Nếu đã chọn rồi, kiểm tra tính liền kề
-        const selectedIndexes = selectedTimeSlots.map((id) => timeSlots.findIndex((slot) => slot._id === id));
+            // Chọn tất cả các khung giờ từ startIndex đến endIndex
+            for (let i = startIndex; i <= endIndex; i++) {
+                const slot = timeSlots[i];
+                const isDisabled = disabledTimeSlots.includes(slot._id);
 
-        const minIndex = Math.min(...selectedIndexes);
-        const maxIndex = Math.max(...selectedIndexes);
+                // Kiểm tra nếu khung giờ đã qua
+                const now = dayjs().subtract(10, 'minute');
+                const isToday = dayjs(selectedDate).isSame(now, 'day');
+                const slotStart = dayjs(selectedDate)
+                    .hour(Number(slot.start_time.split(':')[0]))
+                    .minute(Number(slot.start_time.split(':')[1]));
+                const isPast = isToday && slotStart.isBefore(now);
 
-        // Cho phép chọn tiếp nếu là liền kề trước hoặc sau chuỗi đã chọn
-        if (clickedIndex === minIndex - 1 || clickedIndex === maxIndex + 1) {
-            setSelectedTimeSlots((prev) => [...prev, timeSlotId]);
-        } else {
-            toast.error('Bạn chỉ được chọn các khung giờ liền nhau.');
+                if (isDisabled || isPast) {
+                    isValid = false;
+                    break;
+                }
+                newSelectedTimeSlots.push(slot._id);
+            }
+
+            if (!isValid) {
+                toast.error('Không thể chọn khung giờ này vì có khung giờ đã được đặt hoặc đã qua.');
+                return;
+            }
+
+            setSelectedTimeSlots(newSelectedTimeSlots);
         }
     };
 
@@ -203,7 +218,7 @@ const BookRoomPage = () => {
         }
         // console.log('selectedSlotDetails', selectedSlotDetails);
         // console.log('totalSlotDuration', totalSlotDuration);
-        if (!confirmedOverDuration && Math.abs(totalSlotDuration - film.duration) > 20) {
+        if (!confirmedOverDuration && Math.abs(totalSlotDuration - film.duration) > 30) {
             setContentConfirm(
                 `Phim bạn chọn có thời lượng ${film.duration} phút nhưng bạn đang đặt phòng với thời gian ${totalSlotDuration} phút. Bạn có chắc muốn tiếp tục đặt?`
             );
@@ -383,34 +398,7 @@ const BookRoomPage = () => {
                     </div>
                 </Popup>
             )}
-            {isPopupPaymentStatus && (
-                <Popup
-                    handleClose={() => {
-                        setIsPopupPaymentStatus(false);
-                    }}
-                >
-                    <div className={style.popupPayment}>
-                        {status === 'PAID' ? (
-                            <>
-                                <AiOutlineCheckCircle className={style.success} />
-                                <p>Thanh toán thành công</p>
-                                <Button rounded_10 yellowLinear href={PATH.Overview}>
-                                    Kiểm tra đơn đặt phòng
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <AiOutlineCloseCircle className={style.cancel} href={PATH.Overview} />
-                                <p>Thanh toán thất bại</p>
-                                <Button rounded_10 yellowLinear>
-                                    Kiểm tra đơn đặt phòng
-                                </Button>
-                            </>
-                        )}
-                        {/* <p>{status === 'PAID' ? 'Thanh toán thành công' : 'Thanh toán thất bại'}</p> */}
-                    </div>
-                </Popup>
-            )}
+
             <div className={style.container}>
                 <div className={style.fromInfor}>
                     {user ? (

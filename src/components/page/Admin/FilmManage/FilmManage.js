@@ -106,7 +106,7 @@ const FilmManage = () => {
             country: film.country,
             image: film.image,
             release_date: film.release_date, // Năm phát hành
-            category: Array.isArray(film.category) ? film.category.join(', ') : '', // Hiển thị thể loại
+            category: film.category, // Hiển thị thể loại
             createdAt: film.createdAt,
         })) || [];
 
@@ -483,7 +483,23 @@ const FilmManage = () => {
                                 { key: 'image', label: 'Ảnh' },
                                 { key: 'duration', label: 'Thời lượng' },
                                 { key: 'release_date', label: 'Năm PH' }, // Sửa label
-                                { key: 'category', label: 'Thể loại' }, // Thêm cột thể loại
+                                {
+                                    key: 'category',
+                                    label: 'Thể loại',
+                                    render: (item) => (
+                                        <div className={styles.category}>
+                                            {Array.isArray(item.category) ? (
+                                                item.category.map((cat, index) => (
+                                                    <p key={index} className={styles.categoryItem}>
+                                                        {cat}
+                                                    </p>
+                                                ))
+                                            ) : (
+                                                <p className={styles.categoryItem}>N/A</p>
+                                            )}
+                                        </div>
+                                    ),
+                                }, // Thêm cột thể loại
                                 { key: 'country', label: 'Quốc gia' },
                                 { key: 'createdAt', label: 'Ngày đăng' },
                             ]}
