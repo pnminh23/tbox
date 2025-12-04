@@ -1,5 +1,5 @@
-import useSWR, { mutate } from 'swr';
-import axiosInstance from '../config/axios';
+import useSWR, { mutate } from "swr";
+import axiosInstance from "../config/axios";
 
 const API_URL = `/api/news`;
 
@@ -43,7 +43,7 @@ export const createNews = async (data) => {
     } catch (error) {
         return {
             success: false,
-            message: error?.response?.data?.message || 'Something went wrong',
+            message: error?.response?.data?.message || "Something went wrong",
         };
     }
 };
@@ -56,12 +56,12 @@ export const editNewsById = async (_id, updatedData) => {
 
         return {
             success: true,
-            message: 'Cập nhật combo thành công',
+            message: "Cập nhật combo thành công",
         };
     } catch (error) {
         return {
             success: false,
-            error: error?.response?.data?.message || 'Không thể cập nhật combo',
+            error: error?.response?.data?.message || "Không thể cập nhật combo",
         };
     }
 };
@@ -74,6 +74,11 @@ export const deleteNewsById = async (_id) => {
             message: res.message,
         };
     } catch (err) {
-        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa combo' };
+        throw (
+            err.response?.data || {
+                success: false,
+                message: "Đã xảy ra lỗi khi xóa combo",
+            }
+        );
     }
 };

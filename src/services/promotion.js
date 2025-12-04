@@ -1,5 +1,5 @@
-import useSWR, { mutate } from 'swr';
-import axiosInstance from '../config/axios';
+import useSWR, { mutate } from "swr";
+import axiosInstance from "../config/axios";
 
 const API_URL = `/api/promotion`;
 
@@ -43,12 +43,12 @@ export const createPromotion = async (data) => {
 
         return {
             success: true,
-            message: 'Thêm promotion mới thành công',
+            message: "Thêm promotion mới thành công",
         };
     } catch (error) {
         return {
             success: false,
-            error: error?.response?.data?.message || 'Something went wrong',
+            error: error?.response?.data?.message || "Something went wrong",
         };
     }
 };
@@ -61,12 +61,14 @@ export const editPromotionById = async (_id, data) => {
 
         return {
             success: true,
-            message: 'Cập nhật promotion thành công',
+            message: "Cập nhật promotion thành công",
         };
     } catch (error) {
         return {
             success: false,
-            error: error?.response?.data?.message || 'Không thể cập nhật Promotion',
+            error:
+                error?.response?.data?.message ||
+                "Không thể cập nhật Promotion",
         };
     }
 };
@@ -76,6 +78,11 @@ export const deletePromotionById = async (_id) => {
         await mutate(`${API_URL}/get-all`);
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
-        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa combo' };
+        throw (
+            err.response?.data || {
+                success: false,
+                message: "Đã xảy ra lỗi khi xóa combo",
+            }
+        );
     }
 };

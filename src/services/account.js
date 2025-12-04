@@ -1,6 +1,6 @@
-import useSWR, { mutate } from 'swr';
-import axiosInstance from '../config/axios';
-import { AsyncCompiler } from 'sass';
+import useSWR, { mutate } from "swr";
+import axiosInstance from "../config/axios";
+import { AsyncCompiler } from "sass";
 
 const API_URL = `/api/account`;
 
@@ -39,10 +39,17 @@ export const useAllAccounts = () => {
 
 export const toggleLock = async (email) => {
     try {
-        const res = await axiosInstance.post(`${API_URL}/toggle-lock`, { email });
+        const res = await axiosInstance.post(`${API_URL}/toggle-lock`, {
+            email,
+        });
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
-        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi toggle lock' };
+        throw (
+            err.response?.data || {
+                success: false,
+                message: "Đã xảy ra lỗi khi toggle lock",
+            }
+        );
     }
 };
 
@@ -64,14 +71,23 @@ export const useAccountByEmail = (_Email) => {
 
 export const editAccountByEmail = async (email, formData) => {
     try {
-        const res = await axiosInstance.put(`${API_URL}/edit-account-by-email/${encodeURIComponent(email)}`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
+        const res = await axiosInstance.put(
+            `${API_URL}/edit-account-by-email/${encodeURIComponent(email)}`,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
-        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi chỉnh sửa account' };
+        throw (
+            err.response?.data || {
+                success: false,
+                message: "Đã xảy ra lỗi khi chỉnh sửa account",
+            }
+        );
     }
 };
 
@@ -80,6 +96,11 @@ export const deleteAccountByEmail = async (email) => {
         const res = await axiosInstance.delete(`${API_URL}/delete/${email}`);
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
-        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa account' };
+        throw (
+            err.response?.data || {
+                success: false,
+                message: "Đã xảy ra lỗi khi xóa account",
+            }
+        );
     }
 };

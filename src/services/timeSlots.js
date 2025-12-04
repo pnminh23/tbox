@@ -1,5 +1,5 @@
-import useSWR, { mutate } from 'swr';
-import axiosInstance from '../config/axios';
+import useSWR, { mutate } from "swr";
+import axiosInstance from "../config/axios";
 
 const API_URL = `/api/timeSlots`;
 

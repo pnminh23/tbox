@@ -1,5 +1,5 @@
-import useSWR, { mutate } from 'swr';
-import axiosInstance from '../config/axios';
+import useSWR, { mutate } from "swr";
+import axiosInstance from "../config/axios";
 
 const API_URL = `/api/branch`;
 
@@ -40,24 +40,30 @@ export const useBranch = (_id) => {
 // Thêm hàm createBranch vào cùng file
 export const createBranch = async (branchData) => {
     try {
-        const response = await axiosInstance.post(`${API_URL}/create`, branchData);
+        const response = await axiosInstance.post(
+            `${API_URL}/create`,
+            branchData
+        );
 
         // Sau khi tạo xong, cập nhật danh sách branch
         await mutate(`${API_URL}/get-all`);
 
         return response.data;
     } catch (error) {
-        console.error('Error creating branch:', error);
+        console.error("Error creating branch:", error);
         return {
             success: false,
-            error: error?.response?.data?.message || 'Something went wrong',
+            error: error?.response?.data?.message || "Something went wrong",
         };
     }
 };
 
 export const editBranchById = async (_id, updatedData) => {
     try {
-        const response = await axiosInstance.put(`${API_URL}/edit/${_id}`, updatedData);
+        const response = await axiosInstance.put(
+            `${API_URL}/edit/${_id}`,
+            updatedData
+        );
 
         // Cập nhật lại danh sách sau khi chỉnh sửa
         await mutate(`${API_URL}/get-all`);
@@ -67,7 +73,9 @@ export const editBranchById = async (_id, updatedData) => {
     } catch (error) {
         return {
             success: false,
-            message: error?.response?.data?.message || 'Đã xảy ra lỗi khi cập nhật cơ sở',
+            message:
+                error?.response?.data?.message ||
+                "Đã xảy ra lỗi khi cập nhật cơ sở",
         };
     }
 };
@@ -77,6 +85,11 @@ export const deleteBranchById = async (_id) => {
         const res = await axiosInstance.delete(`${API_URL}/delete/${_id}`);
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
-        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa film' };
+        throw (
+            err.response?.data || {
+                success: false,
+                message: "Đã xảy ra lỗi khi xóa film",
+            }
+        );
     }
 };

@@ -1,4 +1,4 @@
-import axiosInstance from '../config/axios';
+import axiosInstance from "../config/axios";
 
 const API_URL = `/api/payos`;
 
@@ -11,10 +11,10 @@ export const createPayment = async (data) => {
             checkoutUrl: response.data.checkoutUrl,
         };
     } catch (error) {
-        console.error('Error creating Booking:', error);
+        console.error("Error creating Booking:", error);
         return {
             success: false,
-            message: error?.response?.data?.message || 'Something went wrong',
+            message: error?.response?.data?.message || "Something went wrong",
         };
     }
 };

@@ -1,5 +1,5 @@
-import useSWR, { mutate } from 'swr';
-import axiosInstance from '../config/axios';
+import useSWR, { mutate } from "swr";
+import axiosInstance from "../config/axios";
 
 const API_URL = `/api/combo`;
 
@@ -47,7 +47,12 @@ export const createCombo = async (ComboData) => {
 
         return res.data;
     } catch (error) {
-        throw error.response?.data || { success: false, message: 'Đã xảy ra lỗi khi thêm combo' };
+        throw (
+            error.response?.data || {
+                success: false,
+                message: "Đã xảy ra lỗi khi thêm combo",
+            }
+        );
     }
 };
 export const editComboById = async (_id, updatedData) => {
@@ -59,12 +64,12 @@ export const editComboById = async (_id, updatedData) => {
 
         return {
             success: true,
-            message: 'Cập nhật combo thành công',
+            message: "Cập nhật combo thành công",
         };
     } catch (error) {
         return {
             success: false,
-            error: error?.response?.data?.message || 'Không thể cập nhật combo',
+            error: error?.response?.data?.message || "Không thể cập nhật combo",
         };
     }
 };
@@ -74,6 +79,11 @@ export const deleteComboById = async (_id) => {
         await mutate(`${API_URL}/get-all`);
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
-        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa combo' };
+        throw (
+            err.response?.data || {
+                success: false,
+                message: "Đã xảy ra lỗi khi xóa combo",
+            }
+        );
     }
 };

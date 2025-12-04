@@ -1,23 +1,23 @@
-import useSWR, { mutate } from 'swr';
-import axiosInstance from '../config/axios';
+import useSWR, { mutate } from "swr";
+import axiosInstance from "../config/axios";
 
 const API_URL = `/api/film`;
 
 const fetcher = (url) => axiosInstance.get(url).then((res) => res.data);
 
 export const categoryFilms = [
-    'Tâm Lý ',
-    'Tình Cảm',
-    'Chính Kịch',
-    'Hành Động',
-    'Tài Liệu',
-    'Phiêu Lưu',
-    'Hình Sự',
-    'Tội Phạm',
-    'Kinh Dị',
-    'Hoạt Hình',
-    'Hài Hước',
-    'Khoa Học Viễn Tưởng',
+    "Tâm Lý ",
+    "Tình Cảm",
+    "Chính Kịch",
+    "Hành Động",
+    "Tài Liệu",
+    "Phiêu Lưu",
+    "Hình Sự",
+    "Tội Phạm",
+    "Kinh Dị",
+    "Hoạt Hình",
+    "Hài Hước",
+    "Khoa Học Viễn Tưởng",
 ];
 
 export const useAllFilms = () => {
@@ -56,7 +56,9 @@ export const useFilmsByCurrentYear = () => {
 export const useFilmsByCategory = (category) => {
     const shouldFetch = category?.trim(); // kiểm tra category không rỗng và không chỉ chứa khoảng trắng
 
-    const endpoint = shouldFetch ? `${API_URL}/get-film-by-category?name=${encodeURIComponent(category)}` : null;
+    const endpoint = shouldFetch
+        ? `${API_URL}/get-film-by-category?name=${encodeURIComponent(category)}`
+        : null;
     const { data, error, isLoading } = useSWR(endpoint, fetcher, {
         shouldRetryOnError: true,
         revalidateOnFocus: true,
@@ -72,7 +74,9 @@ export const useFilmsByCategory = (category) => {
 export const useFilmsByYear = (year) => {
     const shouldFetch = year?.trim(); // kiểm tra year không rỗng và không chỉ chứa khoảng trắng
 
-    const endpoint = shouldFetch ? `${API_URL}/get-film-by-year?release_date=${encodeURIComponent(year)}` : null;
+    const endpoint = shouldFetch
+        ? `${API_URL}/get-film-by-year?release_date=${encodeURIComponent(year)}`
+        : null;
     const { data, error, isLoading } = useSWR(endpoint, fetcher, {
         shouldRetryOnError: true,
         revalidateOnFocus: true,
@@ -101,19 +105,28 @@ export const useTop10Film = () => {
 
 export const createFilm = async (formData) => {
     try {
-        const res = await axiosInstance.post(`${API_URL}/create-film`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
+        const res = await axiosInstance.post(
+            `${API_URL}/create-film`,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
         return res.data; // trả về response data để frontend xử lý
     } catch (err) {
-        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi tạo film' };
+        throw (
+            err.response?.data || {
+                success: false,
+                message: "Đã xảy ra lỗi khi tạo film",
+            }
+        );
     }
 };
 
 export const useFilm = (_id) => {
-    const shouldFetch = _id != null && _id !== '';
+    const shouldFetch = _id != null && _id !== "";
     const endpoint = shouldFetch ? `${API_URL}/get-film/${_id}` : null;
     const { data, error, isLoading } = useSWR(endpoint, fetcher, {
         shouldRetryOnError: true,
@@ -132,14 +145,23 @@ export const useFilm = (_id) => {
 
 export const editFilmById = async (_id, formData) => {
     try {
-        const res = await axiosInstance.put(`${API_URL}/edit-film/${_id}`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
+        const res = await axiosInstance.put(
+            `${API_URL}/edit-film/${_id}`,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
-        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi chỉnh sửa film' };
+        throw (
+            err.response?.data || {
+                success: false,
+                message: "Đã xảy ra lỗi khi chỉnh sửa film",
+            }
+        );
     }
 };
 
@@ -148,6 +170,11 @@ export const deleteFilmById = async (_id) => {
         const res = await axiosInstance.delete(`${API_URL}/delete-film/${_id}`);
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
-        throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa film' };
+        throw (
+            err.response?.data || {
+                success: false,
+                message: "Đã xảy ra lỗi khi xóa film",
+            }
+        );
     }
 };

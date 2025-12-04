@@ -13,7 +13,11 @@ const axiosInstance = axios.create({
 // Interceptor để xử lý request
 axiosInstance.interceptors.request.use(
     (config) => {
-        // Có thể thêm token vào đây nếu cần
+        // Thêm token từ localStorage vào header nếu có (cho ngrok mode)
+        const token = localStorage.getItem("token");
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
     },
     (error) => {
