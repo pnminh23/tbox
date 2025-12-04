@@ -45,7 +45,7 @@ const MenuTab = ({ user, dark, collapsed }) => {
 
     return (
         <div className={clsx(style.container, dark && style.dark, collapsed && style.collapsed)}>
-            <Image src={logo} width={50} height={50} />
+            <Image src={logo} width={50} height={50} alt="Logo" />
             <ul className={style.menu}>
                 {menuItemPath.map(({ path, label, icon }) => (
                     <li key={path} className={clsx(activePath === path && style.active, user && style.user)}>

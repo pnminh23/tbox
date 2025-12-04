@@ -1,30 +1,46 @@
-import { createRoom, deleteRoomById, editRoomById, useRoomByBranchAndType } from '@/services/room';
-import styles from './RoomList.module.scss';
-import Image from 'next/image';
-import { useState } from 'react';
-import { AiOutlineClose, AiOutlinePlusCircle } from 'react-icons/ai';
-import loadingAnimation from '/public/animations/loadingItem.json';
-import Lottie from 'lottie-react';
-import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css';
-import Popup from '../../../common/Popup/Popup';
-import UploadFileImage from '../../../common/UploadFileImage/UploadFileImage';
-import Input from '../../../common/Input';
-import Button from '../../../common/Button';
-import { toast } from 'react-toastify';
-import clsx from 'clsx';
-import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
+import {
+    createRoom,
+    deleteRoomById,
+    editRoomById,
+    useRoomByBranchAndType,
+} from "@/services/room";
+import styles from "./RoomList.module.scss";
+import Image from "next/image";
+import { useState } from "react";
+import { AiOutlineClose, AiOutlinePlusCircle } from "react-icons/ai";
+import loadingAnimation from "/public/animations/loadingItem.json";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import Popup from "../../../common/Popup/Popup";
+import UploadFileImage from "../../../common/UploadFileImage/UploadFileImage";
+import Input from "../../../common/Input";
+import Button from "../../../common/Button";
+import { toast } from "react-toastify";
+import clsx from "clsx";
+import dynamic from "next/dynamic";
+
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+
+const DynamicLoadingFullPage = dynamic(
+    () => import("@/components/common/LoadingFullPage/loadingFullPage"),
+    {
+        ssr: false, // Tùy chọn QUAN TRỌNG nhất
+        loading: () => null, // Optional: có thể trả về null hoặc một div trống trong lúc chờ load
+    }
+);
 
 const RoomList = ({ branchId, typeRoomId }) => {
-    const { RoomsByBranchAndType, isLoadingAllRooms, isErrorAllRooms, mutateRoom } = useRoomByBranchAndType(
-        branchId,
-        typeRoomId
-    );
+    const {
+        RoomsByBranchAndType,
+        isLoadingAllRooms,
+        isErrorAllRooms,
+        mutateRoom,
+    } = useRoomByBranchAndType(branchId, typeRoomId);
     const [isLoading, setIsLoading] = useState();
     const [isPopupCreate, setIsPopupCreate] = useState(false);
     const [isPopupEdit, setIsPopupEdit] = useState(false);
-    const [nameRoom, setNameRoom] = useState('');
-    const [imageUrl, setImageUrl] = useState('');
+    const [nameRoom, setNameRoom] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
     const [selectedRoomId, setSelectedRoomId] = useState(null);
     const [editFile, setEditFile] = useState(null);
 
@@ -44,16 +60,16 @@ const RoomList = ({ branchId, typeRoomId }) => {
             const formData = new FormData();
             // KHÔNG cần append email vào formData nữa (vì truyền qua params)
             // formData.append('email', editAccount.email); ❌ bỏ dòng này
-            if (branchId) formData.append('branch', branchId);
-            if (typeRoomId) formData.append('type', typeRoomId);
-            if (nameRoom) formData.append('name', nameRoom);
-            if (editFile) formData.append('image', editFile); // nếu có file mới
+            if (branchId) formData.append("branch", branchId);
+            if (typeRoomId) formData.append("type", typeRoomId);
+            if (nameRoom) formData.append("name", nameRoom);
+            if (editFile) formData.append("image", editFile); // nếu có file mới
             const response = await createRoom(formData);
 
             if (response.success) {
                 toast.success(response.message);
                 setIsPopupCreate(false); // đóng popup
-                setNameRoom('');
+                setNameRoom("");
                 mutateRoom();
             } else {
                 toast.error(response.message);
@@ -69,8 +85,8 @@ const RoomList = ({ branchId, typeRoomId }) => {
         try {
             setIsLoading(true);
             const formData = new FormData();
-            if (nameRoom) formData.append('name', nameRoom);
-            if (editFile) formData.append('image', editFile);
+            if (nameRoom) formData.append("name", nameRoom);
+            if (editFile) formData.append("image", editFile);
 
             const response = await editRoomById(selectedRoomId, formData);
 
@@ -84,7 +100,7 @@ const RoomList = ({ branchId, typeRoomId }) => {
             }
         } catch (err) {
             console.error(err);
-            toast.error('Đã xảy ra lỗi khi cập nhật!');
+            toast.error("Đã xảy ra lỗi khi cập nhật!");
         } finally {
             setIsLoading(false);
         }
@@ -104,7 +120,7 @@ const RoomList = ({ branchId, typeRoomId }) => {
             }
         } catch (err) {
             console.error(err);
-            toast.error('Đã xảy ra lỗi khi xóa!');
+            toast.error("Đã xảy ra lỗi khi xóa!");
         } finally {
             setIsLoading(false);
         }
@@ -112,7 +128,9 @@ const RoomList = ({ branchId, typeRoomId }) => {
 
     const renderRoomFormContent = (isEdit = false) => (
         <div className={styles.formPopup}>
-            <p className={styles.title}>{isEdit ? 'Chi tiết phòng' : 'Thêm phòng mới'}</p>
+            <p className={styles.title}>
+                {isEdit ? "Chi tiết phòng" : "Thêm phòng mới"}
+            </p>
             <div className={styles.groupItem}>
                 <UploadFileImage
                     filmImage
@@ -131,7 +149,7 @@ const RoomList = ({ branchId, typeRoomId }) => {
                     value={nameRoom}
                     onChange={(e) => setNameRoom(e.target.value)}
                     onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
+                        if (e.key === "Enter") {
                             isEdit ? handleEdit() : handleCreate();
                         }
                     }}
@@ -143,8 +161,12 @@ const RoomList = ({ branchId, typeRoomId }) => {
                         Xóa phòng
                     </Button>
                 )}
-                <Button rounded_10 blue w_fit onClick={isEdit ? handleEdit : handleCreate}>
-                    {isEdit ? 'Cập nhật' : 'Thêm mới'}
+                <Button
+                    rounded_10
+                    blue
+                    w_fit
+                    onClick={isEdit ? handleEdit : handleCreate}>
+                    {isEdit ? "Cập nhật" : "Thêm mới"}
                 </Button>
             </div>
         </div>
@@ -152,14 +174,19 @@ const RoomList = ({ branchId, typeRoomId }) => {
 
     return (
         <div className={styles.roomsContainer}>
-            {isLoading && <LoadingFullPage />}
+            {isLoading && <DynamicLoadingFullPage />}
             {isLoadingAllRooms && (
-                <Lottie animationData={loadingAnimation} loop={true} autoplay={true} className={styles.loading} />
+                <Lottie
+                    animationData={loadingAnimation}
+                    loop={true}
+                    autoplay={true}
+                    className={styles.loading}
+                />
             )}
             {RoomsByBranchAndType?.map((room) => (
                 <div key={room._id} className={styles.room}>
                     <Image
-                        src={room.image || ''}
+                        src={room.image || ""}
                         alt={room.name}
                         width={100}
                         height={120}
@@ -169,7 +196,10 @@ const RoomList = ({ branchId, typeRoomId }) => {
                 </div>
             ))}
             <Tippy content="Thêm phòng mới" placement="right">
-                <div className={styles.addRoom} tabIndex={0} onClick={() => setIsPopupCreate(true)}>
+                <div
+                    className={styles.addRoom}
+                    tabIndex={0}
+                    onClick={() => setIsPopupCreate(true)}>
                     <AiOutlinePlusCircle size={25} />
                 </div>
             </Tippy>
@@ -178,11 +208,10 @@ const RoomList = ({ branchId, typeRoomId }) => {
                 <Popup
                     handleClose={() => {
                         setIsPopupCreate(false);
-                        setImageUrl('');
-                        setNameRoom('');
+                        setImageUrl("");
+                        setNameRoom("");
                         setEditFile(null); // Thêm dòng này
-                    }}
-                >
+                    }}>
                     {renderRoomFormContent(false)}
                 </Popup>
             )}
@@ -190,11 +219,10 @@ const RoomList = ({ branchId, typeRoomId }) => {
                 <Popup
                     handleClose={() => {
                         setIsPopupEdit(false);
-                        setImageUrl('');
-                        setNameRoom('');
+                        setImageUrl("");
+                        setNameRoom("");
                         setEditFile(null); // Thêm dòng này
-                    }}
-                >
+                    }}>
                     {renderRoomFormContent(true)}
                 </Popup>
             )}

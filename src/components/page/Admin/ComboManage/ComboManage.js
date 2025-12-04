@@ -1,17 +1,31 @@
-import { createCombo, deleteComboById, editComboById, useAllCombo, useCombo } from '@/services/combo';
-import styles from './ComboManage.module.scss';
-import { useEffect, useState } from 'react';
-import Tippy from '@tippyjs/react';
-import Button from '@/components/common/Button';
-import { AiOutlineDelete, AiOutlineEye, AiOutlinePlus } from 'react-icons/ai';
-import Pagination from '@/components/common/Pagonation';
-import Table from '@/components/common/Table';
-import Popup from '@/components/common/Popup/Popup';
-import Input from '@/components/common/Input';
-import clsx from 'clsx';
-import { toast } from 'react-toastify';
-import { useTypeRoom } from '@/services/room';
-import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
+import {
+    createCombo,
+    deleteComboById,
+    editComboById,
+    useAllCombo,
+    useCombo,
+} from "@/services/combo";
+import styles from "./ComboManage.module.scss";
+import { useEffect, useState } from "react";
+import Tippy from "@tippyjs/react";
+import Button from "@/components/common/Button";
+import { AiOutlineDelete, AiOutlineEye, AiOutlinePlus } from "react-icons/ai";
+import Pagination from "@/components/common/Pagonation";
+import Table from "@/components/common/Table";
+import Popup from "@/components/common/Popup/Popup";
+import Input from "@/components/common/Input";
+import clsx from "clsx";
+import { toast } from "react-toastify";
+import { useTypeRoom } from "@/services/room";
+import dynamic from "next/dynamic";
+
+const DynamicLoadingFullPage = dynamic(
+    () => import("@/components/common/LoadingFullPage/loadingFullPage"),
+    {
+        ssr: false, // Tùy chọn QUAN TRỌNG nhất
+        loading: () => null, // Optional: có thể trả về null hoặc một div trống trong lúc chờ load
+    }
+);
 
 const ComboManage = () => {
     const { allCombo } = useAllCombo();
@@ -22,7 +36,8 @@ const ComboManage = () => {
     const [limit, setLimit] = useState(5); // mặc định 8 phim/trang
     const totalItems = allCombo?.length || 0;
     const totalPages = Math.ceil(totalItems / limit);
-    const paginatedBranches = allCombo?.slice((currentPage - 1) * limit, currentPage * limit) || [];
+    const paginatedBranches =
+        allCombo?.slice((currentPage - 1) * limit, currentPage * limit) || [];
     const [isLoading, setIsLoading] = useState();
     const [isPopupEdit, setIsPopupEdit] = useState(false);
     const [isPopupCreate, setIsPopupCreate] = useState(false);
@@ -36,8 +51,8 @@ const ComboManage = () => {
             description: combo.description,
         })) || [];
     const [editCombo, setEditCombo] = useState({
-        name: '',
-        description: '',
+        name: "",
+        description: "",
         types: [],
         duration: 0, // Thêm duration vào state
     });
@@ -45,8 +60,8 @@ const ComboManage = () => {
     useEffect(() => {
         if (combo) {
             setEditCombo({
-                name: combo.name || '',
-                description: combo.description || '',
+                name: combo.name || "",
+                description: combo.description || "",
                 types: combo.types || [],
                 duration: combo.duration || 0, // Cập nhật duration khi có dữ liệu combo
             });
@@ -92,8 +107,8 @@ const ComboManage = () => {
             if (result.success) {
                 toast.success(result.message);
                 setEditCombo({
-                    name: combo.name || '',
-                    description: combo.description || '',
+                    name: combo.name || "",
+                    description: combo.description || "",
                     types: combo.types || [],
                     duration: combo.duration || 0, // Cập nhật lại state
                 });
@@ -125,7 +140,9 @@ const ComboManage = () => {
 
     const renderRoomFormContent = (isEdit = false) => (
         <div className={styles.formPopup}>
-            <p className={styles.title}>{isEdit ? 'Chi tiết combo' : 'Thêm combo mới'}</p>
+            <p className={styles.title}>
+                {isEdit ? "Chi tiết combo" : "Thêm combo mới"}
+            </p>
 
             <div className={styles.groupItem}>
                 <label>Tên combo</label>
@@ -133,8 +150,13 @@ const ComboManage = () => {
                     rounded_10
                     outLine
                     value={editCombo.name}
-                    placeholder={'Nhập tên combo'}
-                    onChange={(e) => setEditCombo((prev) => ({ ...prev, name: e.target.value }))}
+                    placeholder={"Nhập tên combo"}
+                    onChange={(e) =>
+                        setEditCombo((prev) => ({
+                            ...prev,
+                            name: e.target.value,
+                        }))
+                    }
                 />
             </div>
             <div className={styles.groupItem}>
@@ -143,7 +165,12 @@ const ComboManage = () => {
                     rounded_10
                     outLine
                     value={editCombo.duration}
-                    onChange={(e) => setEditCombo((prev) => ({ ...prev, duration: Number(e.target.value) }))}
+                    onChange={(e) =>
+                        setEditCombo((prev) => ({
+                            ...prev,
+                            duration: Number(e.target.value),
+                        }))
+                    }
                 />
             </div>
             <div className={clsx(styles.groupItem, styles.typeRoomContainer)}>
@@ -151,7 +178,9 @@ const ComboManage = () => {
                 {isEdit
                     ? editCombo.types.map((item, index) => (
                           <div className={styles.row} key={item._id}>
-                              <div className={styles.typeRoom}>{item.typeRoom.name}</div>
+                              <div className={styles.typeRoom}>
+                                  {item.typeRoom.name}
+                              </div>
                               <Input
                                   outLine
                                   rounded_10
@@ -177,11 +206,13 @@ const ComboManage = () => {
                               <Input
                                   outLine
                                   rounded_10
-                                  value={editCombo.types?.[index]?.price || ''}
+                                  value={editCombo.types?.[index]?.price || ""}
                                   className={styles.inputPrice}
                                   onChange={(e) => {
                                       const newPrice = Number(e.target.value);
-                                      const updatedTypes = [...(editCombo.types || [])];
+                                      const updatedTypes = [
+                                          ...(editCombo.types || []),
+                                      ];
 
                                       updatedTypes[index] = {
                                           typeRoom: item._id,
@@ -202,7 +233,7 @@ const ComboManage = () => {
                 <textarea
                     rows={5}
                     className={styles.textareaDescription}
-                    value={editCombo.description || ''}
+                    value={editCombo.description || ""}
                     placeholder="Nhập mô tả"
                     onChange={(e) =>
                         setEditCombo((prev) => ({
@@ -218,29 +249,27 @@ const ComboManage = () => {
                 blue
                 w_fit
                 className={styles.btnAdd}
-                onClick={isEdit ? handleEditCombo : handleCreateCombo}
-            >
-                {isEdit ? 'Cập nhật' : 'Thêm mới'}
+                onClick={isEdit ? handleEditCombo : handleCreateCombo}>
+                {isEdit ? "Cập nhật" : "Thêm mới"}
             </Button>
         </div>
     );
     return (
         <div className={styles.container}>
-            {isLoading && <LoadingFullPage />}
+            {isLoading && <DynamicLoadingFullPage />}
             {isPopupEdit && (
                 <Popup
-                    key={selectedComboId || 'create'}
+                    key={selectedComboId || "create"}
                     handleClose={() => {
                         setIsPopupEdit(false);
                         setEditCombo({
-                            name: '',
-                            description: '',
+                            name: "",
+                            description: "",
                             types: [],
                             duration: 0, // Reset duration
                         });
                         setSelectedComboId(null);
-                    }}
-                >
+                    }}>
                     {renderRoomFormContent(true)}
                 </Popup>
             )}
@@ -249,14 +278,13 @@ const ComboManage = () => {
                     handleClose={() => {
                         setIsPopupCreate(false);
                         setEditCombo({
-                            name: '',
-                            description: '',
+                            name: "",
+                            description: "",
                             types: [],
                             duration: 0, // Reset duration
                         });
                         setSelectedComboId(null);
-                    }}
-                >
+                    }}>
                     {renderRoomFormContent(false)}
                 </Popup>
             )}
@@ -264,8 +292,7 @@ const ComboManage = () => {
                 <Popup
                     handleClose={() => {
                         setIsPopupDelete(false);
-                    }}
-                >
+                    }}>
                     <div className={styles.formPopup}>
                         <p className={styles.title}>Xác nhận xóa</p>
                         <div className={styles.row}>
@@ -275,7 +302,11 @@ const ComboManage = () => {
                             </p>
                         </div>
                         <div className={styles.row}>
-                            <Button rounded_10 outline light onClick={() => setIsPopupDelete(false)}>
+                            <Button
+                                rounded_10
+                                outline
+                                light
+                                onClick={() => setIsPopupDelete(false)}>
                                 Hủy
                             </Button>
                             <Button rounded_10 red onClick={handleDeleteCombo}>
@@ -292,8 +323,7 @@ const ComboManage = () => {
                     blue
                     icon={<AiOutlinePlus />}
                     className={styles.btnAdd}
-                    onClick={() => setIsPopupCreate(true)}
-                >
+                    onClick={() => setIsPopupCreate(true)}>
                     Thêm mới Combo
                 </Button>
             </div>
@@ -301,17 +331,17 @@ const ComboManage = () => {
                 <Table
                     data={tableData}
                     columns={[
-                        { key: 'index', label: 'STT' },
+                        { key: "index", label: "STT" },
                         {
-                            key: 'name',
-                            label: 'Tên cơ sở',
+                            key: "name",
+                            label: "Tên cơ sở",
                             render: (item) => (
                                 <div className={styles.nameComboContainer}>
                                     <p>{item.name}</p>
                                 </div>
                             ),
                         },
-                        { key: 'description', label: 'Mô tả' },
+                        { key: "description", label: "Mô tả" },
                     ]}
                     renderActions={(item) => (
                         <>
@@ -323,8 +353,9 @@ const ComboManage = () => {
                                         p_10_14
                                         blueIcon
                                         icon={<AiOutlineEye />}
-                                        onClick={() => handleGetCombo(item._id)}
-                                    ></Button>
+                                        onClick={() =>
+                                            handleGetCombo(item._id)
+                                        }></Button>
                                 </div>
                             </Tippy>
 
@@ -339,8 +370,7 @@ const ComboManage = () => {
                                         onClick={() => {
                                             setIsPopupDelete(true);
                                             setSelectedComboId(item._id);
-                                        }}
-                                    ></Button>
+                                        }}></Button>
                                 </div>
                             </Tippy>
                         </>

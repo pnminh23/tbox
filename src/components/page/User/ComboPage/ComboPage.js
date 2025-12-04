@@ -20,7 +20,17 @@ import { useAllCombo } from "@/services/combo";
 import { formatMoney } from "@/function/formatMoney";
 import { useRoomByBranch } from "@/services/room";
 import { useAllBranches } from "@/services/branch";
-import LoadingItem from "@/components/common/LoadingItem/LoadingItem";
+import dynamic from "next/dynamic";
+
+// Import tĩnh bị lỗi:
+// import LoadingItem from '@/components/common/LoadingItem/LoadingItem';
+// import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
+
+// Thay thế bằng:
+const DynamicLoadingItem = dynamic(
+    () => import("@/components/common/LoadingItem/LoadingItem"),
+    { ssr: false }
+);
 
 const ComboPage = () => {
     const {
@@ -37,7 +47,7 @@ const ComboPage = () => {
         if (branches?.length > 0 && !selectedBranch) {
             setSelectedBranch(branches[0]._id);
         }
-    }, [branches]);
+    }, [branches, selectedBranch]);
     const prevRef = useRef(null);
     const nextRef = useRef(null);
     return (
@@ -157,7 +167,7 @@ const ComboPage = () => {
                     {loadingRoom ? (
                         // Hiển thị một placeholder/skeleton loading rõ ràng
                         <div className={style.loadingPlaceholder}>
-                            <LoadingItem />
+                            <DynamicLoadingItem />
                         </div>
                     ) : (
                         // Chỉ render Slider khi đã có dữ liệu cuối cùng

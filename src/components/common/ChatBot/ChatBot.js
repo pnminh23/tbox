@@ -1,40 +1,50 @@
-import { useEffect, useState, useRef } from 'react';
-import styles from './Chatbot.module.scss';
-import { socket } from '../../../socket';
-import { BsFillChatFill, BsFillChatRightDotsFill } from 'react-icons/bs';
-import { AiOutlineArrowUp } from 'react-icons/ai';
-import LoadingItem from '../LoadingItem/LoadingItem';
-import clsx from 'clsx';
+import { useEffect, useState, useRef } from "react";
+import styles from "./Chatbot.module.scss";
+import { socket } from "../../../socket";
+import { BsFillChatFill, BsFillChatRightDotsFill } from "react-icons/bs";
+import { AiOutlineArrowUp } from "react-icons/ai";
+import clsx from "clsx";
+import dynamic from "next/dynamic";
+
+// Import tĩnh bị lỗi:
+// import LoadingItem from '@/components/common/LoadingItem/LoadingItem';
+// import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
+
+// Thay thế bằng:
+const DynamicLoadingItem = dynamic(
+    () => import("@/components/common/LoadingItem/LoadingItem"),
+    { ssr: false }
+);
 
 const Chatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState('');
+    const [input, setInput] = useState("");
     const [isLoadingBot, setIsLoadingBot] = useState(false);
 
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
-        socket.on('chatbot:reply', (reply) => {
-            setMessages((prev) => [...prev, { sender: 'bot', text: reply }]);
+        socket.on("chatbot:reply", (reply) => {
+            setMessages((prev) => [...prev, { sender: "bot", text: reply }]);
             setIsLoadingBot(false);
         });
 
         return () => {
-            socket.off('chatbot:reply');
+            socket.off("chatbot:reply");
         };
     }, []);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, isLoadingBot]);
 
     const sendMessage = () => {
         if (!input.trim()) return;
-        setMessages((prev) => [...prev, { sender: 'user', text: input }]);
-        setInput('');
+        setMessages((prev) => [...prev, { sender: "user", text: input }]);
+        setInput("");
         setIsLoadingBot(true);
-        socket.emit('chatbot:message', input);
+        socket.emit("chatbot:message", input);
     };
 
     const handleOpenChatbot = () => {
@@ -43,7 +53,7 @@ const Chatbot = () => {
             if (willOpen && messages.length === 0) {
                 setMessages([
                     {
-                        sender: 'bot',
+                        sender: "bot",
                         text: `🎬 Chào bạn! Tôi là chatbot hỗ trợ đặt phòng tại quán cafe phim 🍿 **PNM - BOX**.\nBạn có thể hỏi về:\n- Loại phòng\n- Phim đang chiếu\n- Giờ trống\n- Giá cả...\n\nHãy nhập câu hỏi bất kỳ nhé!`,
                     },
                 ]);
@@ -57,8 +67,7 @@ const Chatbot = () => {
             <button
                 className={styles.chatbotButton}
                 onClick={handleOpenChatbot}
-                title={isOpen ? 'Đóng chatbot' : 'Mở chatbot'}
-            >
+                title={isOpen ? "Đóng chatbot" : "Mở chatbot"}>
                 <BsFillChatRightDotsFill />
             </button>
 
@@ -69,17 +78,25 @@ const Chatbot = () => {
                         {messages.map((msg, idx) => (
                             <div
                                 key={idx}
-                                className={`${styles.message} ${msg.sender === 'user' ? styles.user : styles.bot}`}
-                            >
-                                {msg.text.split('\n').map((line, i) => (
+                                className={`${styles.message} ${
+                                    msg.sender === "user"
+                                        ? styles.user
+                                        : styles.bot
+                                }`}>
+                                {msg.text.split("\n").map((line, i) => (
                                     <div key={i}>{line}</div>
                                 ))}
                             </div>
                         ))}
 
                         {isLoadingBot && (
-                            <div className={clsx(styles.message, styles.bot, styles.loadingMessage)}>
-                                <LoadingItem />
+                            <div
+                                className={clsx(
+                                    styles.message,
+                                    styles.bot,
+                                    styles.loadingMessage
+                                )}>
+                                <DynamicLoadingItem />
                             </div>
                         )}
 
@@ -92,10 +109,14 @@ const Chatbot = () => {
                             className={styles.input}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                            onKeyDown={(e) =>
+                                e.key === "Enter" && sendMessage()
+                            }
                             placeholder="Nhập câu hỏi..."
                         />
-                        <button onClick={sendMessage} className={styles.sendButton}>
+                        <button
+                            onClick={sendMessage}
+                            className={styles.sendButton}>
                             <AiOutlineArrowUp />
                         </button>
                     </div>

@@ -1,25 +1,27 @@
-import { useAllBranches } from '@/services/branch';
-import Title from '../Title';
-import style from './Feedback.module.scss';
-import { useEffect, useState } from 'react';
-import { useFeedbackByBranch } from '@/services/feedback';
-import Button from '../Button';
+import { useAllBranches } from "@/services/branch";
+import Title from "../Title";
+import style from "./Feedback.module.scss";
+import { useEffect, useState } from "react";
+import { useFeedbackByBranch } from "@/services/feedback";
+import Button from "../Button";
 
 const Feedback = () => {
     const { branches } = useAllBranches();
-    const [selectedBranch, setSelectedBranch] = useState('');
+    const [selectedBranch, setSelectedBranch] = useState("");
 
     const { feedbacks } = useFeedbackByBranch(selectedBranch);
     useEffect(() => {
         if (branches?.length > 0 && !selectedBranch) {
             setSelectedBranch(branches[0]._id);
         }
-    }, [branches]);
+    }, [branches, selectedBranch]);
     const renderStars = (count) => {
         return (
             <>
                 {[...Array(5)].map((_, i) => (
-                    <span key={i} className={i < count ? style.filled : style.empty}>
+                    <span
+                        key={i}
+                        className={i < count ? style.filled : style.empty}>
                         ★
                     </span>
                 ))}
@@ -33,9 +35,8 @@ const Feedback = () => {
                 <Title>Đánh giá về cơ sở</Title>
                 <select
                     className={style.select}
-                    value={selectedBranch || ''}
-                    onChange={(e) => setSelectedBranch(e.target.value)}
-                >
+                    value={selectedBranch || ""}
+                    onChange={(e) => setSelectedBranch(e.target.value)}>
                     {branches?.map((branch) => (
                         <option key={branch._id} value={branch._id}>
                             {branch.name}
@@ -50,17 +51,23 @@ const Feedback = () => {
                             <div className={style.name}>
                                 {feedback.name}
                                 <div className={style.date}>
-                                    {new Date(feedback.createdAt).toLocaleString('vi-VN', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
+                                    {new Date(
+                                        feedback.createdAt
+                                    ).toLocaleString("vi-VN", {
+                                        day: "2-digit",
+                                        month: "2-digit",
+                                        year: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
                                     })}
                                 </div>
                             </div>
-                            <div className={style.stars}>{renderStars(feedback.rating)}</div>
-                            <div className={style.comment}>{feedback.comment}</div>
+                            <div className={style.stars}>
+                                {renderStars(feedback.rating)}
+                            </div>
+                            <div className={style.comment}>
+                                {feedback.comment}
+                            </div>
                         </div>
                     ))}
                 </div>

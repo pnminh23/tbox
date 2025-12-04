@@ -1,58 +1,87 @@
-import { useState } from 'react';
-import styles from './RoomTypeManager.module.scss';
-import { useAllTypeRooms, createRoomType, editRoomTypeById, deleteRoomTypeById } from '@/services/room';
-import { toast } from 'react-toastify';
-import Input from '@/components/common/Input';
-import Button from '@/components/common/Button';
-import { AiOutlineCheck, AiOutlineClose, AiOutlineDelete, AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
-import { formatMoney } from '@/function/formatMoney';
-import Popup from '@/components/common/Popup/Popup';
-import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
+import { useState } from "react";
+import styles from "./RoomTypeManager.module.scss";
+import {
+    useAllTypeRooms,
+    createRoomType,
+    editRoomTypeById,
+    deleteRoomTypeById,
+} from "@/services/room";
+import { toast } from "react-toastify";
+import Input from "@/components/common/Input";
+import Button from "@/components/common/Button";
+import {
+    AiOutlineCheck,
+    AiOutlineClose,
+    AiOutlineDelete,
+    AiOutlineEdit,
+    AiOutlinePlus,
+} from "react-icons/ai";
+import { formatMoney } from "@/function/formatMoney";
+import Popup from "@/components/common/Popup/Popup";
+import dynamic from "next/dynamic";
+
+const DynamicLoadingFullPage = dynamic(
+    () => import("@/components/common/LoadingFullPage/loadingFullPage"),
+    {
+        ssr: false, // Tùy chọn QUAN TRỌNG nhất
+        loading: () => null, // Optional: có thể trả về null hoặc một div trống trong lúc chờ load
+    }
+);
 
 const RoomTypeManager = () => {
-    const { typeRooms, isLoading, isError, mutateTypeRooms } = useAllTypeRooms();
+    const { typeRooms, isLoading, isError, mutateTypeRooms } =
+        useAllTypeRooms();
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const [newTypeName, setNewTypeName] = useState('');
-    const [newTypePrice, setNewTypePrice] = useState('');
+    const [newTypeName, setNewTypeName] = useState("");
+    const [newTypePrice, setNewTypePrice] = useState("");
 
     const [editingId, setEditingId] = useState(null);
-    const [editingData, setEditingData] = useState({ name: '', price: '' });
+    const [editingData, setEditingData] = useState({ name: "", price: "" });
 
     const [isPopupDelete, setIsPopupDelete] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
 
     const handleCreate = async () => {
         if (!newTypeName || !newTypePrice) {
-            return toast.warn('Vui lòng nhập đủ tên và giá.');
+            return toast.warn("Vui lòng nhập đủ tên và giá.");
         }
         setIsProcessing(true);
-        const result = await createRoomType({ name: newTypeName, price: newTypePrice });
+        const result = await createRoomType({
+            name: newTypeName,
+            price: newTypePrice,
+        });
         if (result.success) {
-            toast.success('Thêm loại phòng thành công!');
+            toast.success("Thêm loại phòng thành công!");
             mutateTypeRooms();
-            setNewTypeName('');
-            setNewTypePrice('');
+            setNewTypeName("");
+            setNewTypePrice("");
         } else {
-            toast.error(result.message || 'Thêm thất bại.');
+            toast.error(result.message || "Thêm thất bại.");
         }
         setIsProcessing(false);
     };
 
     const handleStartEdit = (typeRoom) => {
         setEditingId(typeRoom._id);
-        setEditingData({ name: typeRoom.name, price: typeRoom.base_price_per_minute });
+        setEditingData({
+            name: typeRoom.name,
+            price: typeRoom.base_price_per_minute,
+        });
     };
 
     const handleSaveEdit = async (id) => {
         setIsProcessing(true);
-        const result = await editRoomTypeById(id, { name: editingData.name, price: editingData.price });
+        const result = await editRoomTypeById(id, {
+            name: editingData.name,
+            price: editingData.price,
+        });
         if (result.success) {
-            toast.success('Cập nhật thành công!');
+            toast.success("Cập nhật thành công!");
             mutateTypeRooms();
             setEditingId(null);
         } else {
-            toast.error(result.message || 'Cập nhật thất bại.');
+            toast.error(result.message || "Cập nhật thất bại.");
         }
         setIsProcessing(false);
     };
@@ -69,13 +98,13 @@ const RoomTypeManager = () => {
         try {
             const result = await deleteRoomTypeById(itemToDelete._id);
             if (result.success) {
-                toast.success('Xóa loại phòng thành công!');
+                toast.success("Xóa loại phòng thành công!");
                 mutateTypeRooms();
             } else {
-                toast.error(result.message || 'Xóa thất bại.');
+                toast.error(result.message || "Xóa thất bại.");
             }
         } catch (error) {
-            toast.error(error.message || 'Có lỗi xảy ra khi xóa.');
+            toast.error(error.message || "Có lỗi xảy ra khi xóa.");
         } finally {
             setIsProcessing(false);
             setIsPopupDelete(false);
@@ -83,26 +112,36 @@ const RoomTypeManager = () => {
         }
     };
 
-    if (isLoading) return <LoadingFullPage />;
+    if (isLoading) return <DynamicLoadingFullPage />;
     if (isError) return <p>Lỗi khi tải dữ liệu.</p>;
 
     return (
         <div className={styles.managerContainer}>
-            {isProcessing && <LoadingFullPage />}
+            {isProcessing && <DynamicLoadingFullPage />}
 
             {isPopupDelete && (
                 <Popup handleClose={() => setIsPopupDelete(false)}>
                     <div className={styles.confirmPopup}>
                         <p className={styles.title}>Xác nhận xóa</p>
                         <p>
-                            Bạn có chắc muốn xóa loại phòng: <strong>{itemToDelete?.name}</strong>?
+                            Bạn có chắc muốn xóa loại phòng:{" "}
+                            <strong>{itemToDelete?.name}</strong>?
                         </p>
-                        <p className={styles.warning}>Hành động này không thể hoàn tác!</p>
+                        <p className={styles.warning}>
+                            Hành động này không thể hoàn tác!
+                        </p>
                         <div className={styles.popupActions}>
-                            <Button outline light rounded_10 onClick={() => setIsPopupDelete(false)}>
+                            <Button
+                                outline
+                                light
+                                rounded_10
+                                onClick={() => setIsPopupDelete(false)}>
                                 Hủy
                             </Button>
-                            <Button red rounded_10 onClick={handleConfirmDelete}>
+                            <Button
+                                red
+                                rounded_10
+                                onClick={handleConfirmDelete}>
                                 Xác nhận xóa
                             </Button>
                         </div>
@@ -121,9 +160,14 @@ const RoomTypeManager = () => {
                                     outLine
                                     rounded_10
                                     value={editingData.name}
-                                    onChange={(e) => setEditingData({ ...editingData, name: e.target.value })}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            name: e.target.value,
+                                        })
+                                    }
                                     onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
+                                        if (e.key === "Enter") {
                                             handleSaveEdit(type._id);
                                         }
                                     }}
@@ -133,9 +177,14 @@ const RoomTypeManager = () => {
                                     rounded_10
                                     type="number"
                                     value={editingData.price}
-                                    onChange={(e) => setEditingData({ ...editingData, price: e.target.value })}
+                                    onChange={(e) =>
+                                        setEditingData({
+                                            ...editingData,
+                                            price: e.target.value,
+                                        })
+                                    }
                                     onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
+                                        if (e.key === "Enter") {
                                             handleSaveEdit(type._id);
                                         }
                                     }}
@@ -158,9 +207,13 @@ const RoomTypeManager = () => {
                             </>
                         ) : (
                             <>
-                                <span className={styles.itemName}>{`BOX - ${type.name}`}</span>
+                                <span
+                                    className={
+                                        styles.itemName
+                                    }>{`BOX - ${type.name}`}</span>
                                 <span className={styles.itemPrice}>
-                                    {formatMoney(type.base_price_per_minute)} / phút
+                                    {formatMoney(type.base_price_per_minute)} /
+                                    phút
                                 </span>
                                 <div className={styles.actions}>
                                     <Button
@@ -175,7 +228,9 @@ const RoomTypeManager = () => {
                                         redIcon
                                         small
                                         icon={<AiOutlineDelete />}
-                                        onClick={() => handleOpenDeletePopup(type)}
+                                        onClick={() =>
+                                            handleOpenDeletePopup(type)
+                                        }
                                     />
                                 </div>
                             </>
@@ -202,12 +257,17 @@ const RoomTypeManager = () => {
                         value={newTypePrice}
                         onChange={(e) => setNewTypePrice(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
+                            if (e.key === "Enter") {
                                 handleCreate();
                             }
                         }}
                     />
-                    <Button rounded_10 blue icon={<AiOutlinePlus />} onClick={handleCreate} disabled={isProcessing}>
+                    <Button
+                        rounded_10
+                        blue
+                        icon={<AiOutlinePlus />}
+                        onClick={handleCreate}
+                        disabled={isProcessing}>
                         Thêm
                     </Button>
                 </div>

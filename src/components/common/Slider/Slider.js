@@ -1,18 +1,32 @@
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Autoplay } from 'swiper/modules';
-import { AiOutlineLeft, AiOutlineRight, AiOutlineDoubleRight } from 'react-icons/ai';
-import style from './Slider.module.scss';
-import { useState, useEffect, useRef } from 'react';
-import clsx from 'clsx';
-import Title from '../Title';
-import { PATH } from '@/constants/config';
-import LoadingItem from '../LoadingItem/LoadingItem';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay } from "swiper/modules";
+import {
+    AiOutlineLeft,
+    AiOutlineRight,
+    AiOutlineDoubleRight,
+} from "react-icons/ai";
+import style from "./Slider.module.scss";
+import { useState, useEffect, useRef } from "react";
+import clsx from "clsx";
+import Title from "../Title";
+import { PATH } from "@/constants/config";
+import dynamic from "next/dynamic";
+
+// Import tĩnh bị lỗi:
+// import LoadingItem from '@/components/common/LoadingItem/LoadingItem';
+// import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
+
+// Thay thế bằng:
+const DynamicLoadingItem = dynamic(
+    () => import("@/components/common/LoadingItem/LoadingItem"),
+    { ssr: false }
+);
 
 const Slider = ({
     data = [],
     isLoading,
     renderItem,
-    title = 'Slider',
+    title = "Slider",
     subtitle,
     slidesPerView,
     autoplay = false,
@@ -53,8 +67,10 @@ const Slider = ({
 
     useEffect(() => {
         if (swiperRef.current && swiperRef.current.swiper) {
-            swiperRef.current.swiper.params.navigation.prevEl = prevButtonRef.current;
-            swiperRef.current.swiper.params.navigation.nextEl = nextButtonRef.current;
+            swiperRef.current.swiper.params.navigation.prevEl =
+                prevButtonRef.current;
+            swiperRef.current.swiper.params.navigation.nextEl =
+                nextButtonRef.current;
             swiperRef.current.swiper.navigation.init();
             swiperRef.current.swiper.navigation.update();
             swiperRef.current.swiper.update();
@@ -93,17 +109,24 @@ const Slider = ({
                 }}
                 observer={true} // Thêm dòng này
                 observeParents={true} // Thêm dòng này
-                autoplay={autoplay ? { delay: 7000, disableOnInteraction: false } : false}
-                breakpoints={breakpoints}
-            >
+                autoplay={
+                    autoplay
+                        ? { delay: 7000, disableOnInteraction: false }
+                        : false
+                }
+                breakpoints={breakpoints}>
                 {isLoading
                     ? Array.from({ length: slidesPerView }).map((_, index) => (
                           <SwiperSlide key={index}>
-                              <LoadingItem />
+                              <DynamicLoadingItem />
                           </SwiperSlide>
                       ))
                     : // <p>loading</p>
-                      data.map((item, index) => <SwiperSlide key={index}>{renderItem(item)}</SwiperSlide>)}
+                      data.map((item, index) => (
+                          <SwiperSlide key={index}>
+                              {renderItem(item)}
+                          </SwiperSlide>
+                      ))}
             </Swiper>
         </div>
     );

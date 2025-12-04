@@ -1,28 +1,47 @@
-import { useEffect, useMemo, useState } from 'react';
-import styles from './LocationManage.module.scss';
-import { toast } from 'react-toastify';
+import { useEffect, useMemo, useState } from "react";
+import styles from "./LocationManage.module.scss";
+import { toast } from "react-toastify";
 
 // Services & Hooks
-import { createBranch, deleteBranchById, editBranchById, useAllBranches, useBranch } from '@/services/branch';
-import { useTypeRoom } from '@/services/room';
+import {
+    createBranch,
+    deleteBranchById,
+    editBranchById,
+    useAllBranches,
+    useBranch,
+} from "@/services/branch";
+import { useTypeRoom } from "@/services/room";
 
 // Components
-import Table from '@/components/common/Table';
-import Pagination from '@/components/common/Pagonation';
-import Button from '@/components/common/Button';
-import Input from '@/components/common/Input';
-import Popup from '@/components/common/Popup/Popup';
-import Tippy from '@tippyjs/react';
-import { AiOutlineDelete, AiOutlineEye, AiOutlinePlus, AiOutlineSearch } from 'react-icons/ai';
-import RoomList from '@/components/page/Admin/RoomList/RoomList';
-import Tabs from '@/components/common/Tabs/Tabs';
-import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
-import RoomTypeManager from '../RoomTypeManager/RoomTypeManager';
+import Table from "@/components/common/Table";
+import Pagination from "@/components/common/Pagonation";
+import Button from "@/components/common/Button";
+import Input from "@/components/common/Input";
+import Popup from "@/components/common/Popup/Popup";
+import Tippy from "@tippyjs/react";
+import {
+    AiOutlineDelete,
+    AiOutlineEye,
+    AiOutlinePlus,
+    AiOutlineSearch,
+} from "react-icons/ai";
+import RoomList from "@/components/page/Admin/RoomList/RoomList";
+import Tabs from "@/components/common/Tabs/Tabs";
+import dynamic from "next/dynamic";
+
+const DynamicLoadingFullPage = dynamic(
+    () => import("@/components/common/LoadingFullPage/loadingFullPage"),
+    {
+        ssr: false, // Tùy chọn QUAN TRỌNG nhất
+        loading: () => null, // Optional: có thể trả về null hoặc một div trống trong lúc chờ load
+    }
+);
+import RoomTypeManager from "../RoomTypeManager/RoomTypeManager";
 
 const LocationManage = () => {
     // === State Management ===
-    const [searchInput, setSearchInput] = useState('');
-    const [activeSearchQuery, setActiveSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState("");
+    const [activeSearchQuery, setActiveSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [limit, setLimit] = useState(5);
     const [selectedBranchId, setSelectedBranchId] = useState(null);
@@ -35,7 +54,7 @@ const LocationManage = () => {
     const [isPopupDelete, setIsPopupDelete] = useState(false);
 
     // State cho form
-    const initialEditBranch = { name: '', address: '', phone: '' };
+    const initialEditBranch = { name: "", address: "", phone: "" };
     const [editBranch, setEditBranch] = useState(initialEditBranch);
 
     // === Data Fetching ===
@@ -61,7 +80,10 @@ const LocationManage = () => {
     const totalItems = filteredBranches.length;
     const totalPages = Math.ceil(totalItems / limit) || 1;
     const paginatedBranches = useMemo(() => {
-        return filteredBranches.slice((currentPage - 1) * limit, currentPage * limit);
+        return filteredBranches.slice(
+            (currentPage - 1) * limit,
+            currentPage * limit
+        );
     }, [filteredBranches, currentPage, limit]);
 
     const tableData = paginatedBranches.map((branch, index) => ({
@@ -75,9 +97,9 @@ const LocationManage = () => {
     useEffect(() => {
         if (selectedBranch) {
             setEditBranch({
-                name: selectedBranch.name || '',
-                address: selectedBranch.address || '',
-                phone: selectedBranch.phone || '',
+                name: selectedBranch.name || "",
+                address: selectedBranch.address || "",
+                phone: selectedBranch.phone || "",
             });
         }
     }, [selectedBranch]);
@@ -106,12 +128,12 @@ const LocationManage = () => {
         setIsProcessing(true);
         const result = await createBranch(editBranch);
         if (result.success) {
-            toast.success('Thêm cơ sở mới thành công!');
+            toast.success("Thêm cơ sở mới thành công!");
             mutateBranches();
             setIsPopupCreate(false);
             resetForm();
         } else {
-            toast.error(result.message || 'Thêm mới thất bại.');
+            toast.error(result.message || "Thêm mới thất bại.");
         }
         setIsProcessing(false);
     };
@@ -121,11 +143,11 @@ const LocationManage = () => {
         setIsProcessing(true);
         const result = await editBranchById(selectedBranchId, editBranch);
         if (result.success) {
-            toast.success('Cập nhật cơ sở thành công!');
+            toast.success("Cập nhật cơ sở thành công!");
             mutateBranches();
             setIsPopupEdit(false);
         } else {
-            toast.error(result.message || 'Cập nhật thất bại.');
+            toast.error(result.message || "Cập nhật thất bại.");
         }
         setIsProcessing(false);
     };
@@ -148,7 +170,9 @@ const LocationManage = () => {
     // Hàm render form chung cho Cả Create và Edit
     const renderBranchForm = (isEdit = false) => (
         <div className={styles.formPopup}>
-            <p className={styles.title}>{isEdit ? 'Chi tiết & Chỉnh sửa cơ sở' : 'Thêm cơ sở mới'}</p>
+            <p className={styles.title}>
+                {isEdit ? "Chi tiết & Chỉnh sửa cơ sở" : "Thêm cơ sở mới"}
+            </p>
             <div className={styles.row}>
                 <div className={styles.groupItem}>
                     <label>Tên cơ sở</label>
@@ -156,7 +180,12 @@ const LocationManage = () => {
                         rounded_10
                         outLine
                         value={editBranch.name}
-                        onChange={(e) => setEditBranch((prev) => ({ ...prev, name: e.target.value }))}
+                        onChange={(e) =>
+                            setEditBranch((prev) => ({
+                                ...prev,
+                                name: e.target.value,
+                            }))
+                        }
                     />
                 </div>
                 <div className={styles.groupItem}>
@@ -165,7 +194,12 @@ const LocationManage = () => {
                         rounded_10
                         outLine
                         value={editBranch.phone}
-                        onChange={(e) => setEditBranch((prev) => ({ ...prev, phone: e.target.value }))}
+                        onChange={(e) =>
+                            setEditBranch((prev) => ({
+                                ...prev,
+                                phone: e.target.value,
+                            }))
+                        }
                     />
                 </div>
             </div>
@@ -175,7 +209,12 @@ const LocationManage = () => {
                     rounded_10
                     outLine
                     value={editBranch.address}
-                    onChange={(e) => setEditBranch((prev) => ({ ...prev, address: e.target.value }))}
+                    onChange={(e) =>
+                        setEditBranch((prev) => ({
+                            ...prev,
+                            address: e.target.value,
+                        }))
+                    }
                 />
             </div>
 
@@ -185,7 +224,12 @@ const LocationManage = () => {
                     <Tabs
                         tabs={typeRooms?.map((item) => ({
                             label: item.name,
-                            content: <RoomList branchId={selectedBranchId} typeRoomId={item._id} />,
+                            content: (
+                                <RoomList
+                                    branchId={selectedBranchId}
+                                    typeRoomId={item._id}
+                                />
+                            ),
                         }))}
                     />
                 </div>
@@ -196,36 +240,44 @@ const LocationManage = () => {
                 blue
                 w_fit
                 className={styles.btnAdd}
-                onClick={isEdit ? handleEditBranch : handleCreateBranch}
-            >
-                {isEdit ? 'Cập nhật' : 'Thêm mới'}
+                onClick={isEdit ? handleEditBranch : handleCreateBranch}>
+                {isEdit ? "Cập nhật" : "Thêm mới"}
             </Button>
         </div>
     );
 
-    if (isLoading) return <LoadingFullPage />;
+    if (isLoading) return <DynamicLoadingFullPage />;
     if (isError) return <div>Lỗi khi tải dữ liệu cơ sở.</div>;
 
     return (
         <div className={styles.container}>
-            {isProcessing && <LoadingFullPage />}
+            {isProcessing && <DynamicLoadingFullPage />}
 
             {isPopupEdit && (
                 <Popup big handleClose={() => setIsPopupEdit(false)}>
                     {renderBranchForm(true)}
                 </Popup>
             )}
-            {isPopupCreate && <Popup handleClose={() => setIsPopupCreate(false)}>{renderBranchForm(false)}</Popup>}
+            {isPopupCreate && (
+                <Popup handleClose={() => setIsPopupCreate(false)}>
+                    {renderBranchForm(false)}
+                </Popup>
+            )}
             {isPopupDelete && (
                 <Popup handleClose={() => setIsPopupDelete(false)}>
                     <div className={styles.formPopup}>
                         <p className={styles.title}>Xác nhận xóa</p>
                         <p>
-                            Bạn có chắc muốn xóa cơ sở <strong>{selectedBranch?.name}</strong>? Toàn bộ phòng và đơn đặt
-                            thuộc cơ sở này cũng sẽ bị ảnh hưởng.
+                            Bạn có chắc muốn xóa cơ sở{" "}
+                            <strong>{selectedBranch?.name}</strong>? Toàn bộ
+                            phòng và đơn đặt thuộc cơ sở này cũng sẽ bị ảnh
+                            hưởng.
                         </p>
                         <div className={styles.confirmActions}>
-                            <Button outline light onClick={() => setIsPopupDelete(false)}>
+                            <Button
+                                outline
+                                light
+                                onClick={() => setIsPopupDelete(false)}>
                                 Hủy
                             </Button>
                             <Button red onClick={handleDeleteBranch}>
@@ -249,16 +301,33 @@ const LocationManage = () => {
                         placeholder="Tìm kiếm theo tên, địa chỉ, SĐT..."
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handlePerformSearch()}
+                        onKeyPress={(e) =>
+                            e.key === "Enter" && handlePerformSearch()
+                        }
                     />
-                    <Button w_fit rounded_10 yellowLinear icon={<AiOutlineSearch />} onClick={handlePerformSearch}>
+                    <Button
+                        w_fit
+                        rounded_10
+                        yellowLinear
+                        icon={<AiOutlineSearch />}
+                        onClick={handlePerformSearch}>
                         Tìm kiếm
                     </Button>
-                    <Button rounded_10 blue onClick={() => setIsRoomTypePopupVisible((prev) => !prev)}>
+                    <Button
+                        rounded_10
+                        blue
+                        onClick={() =>
+                            setIsRoomTypePopupVisible((prev) => !prev)
+                        }>
                         Tùy chỉnh loại phòng
                     </Button>
                 </div>
-                <Button w_fit rounded_10 blue icon={<AiOutlinePlus />} onClick={handleOpenCreatePopup}>
+                <Button
+                    w_fit
+                    rounded_10
+                    blue
+                    icon={<AiOutlinePlus />}
+                    onClick={handleOpenCreatePopup}>
                     Thêm mới cơ sở
                 </Button>
             </div>
@@ -267,21 +336,25 @@ const LocationManage = () => {
                 <Table
                     data={tableData}
                     columns={[
-                        { key: 'index', label: 'STT' },
-                        { key: 'name', label: 'Tên cơ sở' },
-                        { key: 'address', label: 'Địa chỉ' },
-                        { key: 'phone', label: 'Hotline' },
+                        { key: "index", label: "STT" },
+                        { key: "name", label: "Tên cơ sở" },
+                        { key: "address", label: "Địa chỉ" },
+                        { key: "phone", label: "Hotline" },
                     ]}
                     renderActions={(item) => (
                         <>
-                            <Tippy content="Chi tiết & Chỉnh sửa" placement="bottom">
+                            <Tippy
+                                content="Chi tiết & Chỉnh sửa"
+                                placement="bottom">
                                 <div>
                                     <Button
                                         rounded_10
                                         w_fit
                                         blueIcon
                                         icon={<AiOutlineEye />}
-                                        onClick={() => handleGetBranch(item._id)}
+                                        onClick={() =>
+                                            handleGetBranch(item._id)
+                                        }
                                     />
                                 </div>
                             </Tippy>
@@ -292,7 +365,9 @@ const LocationManage = () => {
                                         w_fit
                                         redIcon
                                         icon={<AiOutlineDelete />}
-                                        onClick={() => handleOpenDeletePopup(item._id)}
+                                        onClick={() =>
+                                            handleOpenDeletePopup(item._id)
+                                        }
                                     />
                                 </div>
                             </Tippy>

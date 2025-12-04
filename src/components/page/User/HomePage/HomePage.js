@@ -28,7 +28,17 @@ import { useAllFilms, useFilmsByCurrentYear } from "@/services/films";
 import { PATH } from "@/constants/config";
 import { useAllBranches } from "@/services/branch";
 import { useRoomByBranch } from "@/services/room";
-import LoadingItem from "@/components/common/LoadingItem/LoadingItem";
+import dynamic from "next/dynamic";
+
+// Import tĩnh bị lỗi:
+// import LoadingItem from '@/components/common/LoadingItem/LoadingItem';
+// import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
+
+// Thay thế bằng:
+const DynamicLoadingItem = dynamic(
+    () => import("@/components/common/LoadingItem/LoadingItem"),
+    { ssr: false }
+);
 const Home = () => {
     // const { films, isLoadingAllFimls, isErrorAllFimls, mutateFilms } = useAllFilms();
     const { branches, isLoadingAllBranches } = useAllBranches();
@@ -90,7 +100,7 @@ const Home = () => {
                     {loadingRoom ? (
                         // Hiển thị một placeholder/skeleton loading rõ ràng
                         <div className={style.loadingPlaceholder}>
-                            <LoadingItem />
+                            <DynamicLoadingItem />
                         </div>
                     ) : (
                         // Chỉ render Slider khi đã có dữ liệu cuối cùng

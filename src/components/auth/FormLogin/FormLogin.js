@@ -1,25 +1,33 @@
-import { useState, useEffect } from 'react';
-import { login } from '@/services/auth';
-import { toast } from 'react-toastify';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Cookie from 'js-cookie';
-import Link from 'next/link';
-import clsx from 'clsx';
-import style from './FormLogin.module.scss';
-import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css';
-import { AiFillEye, AiFillEyeInvisible, AiOutlineLeft } from 'react-icons/ai';
-import Button from '@/components/common/Button/Button';
-import LoadingFullPage from '@/components/common/LoadingFullPage/loadingFullPage';
-import { useRouter } from 'next/router';
-import { PATH } from '@/constants/config';
-import Input from '@/components/common/Input';
+import { useState, useEffect } from "react";
+import { login } from "@/services/auth";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Cookie from "js-cookie";
+import Link from "next/link";
+import clsx from "clsx";
+import style from "./FormLogin.module.scss";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import { AiFillEye, AiFillEyeInvisible, AiOutlineLeft } from "react-icons/ai";
+import Button from "@/components/common/Button/Button";
+import dynamic from "next/dynamic";
+
+const DynamicLoadingFullPage = dynamic(
+    () => import("@/components/common/LoadingFullPage/loadingFullPage"),
+    {
+        ssr: false, // Tùy chọn QUAN TRỌNG nhất
+        loading: () => null, // Optional: có thể trả về null hoặc một div trống trong lúc chờ load
+    }
+);
+import { useRouter } from "next/router";
+import { PATH } from "@/constants/config";
+import Input from "@/components/common/Input";
 
 const FormLogin = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [errors, setErrors] = useState({ email: '', password: '' });
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [errors, setErrors] = useState({ email: "", password: "" });
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
@@ -27,22 +35,26 @@ const FormLogin = () => {
         setErrors((prev) => {
             let newErrors = { ...prev };
             if (!value.trim()) {
-                newErrors[name] = 'Trường này không được bỏ trống.';
-            } else if (name === 'email') {
+                newErrors[name] = "Trường này không được bỏ trống.";
+            } else if (name === "email") {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                newErrors.email = emailRegex.test(value) ? '' : 'Email không đúng định dạng.';
-            } else if (name === 'password') {
+                newErrors.email = emailRegex.test(value)
+                    ? ""
+                    : "Email không đúng định dạng.";
+            } else if (name === "password") {
                 if (value.length < 8 && !/[A-Z]/.test(value)) {
-                    newErrors.password = 'Mật khẩu phải đủ 8 kí tự và ít nhất 1 chữ cái viết hoa.';
+                    newErrors.password =
+                        "Mật khẩu phải đủ 8 kí tự và ít nhất 1 chữ cái viết hoa.";
                 } else if (value.length < 8) {
-                    newErrors.password = 'Mật khẩu phải đủ 8 kí tự.';
+                    newErrors.password = "Mật khẩu phải đủ 8 kí tự.";
                 } else if (!/[A-Z]/.test(value)) {
-                    newErrors.password = 'Mật khẩu phải có ít nhất 1 chữ cái viết hoa.';
+                    newErrors.password =
+                        "Mật khẩu phải có ít nhất 1 chữ cái viết hoa.";
                 } else {
-                    newErrors.password = '';
+                    newErrors.password = "";
                 }
             } else {
-                newErrors[name] = '';
+                newErrors[name] = "";
             }
             return newErrors;
         });
@@ -51,7 +63,7 @@ const FormLogin = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         if (errors.email || errors.password || !email || !password) {
-            toast.error('Vui lòng kiểm tra lại thông tin!');
+            toast.error("Vui lòng kiểm tra lại thông tin!");
             return;
         }
 
@@ -60,10 +72,10 @@ const FormLogin = () => {
             const response = await login(email, password);
 
             if (response.success) {
-                toast.success('Đăng nhập thành công!');
-                localStorage.setItem('email', email);
+                toast.success("Đăng nhập thành công!");
+                localStorage.setItem("email", email);
                 setTimeout(() => {
-                    router.push('/');
+                    router.push("/");
                 }, 1500);
             } else {
                 toast.error(response.message);
@@ -80,18 +92,21 @@ const FormLogin = () => {
     // }, []);
     return (
         <>
-            {loading && <LoadingFullPage />} {/* Loading toàn trang */}
+            {loading && <DynamicLoadingFullPage />} {/* Loading toàn trang */}
             <div className={style.container}>
                 <form className={style.login} onSubmit={handleLogin}>
                     <div className={style.headerRow}>
                         <h3>Đăng nhập</h3>
                         <p className={style.back}>
-                            <AiOutlineLeft  onClick={() => router.back()} />
-                                Trang chủ
-                            </p>
+                            <AiOutlineLeft onClick={() => router.back()} />
+                            Trang chủ
+                        </p>
                     </div>
                     <div className={clsx(style.groupItem, style.relative)}>
-                        <Tippy content={errors.email} visible={!!errors.email} placement="right">
+                        <Tippy
+                            content={errors.email}
+                            visible={!!errors.email}
+                            placement="right">
                             <div className={style.inputWrapper}>
                                 <Input
                                     type="text"
@@ -101,15 +116,20 @@ const FormLogin = () => {
                                     value={email}
                                     onChange={(e) => {
                                         setEmail(e.target.value);
-                                        validateInput('email', e.target.value);
+                                        validateInput("email", e.target.value);
                                     }}
-                                    onBlur={(e) => validateInput('email', e.target.value)}
+                                    onBlur={(e) =>
+                                        validateInput("email", e.target.value)
+                                    }
                                 />
                             </div>
                         </Tippy>
                     </div>
                     <div className={clsx(style.groupItem, style.relative)}>
-                        <Tippy content={errors.password} visible={!!errors.password} placement="right">
+                        <Tippy
+                            content={errors.password}
+                            visible={!!errors.password}
+                            placement="right">
                             <div className={style.inputWrapper}>
                                 <Input
                                     dark
@@ -119,9 +139,17 @@ const FormLogin = () => {
                                     value={password}
                                     onChange={(e) => {
                                         setPassword(e.target.value);
-                                        validateInput('password', e.target.value);
+                                        validateInput(
+                                            "password",
+                                            e.target.value
+                                        );
                                     }}
-                                    onBlur={(e) => validateInput('password', e.target.value)}
+                                    onBlur={(e) =>
+                                        validateInput(
+                                            "password",
+                                            e.target.value
+                                        )
+                                    }
                                 />
                             </div>
                         </Tippy>
@@ -135,13 +163,20 @@ const FormLogin = () => {
                             yellowLinear
                             rounded_20
                             uppercase
-                            disabled={!!errors.email || !!errors.password || !email || !password || loading}
-                        >
+                            disabled={
+                                !!errors.email ||
+                                !!errors.password ||
+                                !email ||
+                                !password ||
+                                loading
+                            }>
                             Đăng nhập
                         </Button>
                     </div>
                     <div className={style.groupItem}>
-                        <span className={style.dividerText}>Bạn chưa có tài khoản?</span>
+                        <span className={style.dividerText}>
+                            Bạn chưa có tài khoản?
+                        </span>
                     </div>
                     <div className={style.groupItem}>
                         <Button light rounded_20 uppercase href={PATH.Register}>
