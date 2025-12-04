@@ -74,8 +74,12 @@ const FormLogin = () => {
             if (response.success) {
                 toast.success("Đăng nhập thành công!");
                 localStorage.setItem("email", email);
+                
+                // Redirect theo role
+                const redirectPath = response.role === 'admin' ? '/admin' : '/';
+                
                 setTimeout(() => {
-                    router.push("/");
+                    router.push(redirectPath);
                 }, 1500);
             } else {
                 toast.error(response.message);

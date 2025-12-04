@@ -38,7 +38,15 @@ export async function middleware(req) {
 
     // Lấy token từ cookie
     const token = req.cookies.get('token')?.value;
+    
+    // Nếu không có cookie token, cho phép pass (sẽ check bằng localStorage ở client-side)
+    // Điều này cần thiết cho Vercel deployment với token trong localStorage
     if (!token) {
+        // Nếu là admin route, vẫn cho qua (client-side protection sẽ handle)
+        if (pathname.startsWith('/admin')) {
+            return NextResponse.next();
+        }
+        // Các route khác cần login → redirect
         return NextResponse.redirect(new URL('/', req.url));
     }
 
