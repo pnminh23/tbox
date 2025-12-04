@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAllBranches } from "@/services/branch";
 function Footer() {
-    const {branches} = useAllBranches();
+    const { branches } = useAllBranches();
     return (
         <div className={style.container}>
             <div className="container">
@@ -20,11 +20,11 @@ function Footer() {
                     <div className={style.listBranch}>
                         <h3>Hệ thống cơ sở chi nhánh của TBOX </h3>
                         <div className={style.listBranchctn}>
-                        <ul>
-                            {branches?.map((branch) => (
-                                <li>{branch.name}</li>
-                            ))}
-                        </ul>
+                            <ul>
+                                {branches?.map((branch) => (
+                                    <li key={branch._id}>{branch.name}</li>
+                                ))}
+                            </ul>
                         </div>
                     </div>
                     <div className={style.contact}>
