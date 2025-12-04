@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import styles from "./Chatbot.module.scss";
+import styles from "./ChatBot.module.scss";
 import { socket } from "../../../socket";
 import { BsFillChatFill, BsFillChatRightDotsFill } from "react-icons/bs";
 import { AiOutlineArrowUp } from "react-icons/ai";
