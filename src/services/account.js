@@ -1,10 +1,10 @@
 import useSWR, { mutate } from 'swr';
-import axios from 'axios';
+import axiosInstance from '../config/axios';
 import { AsyncCompiler } from 'sass';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/account`;
+const API_URL = `/api/account`;
 
-const fetcher = (url) => axios.get(url, { withCredentials: true }).then((res) => res.data);
+const fetcher = (url) => axiosInstance.get(url).then((res) => res.data);
 
 export const useUserData = () => {
     const { data, error, isLoading } = useSWR(`${API_URL}/data`, fetcher, {
@@ -39,7 +39,7 @@ export const useAllAccounts = () => {
 
 export const toggleLock = async (email) => {
     try {
-        const res = await axios.post(`${API_URL}/toggle-lock`, { email }, { withCredentials: true });
+        const res = await axiosInstance.post(`${API_URL}/toggle-lock`, { email });
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
         throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi toggle lock' };
@@ -64,8 +64,7 @@ export const useAccountByEmail = (_Email) => {
 
 export const editAccountByEmail = async (email, formData) => {
     try {
-        const res = await axios.put(`${API_URL}/edit-account-by-email/${encodeURIComponent(email)}`, formData, {
-            withCredentials: true,
+        const res = await axiosInstance.put(`${API_URL}/edit-account-by-email/${encodeURIComponent(email)}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -78,9 +77,7 @@ export const editAccountByEmail = async (email, formData) => {
 
 export const deleteAccountByEmail = async (email) => {
     try {
-        const res = await axios.delete(`${API_URL}/delete/${email}`, {
-            withCredentials: true,
-        });
+        const res = await axiosInstance.delete(`${API_URL}/delete/${email}`);
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
         throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa account' };

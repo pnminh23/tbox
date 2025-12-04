@@ -1,9 +1,9 @@
 import useSWR, { mutate } from 'swr';
-import axios from 'axios';
+import axiosInstance from '../config/axios';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/promotion`;
+const API_URL = `/api/promotion`;
 
-const fetcher = (url) => axios.get(url, { withCredentials: true }).then((res) => res.data);
+const fetcher = (url) => axiosInstance.get(url).then((res) => res.data);
 
 export const useAllPromotion = () => {
     const endpoint = `${API_URL}/get-all`;
@@ -37,9 +37,7 @@ export const usePromotion = (_id) => {
 
 export const createPromotion = async (data) => {
     try {
-        await axios.post(`${API_URL}/create`, data, {
-            withCredentials: true,
-        });
+        await axiosInstance.post(`${API_URL}/create`, data);
 
         await mutate(`${API_URL}/get-all`);
 
@@ -56,9 +54,7 @@ export const createPromotion = async (data) => {
 };
 export const editPromotionById = async (_id, data) => {
     try {
-        await axios.put(`${API_URL}/edit/${_id}`, data, {
-            withCredentials: true,
-        });
+        await axiosInstance.put(`${API_URL}/edit/${_id}`, data);
 
         // Cập nhật lại cache của SWR sau khi edit
         await mutate(`${API_URL}/get-all`);
@@ -76,9 +72,7 @@ export const editPromotionById = async (_id, data) => {
 };
 export const deletePromotionById = async (_id) => {
     try {
-        const res = await axios.delete(`${API_URL}/delete/${_id}`, {
-            withCredentials: true,
-        });
+        const res = await axiosInstance.delete(`${API_URL}/delete/${_id}`);
         await mutate(`${API_URL}/get-all`);
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {

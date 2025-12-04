@@ -1,9 +1,9 @@
 import useSWR, { mutate } from 'swr';
-import axios from 'axios';
+import axiosInstance from '../config/axios';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/branch`;
+const API_URL = `/api/branch`;
 
-const fetcher = (url) => axios.get(url, { withCredentials: true }).then((res) => res.data);
+const fetcher = (url) => axiosInstance.get(url).then((res) => res.data);
 
 export const useAllBranches = () => {
     const endpoint = `${API_URL}/get-all`;
@@ -40,9 +40,7 @@ export const useBranch = (_id) => {
 // Thêm hàm createBranch vào cùng file
 export const createBranch = async (branchData) => {
     try {
-        const response = await axios.post(`${API_URL}/create`, branchData, {
-            withCredentials: true,
-        });
+        const response = await axiosInstance.post(`${API_URL}/create`, branchData);
 
         // Sau khi tạo xong, cập nhật danh sách branch
         await mutate(`${API_URL}/get-all`);
@@ -59,9 +57,7 @@ export const createBranch = async (branchData) => {
 
 export const editBranchById = async (_id, updatedData) => {
     try {
-        const response = await axios.put(`${API_URL}/edit/${_id}`, updatedData, {
-            withCredentials: true,
-        });
+        const response = await axiosInstance.put(`${API_URL}/edit/${_id}`, updatedData);
 
         // Cập nhật lại danh sách sau khi chỉnh sửa
         await mutate(`${API_URL}/get-all`);
@@ -78,9 +74,7 @@ export const editBranchById = async (_id, updatedData) => {
 
 export const deleteBranchById = async (_id) => {
     try {
-        const res = await axios.delete(`${API_URL}/delete/${_id}`, {
-            withCredentials: true,
-        });
+        const res = await axiosInstance.delete(`${API_URL}/delete/${_id}`);
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
         throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa film' };

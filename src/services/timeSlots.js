@@ -1,9 +1,9 @@
 import useSWR, { mutate } from 'swr';
-import axios from 'axios';
+import axiosInstance from '../config/axios';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/timeSlots`;
+const API_URL = `/api/timeSlots`;
 
-const fetcher = (url) => axios.get(url, { withCredentials: true }).then((res) => res.data);
+const fetcher = (url) => axiosInstance.get(url).then((res) => res.data);
 
 export const useAllTimeSlots = () => {
     const endpoint = `${API_URL}/get-all`;

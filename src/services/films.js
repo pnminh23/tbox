@@ -1,9 +1,9 @@
 import useSWR, { mutate } from 'swr';
-import axios from 'axios';
+import axiosInstance from '../config/axios';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/film`;
+const API_URL = `/api/film`;
 
-const fetcher = (url) => axios.get(url, { withCredentials: true }).then((res) => res.data);
+const fetcher = (url) => axiosInstance.get(url).then((res) => res.data);
 
 export const categoryFilms = [
     'Tâm Lý ',
@@ -101,8 +101,7 @@ export const useTop10Film = () => {
 
 export const createFilm = async (formData) => {
     try {
-        const res = await axios.post(`${API_URL}/create-film`, formData, {
-            withCredentials: true,
+        const res = await axiosInstance.post(`${API_URL}/create-film`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -133,8 +132,7 @@ export const useFilm = (_id) => {
 
 export const editFilmById = async (_id, formData) => {
     try {
-        const res = await axios.put(`${API_URL}/edit-film/${_id}`, formData, {
-            withCredentials: true,
+        const res = await axiosInstance.put(`${API_URL}/edit-film/${_id}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -147,9 +145,7 @@ export const editFilmById = async (_id, formData) => {
 
 export const deleteFilmById = async (_id) => {
     try {
-        const res = await axios.delete(`${API_URL}/delete-film/${_id}`, {
-            withCredentials: true,
-        });
+        const res = await axiosInstance.delete(`${API_URL}/delete-film/${_id}`);
         return res.data; // trả về data để frontend xử lý nếu cần
     } catch (err) {
         throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa film' };

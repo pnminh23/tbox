@@ -1,9 +1,9 @@
 import useSWR, { mutate } from 'swr';
-import axios from 'axios';
+import axiosInstance from '../config/axios';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/room`;
+const API_URL = `/api/room`;
 
-const fetcher = (url) => axios.get(url, { withCredentials: true }).then((res) => res.data);
+const fetcher = (url) => axiosInstance.get(url).then((res) => res.data);
 
 export const useRoomByBranchAndType = (branchId, typeRoomId) => {
     const endpoint = branchId && typeRoomId ? `${API_URL}/get-room/${branchId}/${typeRoomId}` : null;
@@ -36,8 +36,7 @@ export const useRoomByBranch = (branchId) => {
 
 export const createRoom = async (formData) => {
     try {
-        const res = await axios.post(`${API_URL}/create-room`, formData, {
-            withCredentials: true,
+        const res = await axiosInstance.post(`${API_URL}/create-room`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -51,8 +50,7 @@ export const createRoom = async (formData) => {
 
 export const editRoomById = async (_id, formData) => {
     try {
-        const res = await axios.put(`${API_URL}/edit-room/${_id}`, formData, {
-            withCredentials: true,
+        const res = await axiosInstance.put(`${API_URL}/edit-room/${_id}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -84,9 +82,7 @@ export const useTypeRoom = () => {
 
 export const deleteRoomById = async (_id) => {
     try {
-        const res = await axios.delete(`${API_URL}/delete-room/${_id}`, {
-            withCredentials: true,
-        });
+        const res = await axiosInstance.delete(`${API_URL}/delete-room/${_id}`);
         return res.data;
     } catch (err) {
         throw err.response?.data || { success: false, message: 'Đã xảy ra lỗi khi xóa combo' };
@@ -95,9 +91,7 @@ export const deleteRoomById = async (_id) => {
 
 export const createRoomType = async (roomTypeData) => {
     try {
-        const res = await axios.post(`${API_URL}/create-roomType`, roomTypeData, {
-            withCredentials: true,
-        });
+        const res = await axiosInstance.post(`${API_URL}/create-roomType`, roomTypeData);
         return res.data;
     } catch (err) {
         throw (
@@ -121,9 +115,7 @@ export const useAllTypeRooms = () => {
 
 export const editRoomTypeById = async (_id, roomTypeData) => {
     try {
-        const res = await axios.put(`${API_URL}/edit-type-room/${_id}`, roomTypeData, {
-            withCredentials: true,
-        });
+        const res = await axiosInstance.put(`${API_URL}/edit-type-room/${_id}`, roomTypeData);
         const messageFromServer = res.data?.message || 'Cập nhật loại phòng thành công.';
         return res.data;
     } catch (err) {
@@ -139,9 +131,7 @@ export const editRoomTypeById = async (_id, roomTypeData) => {
 
 export const deleteRoomTypeById = async (_id) => {
     try {
-        const res = await axios.delete(`${API_URL}/delete-roomType/${_id}`, {
-            withCredentials: true,
-        });
+        const res = await axiosInstance.delete(`${API_URL}/delete-roomType/${_id}`);
         const messageFromServer = res.data?.message || 'Xóa loại phòng thành công.';
         return {
             success: true,

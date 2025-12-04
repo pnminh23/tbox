@@ -1,9 +1,9 @@
 import useSWR, { mutate } from 'swr';
-import axios from 'axios';
+import axiosInstance from '../config/axios';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/news`;
+const API_URL = `/api/news`;
 
-const fetcher = (url) => axios.get(url, { withCredentials: true }).then((res) => res.data);
+const fetcher = (url) => axiosInstance.get(url).then((res) => res.data);
 
 export const useAllNews = () => {
     const endpoint = `${API_URL}/get-all`;
@@ -35,9 +35,7 @@ export const useNews = (_id) => {
 
 export const createNews = async (data) => {
     try {
-        const response = await axios.post(`${API_URL}/create`, data, {
-            withCredentials: true,
-        });
+        const response = await axiosInstance.post(`${API_URL}/create`, data);
 
         await mutate(`${API_URL}/get-all`);
 
@@ -51,9 +49,7 @@ export const createNews = async (data) => {
 };
 export const editNewsById = async (_id, updatedData) => {
     try {
-        await axios.put(`${API_URL}/edit/${_id}`, updatedData, {
-            withCredentials: true,
-        });
+        await axiosInstance.put(`${API_URL}/edit/${_id}`, updatedData);
 
         // Cập nhật lại cache của SWR sau khi edit
         await mutate(`${API_URL}/get-all`);
@@ -71,9 +67,7 @@ export const editNewsById = async (_id, updatedData) => {
 };
 export const deleteNewsById = async (_id) => {
     try {
-        const res = await axios.delete(`${API_URL}/delete/${_id}`, {
-            withCredentials: true,
-        });
+        const res = await axiosInstance.delete(`${API_URL}/delete/${_id}`);
         await mutate(`${API_URL}/get-all`);
         return {
             success: true,

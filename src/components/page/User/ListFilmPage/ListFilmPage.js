@@ -1,15 +1,15 @@
-import Slider from '@/components/common/Slider';
-import style from './ListFilmPage.module.scss';
-import { useState, useRef, useEffect } from 'react';
-import { AiOutlineSearch, AiOutlineRight, AiOutlineLeft } from 'react-icons/ai';
-import FilmItem from '@/components/common/ItemSlider/FilmItem';
-import Banner from '@/components/common/Banner';
-import clsx from 'clsx';
-import SearchBar from '@/components/common/SearchBar';
-import loadingAnimation from '@public/animations/loadingItem.json';
-import dynamic from 'next/dynamic';
+import Slider from "@/components/common/Slider";
+import style from "./ListFilmPage.module.scss";
+import { useState, useRef, useEffect } from "react";
+import { AiOutlineSearch, AiOutlineRight, AiOutlineLeft } from "react-icons/ai";
+import FilmItem from "@/components/common/ItemSlider/FilmItem";
+import Banner from "@/components/common/Banner";
+import clsx from "clsx";
+import SearchBar from "@/components/common/SearchBar";
+import loadingAnimation from "@public/animations/loadingItem.json";
+import dynamic from "next/dynamic";
 
-const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 import {
     categoryFilms,
@@ -19,28 +19,32 @@ import {
     useFilmsByCurrentYear,
     useFilmsByYear,
     useTop10Film,
-} from '@/services/films';
-import Pagination from '@/components/common/Pagonation';
-import Button from '@/components/common/Button';
+} from "@/services/films";
+import Pagination from "@/components/common/Pagonation";
+import Button from "@/components/common/Button";
 
 const ListFilmPage = () => {
     // --- State cho việc chọn filter ---
     const [selectedFilmId, setSelectedFilmId] = useState(null);
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedYear, setSelectedYear] = useState('');
-    const [activeFilter, setActiveFilter] = useState(''); // 'search', 'category', 'year', 'top10'
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedYear, setSelectedYear] = useState("");
+    const [activeFilter, setActiveFilter] = useState(""); // 'search', 'category', 'year', 'top10'
 
     // --- Các hook fetch data gốc ---
-    const { film: filmById, isLoading: loadingFilmById } = useFilm(selectedFilmId);
-    const { film: filmByCategory, isLoading: loadingFilmByCategory } = useFilmsByCategory(selectedCategory);
-    const { film: filmByYear, isLoading: loadingFilmByYear } = useFilmsByYear(selectedYear);
+    const { film: filmById, isLoading: loadingFilmById } =
+        useFilm(selectedFilmId);
+    const { film: filmByCategory, isLoading: loadingFilmByCategory } =
+        useFilmsByCategory(selectedCategory);
+    const { film: filmByYear, isLoading: loadingFilmByYear } =
+        useFilmsByYear(selectedYear);
     const { film: top10Film, isLoading: loadingTop10Film } = useTop10Film();
-    const { filmsCurrentyear, isLoadingFilmsByCurrentYear } = useFilmsByCurrentYear();
+    const { filmsCurrentyear, isLoadingFilmsByCurrentYear } =
+        useFilmsByCurrentYear();
     const { films, isLoadingFilms, isErrorFilms } = useAllFilms();
 
     // --- STATE CHUNG ĐỂ HIỂN THỊ (Đây là phần quan trọng nhất) ---
     const [displayFilms, setDisplayFilms] = useState([]);
-    const [displayTitle, setDisplayTitle] = useState('');
+    const [displayTitle, setDisplayTitle] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
     // --- Logic phân trang cho danh sách mặc định ---
@@ -48,7 +52,8 @@ const ListFilmPage = () => {
     const [limit, setLimit] = useState(8);
     const totalItems = films?.length || 0;
     const totalPages = Math.ceil(totalItems / limit);
-    const paginatedFilms = films?.slice((currentPage - 1) * limit, currentPage * limit) || [];
+    const paginatedFilms =
+        films?.slice((currentPage - 1) * limit, currentPage * limit) || [];
     const FilmOptions = films?.map((film) => ({
         name: `${film.name} - ${film.nameEnglish}`,
         id: film._id,
@@ -59,18 +64,18 @@ const ListFilmPage = () => {
 
     // 1. Lắng nghe filter THEO SEARCH
     useEffect(() => {
-        if (activeFilter === 'search') {
+        if (activeFilter === "search") {
             setIsLoading(loadingFilmById);
             if (!loadingFilmById && filmById) {
                 setDisplayFilms([filmById]); // filmById là 1 object, cần cho vào mảng
-                setDisplayTitle('Phim bạn tìm kiếm');
+                setDisplayTitle("Phim bạn tìm kiếm");
             }
         }
     }, [activeFilter, filmById, loadingFilmById]);
 
     // 2. Lắng nghe filter THEO THỂ LOẠI
     useEffect(() => {
-        if (activeFilter === 'category') {
+        if (activeFilter === "category") {
             setIsLoading(loadingFilmByCategory);
             if (!loadingFilmByCategory && filmByCategory) {
                 setDisplayFilms(filmByCategory);
@@ -81,7 +86,7 @@ const ListFilmPage = () => {
 
     // 3. Lắng nghe filter THEO NĂM
     useEffect(() => {
-        if (activeFilter === 'year') {
+        if (activeFilter === "year") {
             setIsLoading(loadingFilmByYear);
             if (!loadingFilmByYear && filmByYear) {
                 setDisplayFilms(filmByYear);
@@ -92,26 +97,28 @@ const ListFilmPage = () => {
 
     // 4. Lắng nghe filter TOP 10
     useEffect(() => {
-        if (activeFilter === 'top10') {
+        if (activeFilter === "top10") {
             setIsLoading(loadingTop10Film);
             if (!loadingTop10Film && top10Film) {
                 setDisplayFilms(top10Film);
-                setDisplayTitle('Top 10 phim được đặt nhiều nhất');
+                setDisplayTitle("Top 10 phim được đặt nhiều nhất");
             }
         }
     }, [activeFilter, top10Film, loadingTop10Film]);
 
     const uniqueYears = films
-        ? [...new Set(films.map((film) => film.release_date))].sort((a, b) => b - a) // Sắp xếp giảm dần (năm mới nhất lên đầu)
+        ? [...new Set(films.map((film) => film.release_date))].sort(
+              (a, b) => b - a
+          ) // Sắp xếp giảm dần (năm mới nhất lên đầu)
         : [];
 
     const clearAllFilters = () => {
         setSelectedFilmId(null);
-        setSelectedCategory('');
-        setSelectedYear('');
-        setActiveFilter('');
+        setSelectedCategory("");
+        setSelectedYear("");
+        setActiveFilter("");
         setDisplayFilms([]); // Xóa dữ liệu hiển thị filter
-        setDisplayTitle('');
+        setDisplayTitle("");
     };
 
     // Biến kiểm tra xem có đang filter hay không
@@ -120,13 +127,18 @@ const ListFilmPage = () => {
     return (
         <>
             <Banner />
-            <div className={clsx('container', style.container)}>
+            <div className={clsx("container", style.container)}>
                 <div className={style.left}>
                     {/* ---- KHỐI RENDER TẬP TRUNG ---- */}
                     {isFiltering ? (
                         isLoading ? (
                             <div className={style.loadingContainer}>
-                                <Lottie animationData={loadingAnimation} loop autoplay className={style.loading} />
+                                <Lottie
+                                    animationData={loadingAnimation}
+                                    loop
+                                    autoplay
+                                    className={style.loading}
+                                />
                                 <p>Đang tìm kiếm...</p>
                             </div>
                         ) : displayFilms.length > 0 ? (
@@ -139,7 +151,10 @@ const ListFilmPage = () => {
                             />
                         ) : (
                             <div className={style.noResult}>
-                                <p>Không tìm thấy phim phù hợp với lựa chọn của bạn.</p>
+                                <p>
+                                    Không tìm thấy phim phù hợp với lựa chọn của
+                                    bạn.
+                                </p>
                             </div>
                         )
                     ) : (
@@ -162,7 +177,9 @@ const ListFilmPage = () => {
                                     ) : isErrorFilms ? (
                                         <p>Lỗi khi tải phim.</p>
                                     ) : (
-                                        paginatedFilms.map((film, index) => <FilmItem key={index} film={film} />)
+                                        paginatedFilms.map((film, index) => (
+                                            <FilmItem key={index} film={film} />
+                                        ))
                                     )}
                                 </div>
                                 <Pagination
@@ -186,7 +203,7 @@ const ListFilmPage = () => {
                     <SearchBar
                         data={FilmOptions}
                         onSelect={(item) => {
-                            setActiveFilter('search');
+                            setActiveFilter("search");
                             setSelectedFilmId(item.id);
                         }}
                         heightImage={70}
@@ -194,9 +211,10 @@ const ListFilmPage = () => {
                     />
                     <ul className={clsx(style.options)}>
                         <li
-                            className={clsx(activeFilter === 'top10' && style.active)}
-                            onClick={() => setActiveFilter('top10')}
-                        >
+                            className={clsx(
+                                activeFilter === "top10" && style.active
+                            )}
+                            onClick={() => setActiveFilter("top10")}>
                             <AiOutlineRight />
                             Hot và phổ biến
                         </li>
@@ -208,13 +226,14 @@ const ListFilmPage = () => {
                                 <li
                                     key={index}
                                     className={clsx(
-                                        activeFilter === 'category' && selectedCategory === category && style.active
+                                        activeFilter === "category" &&
+                                            selectedCategory === category &&
+                                            style.active
                                     )}
                                     onClick={() => {
-                                        setActiveFilter('category');
+                                        setActiveFilter("category");
                                         setSelectedCategory(category);
-                                    }}
-                                >
+                                    }}>
                                     <AiOutlineRight />
                                     {category}
                                 </li>
@@ -229,13 +248,14 @@ const ListFilmPage = () => {
                                     key={year}
                                     className={clsx(
                                         style.yearItem, // Class gốc
-                                        activeFilter === 'year' && selectedYear === year && style.active
+                                        activeFilter === "year" &&
+                                            selectedYear === year &&
+                                            style.active
                                     )}
                                     onClick={() => {
-                                        setActiveFilter('year');
+                                        setActiveFilter("year");
                                         setSelectedYear(year);
-                                    }}
-                                >
+                                    }}>
                                     <p>{year}</p>
                                 </div>
                             ))}
@@ -248,8 +268,7 @@ const ListFilmPage = () => {
                         disabled={!activeFilter}
                         rounded_10
                         h30
-                        onClick={clearAllFilters}
-                    >
+                        onClick={clearAllFilters}>
                         Xoá bộ lọc
                     </Button>
                 </div>

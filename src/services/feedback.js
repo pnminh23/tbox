@@ -1,9 +1,9 @@
 import useSWR, { mutate } from 'swr';
-import axios from 'axios';
+import axiosInstance from '../config/axios';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/review`;
+const API_URL = `/api/review`;
 
-const fetcher = (url) => axios.get(url, { withCredentials: true }).then((res) => res.data);
+const fetcher = (url) => axiosInstance.get(url).then((res) => res.data);
 
 export const useFeedbackByBranch = (branchId) => {
     const shouldFetch = branchId != null && branchId !== '';
@@ -22,9 +22,7 @@ export const useFeedbackByBranch = (branchId) => {
 
 export const createFeedback = async (data) => {
     try {
-        const response = await axios.post(`${API_URL}/create`, data, {
-            withCredentials: true,
-        });
+        const response = await axiosInstance.post(`${API_URL}/create`, data);
 
         // Sau khi tạo xong, cập nhật danh sách branch
 

@@ -1,17 +1,15 @@
-import axios from 'axios';
+import axiosInstance from '../config/axios';
 import useSWR, { mutate } from 'swr';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/booking`;
-const fetcher = (url) => axios.get(url, { withCredentials: true }).then((res) => res.data);
+const API_URL = `/api/booking`;
+const fetcher = (url) => axiosInstance.get(url).then((res) => res.data);
 
 export const getBookedByDate = async (roomID, dateISO) =>
-    axios.get(`${API_URL}/get-book-timeSlots-by-room/${roomID}/${dateISO}`).then((r) => r.data.data);
+    axiosInstance.get(`${API_URL}/get-book-timeSlots-by-room/${roomID}/${dateISO}`).then((r) => r.data.data);
 
 export const createBooking = async (BookingData) => {
     try {
-        const response = await axios.post(`${API_URL}/create`, BookingData, {
-            withCredentials: true,
-        });
+        const response = await axiosInstance.post(`${API_URL}/create`, BookingData);
 
         await mutate(`${API_URL}/get-booking-by-email-current`);
         await mutate(`${API_URL}/get-booking-by-email`);
@@ -186,9 +184,7 @@ export const editBooking = async (_id, data) => {
             throw { success: false, message: 'Dữ liệu chỉnh sửa không được để trống' };
         }
 
-        const res = await axios.put(`${API_URL}/edit/${_id}`, data, {
-            withCredentials: true,
-        });
+        const res = await axiosInstance.put(`${API_URL}/edit/${_id}`, data);
 
         await mutate(`${API_URL}/get-booking-by-email-current`);
         await mutate(`${API_URL}/get-booking-by-email`);
